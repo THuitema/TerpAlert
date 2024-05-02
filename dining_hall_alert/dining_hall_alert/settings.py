@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import os
 
+#  ***** HIDE SENSITIVE INFO BEFORE DEPLOYING #######
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -74,8 +75,12 @@ WSGI_APPLICATION = 'dining_hall_alert.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'dininghallalert',
+        'USER': 'postgres',
+        'PASSWORD': 'NerfTAH321',  # definitely hide this somehow when pushing to github
+        'HOST': 'localhost',
+        'POST': '',
     }
 }
 
