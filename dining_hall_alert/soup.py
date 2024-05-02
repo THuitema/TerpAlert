@@ -8,3 +8,4 @@ def build_url(base_url, location_num):
     day = 1
     year = 2024
     return base_url + "/?locationNum=" + str(location_num) + "&dtdate=" + str(month) + "/" + str(day) + "/" + str(year)
+
