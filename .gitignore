@@ -7,3 +7,8 @@
 out
 gen
 
+# Sensitive files
+database.ini
+
+# for now after securing sensitive data
+settings.py

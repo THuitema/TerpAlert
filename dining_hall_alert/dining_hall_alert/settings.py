@@ -12,8 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+from scraping.config import load_config
 
-#  ***** HIDE SENSITIVE INFO BEFORE DEPLOYING #######
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -73,13 +73,15 @@ WSGI_APPLICATION = 'dining_hall_alert.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+config = load_config()  # load local database config
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'dininghallalert',
-        'USER': 'postgres',
-        'PASSWORD': 'NerfTAH321',  # definitely hide this somehow when pushing to github
-        'HOST': 'localhost',
+        'NAME': config['database'],
+        'USER': config['user'],
+        'PASSWORD': config['password'],
+        'HOST': config['host'],
         'POST': '',
     }
 }
