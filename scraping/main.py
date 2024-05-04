@@ -1,4 +1,4 @@
-from umd import DiningHall
+from umd import DiningHall, Menu, Item
 import django
 import db
 
@@ -8,11 +8,11 @@ TWO_FIFTY_ONE = "251"
 HALLS = {SOUTH: 16, YAHENTAMITSI: 19, TWO_FIFTY_ONE: 51}
 
 
-def process_commands(dining_halls: list[DiningHall]):
-    conn = db.connect()
-    for hall in dining_halls:
-        hall.check_for_alerts(conn)
-    conn.close()
+# def process_commands(dining_halls: list[DiningHall]):
+#     conn = db.connect()
+#     for hall in dining_halls:
+#         hall.check_for_alerts(conn)
+#     conn.close()
 
 
 def main():
@@ -22,7 +22,10 @@ def main():
 
     dining_halls = [the_y, south, two_fifty_one]
 
-    process_commands(dining_halls)
+    # process_commands(dining_halls)
+    menu = Menu(dining_halls)
+    menu.create_menu()
+    print(str(menu))
 
 
 if __name__ == "__main__":

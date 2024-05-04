@@ -32,28 +32,6 @@ class DiningHall:
 
         return items
 
-    # def print_menu(self):
-    #     for item in self.menu:
-    #         print(item)
-    #
-    # def menu_contains(self, item: str, partial_check: bool) -> bool:
-    #     if not partial_check:
-    #         return item in self.menu
-    #
-    #     for entry in self.menu:
-    #         if item in entry:
-    #             return True
-    #
-    #     return False
-    #
-    # def get_items_by_keyword(self, item: str) -> [str]:
-    #     items = list()
-    #     for entry in self.menu:
-    #         if item in entry:
-    #             items.append(entry)
-    #
-    #     return items
-    #
     def check_for_alerts(self, conn):  # , fields, table, conditions
         for item in self.menu:
             item = item.replace("'", "''")  # Replace single quotes w/ double quotes (required for SQL)
@@ -74,12 +52,58 @@ class DiningHall:
                 print("User {0}: alert for {1} at {2} dining hall".format(row[0], row[2], self.name))
 
 
-'''
-scrape menu for each dining hall, store in (three?) SET(s?)
-	for each dining hall:
-		for each item in menu:
-			get rows in Keyword where keyword = item
-			for each row:
-				print(user id and phone# (from Users), keyword, dining hall)
-	
-'''
+class Menu:
+    def __init__(self, dining_halls: [DiningHall]):
+        self.dining_halls = dining_halls
+        self.discovered_items = []  # type string
+        self.item_list = []  # type Item
+
+    def create_menu(self):
+        for dining_hall in self.dining_halls:  # iterate through dining halls
+            for item in dining_hall.menu:  # iterate through each menu item
+                # if item has already been seen, add current dining hall to its list
+                if item in self.discovered_items:
+                    for obj in self.item_list:
+                        if obj.name == item:
+                            obj.dining_halls.append(dining_hall.name)
+                            break
+
+                else:  # new item
+                    self.discovered_items.append(item)
+                    item_obj = Item(item)
+                    item_obj.dining_halls.append(dining_hall.name)
+                    self.item_list.append(item_obj)
+        print("Number of unique items: {0}".format(len(self.item_list)))
+
+    def __str__(self):
+        out = ''
+        for item in self.item_list:
+            out += str(item) + '\n'
+        return out
+
+
+class Item:
+    def __init__(self, name):
+        self.name = name
+        # self.atYahentamitsi = False
+        # self.atSouth = False
+        # self.at251 = False
+        self.dining_halls = []
+
+    # def __build_list(self):
+    #     if self.atYahentamitsi:
+    #         self.dining_halls.append('Yahentamitsi')
+    #     if self.atSouth:
+    #         self.dining_halls.append('South')
+    #     if self.at251:
+    #         self.dining_halls.append('251')
+
+    def __str__(self):
+        # self.__build_list()
+        out = '{0} at '.format(self.name)
+        out += ', '.join(self.dining_halls)
+        return out
+
+
+
+
