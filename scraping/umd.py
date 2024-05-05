@@ -40,21 +40,16 @@ class Menu:
         self.users_to_alert = []  # type User
         self.discovered_users = []
 
+        self.total_menu = {}
+
     def create_menu(self):
         for dining_hall in self.dining_halls:  # iterate through dining halls
             for item in dining_hall.menu:  # iterate through each menu item
                 # if item has already been seen, add current dining hall to its list
-                if item in self.discovered_items:
-                    for obj in self.item_list:
-                        if obj.name == item:
-                            obj.dining_halls.append(dining_hall.name)
-                            break
-
-                else:  # new item
-                    self.discovered_items.append(item)
-                    item_obj = Item(item)
-                    item_obj.dining_halls.append(dining_hall.name)
-                    self.item_list.append(item_obj)
+                if item in self.total_menu:
+                    self.total_menu[item].append(dining_hall.name)
+                else:
+                    self.total_menu[item] = [dining_hall.name]
 
     def check_for_alerts(self, conn):
         for item in self.item_list:
@@ -87,10 +82,19 @@ class Menu:
             out += str(user) + '\n'
         print(out)
 
+    def print_item(self, item):
+        out = '{0} at '.format(item)
+        out += ', '.join(self.total_menu[item])
+        return out
+
     def __str__(self):
+        # out = ''
+        # for item in self.item_list:
+        #     out += str(item) + '\n'
+        # return out
         out = ''
-        for item in self.item_list:
-            out += str(item) + '\n'
+        for item in self.total_menu:
+            out += self.print_item(item) + '\n'
         return out
 
 

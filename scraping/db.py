@@ -24,7 +24,7 @@ def execute_write(db: psycopg2.extensions.connection, sql_query):
     cur.close()
 
 
-def db_select(db: psycopg2.extensions.connection, query, *args):  #fields, table, conditions
+def db_select(db: psycopg2.extensions.connection, query, *args):  # fields, table, conditions
     # query = "SELECT {0} FROM \"{1}\" WHERE {2}".format(fields, table, conditions)
 
     result = []
