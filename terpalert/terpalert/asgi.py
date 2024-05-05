@@ -1,5 +1,5 @@
 """
-ASGI config for dining_hall_alert project.
+ASGI config for terpalert project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'dining_hall_alert.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'terpalert.settings')
 
 application = get_asgi_application()
