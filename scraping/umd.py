@@ -35,25 +35,24 @@ class DiningHall:
 class Menu:
     def __init__(self, dining_halls: [DiningHall]):
         self.dining_halls = dining_halls
-        self.discovered_items = []  # type string
-        self.item_list = []  # type Item
-        self.users_to_alert = []  # type User
         self.discovered_users = []
-
-        self.total_menu = {}
+        self.total_menu = {}  # item name mapping to Item obj
+        self.users_to_alert = {}  # user_id mapping to User obj
 
     def create_menu(self):
         for dining_hall in self.dining_halls:  # iterate through dining halls
             for item in dining_hall.menu:  # iterate through each menu item
                 # if item has already been seen, add current dining hall to its list
                 if item in self.total_menu:
-                    self.total_menu[item].append(dining_hall.name)
+                    self.total_menu[item].dining_halls.append(dining_hall.name)
                 else:
-                    self.total_menu[item] = [dining_hall.name]
+                    self.total_menu[item] = Item(item)
+                    self.total_menu[item].dining_halls = [dining_hall.name]
 
     def check_for_alerts(self, conn):
-        for item in self.item_list:
-            name = item.name.replace("'", "''")  # replace single quotes w/ double quotes (SQL req.)
+        for item_name, obj in self.total_menu.items():
+            item_name = item_name.replace("'", "''")  # replaces single quotes w/ double quotes (SQL req.)
+
             query = '''
                 SELECT *
                 FROM "Users"
@@ -63,23 +62,20 @@ class Menu:
                     WHERE keyword = %s
                 )
             '''
-            rows = db_select(conn, query, name)
+            rows = db_select(conn, query, item_name)
 
             for row in rows:
-                if row in self.discovered_users:
-                    for obj in self.users_to_alert:
-                        if obj.info == row:
-                            obj.alerts.append(item)
+                user_id = row[0]
+                if user_id in self.users_to_alert:
+                    self.users_to_alert[user_id].alerts.append(obj)
                 else:
-                    self.discovered_users.append(row)
-                    user = User(row)
-                    user.alerts.append(item)
-                    self.users_to_alert.append(user)
+                    self.users_to_alert[user_id] = User(row)
+                    self.users_to_alert[user_id].alerts = [obj]
 
     def alert_users(self):
         out = ''
-        for user in self.users_to_alert:
-            out += str(user) + '\n'
+        for user_id, obj in self.users_to_alert.items():
+            out += str(obj) + '\n'
         print(out)
 
     def print_item(self, item):
@@ -88,13 +84,20 @@ class Menu:
         return out
 
     def __str__(self):
-        # out = ''
-        # for item in self.item_list:
-        #     out += str(item) + '\n'
-        # return out
         out = ''
-        for item in self.total_menu:
-            out += self.print_item(item) + '\n'
+        for item_name, obj in self.total_menu.items():  # item_list
+            out += str(obj) + '\n'
+        return out
+
+
+class Item:
+    def __init__(self, name):
+        self.name = name
+        self.dining_halls = []
+
+    def __str__(self):
+        out = '{0} at '.format(self.name)
+        out += ', '.join(self.dining_halls)
         return out
 
 
@@ -110,12 +113,3 @@ class User:
         return out
 
 
-class Item:
-    def __init__(self, name):
-        self.name = name
-        self.dining_halls = []
-
-    def __str__(self):
-        out = '{0} at '.format(self.name)
-        out += ', '.join(self.dining_halls)
-        return out

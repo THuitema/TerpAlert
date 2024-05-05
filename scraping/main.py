@@ -27,10 +27,10 @@ def main():
     menu.create_menu()
     print(str(menu))
 
-    # conn = db.connect()
-    # menu.check_for_alerts(conn)
-    # conn.close()
-    # menu.alert_users()
+    conn = db.connect()
+    menu.check_for_alerts(conn)
+    conn.close()
+    menu.alert_users()
 
 
 if __name__ == "__main__":
