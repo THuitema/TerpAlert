@@ -37,7 +37,7 @@ class DiningHall:
         :return: str, the url
         """
         month = 5  # TODO: make these dynamic dates
-        day = 4
+        day = 6
         year = 2024
         return BASE_URL + "/?locationNum=" + str(self.location_num) + "&dtdate=" + str(month) + "/" + str(
                day) + "/" + str(year)
@@ -113,10 +113,10 @@ class Menu:
             # Get users from database that want to be alerted to the current item
             query = '''
                 SELECT *
-                FROM "Users"
+                FROM account_user
                 WHERE id IN (
                     SELECT user_id
-                    FROM "Keyword"
+                    FROM account_keyword
                     WHERE keyword = %s
                 )
             '''

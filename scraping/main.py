@@ -1,5 +1,4 @@
-from umd import DiningHall, Menu, Item
-import django
+from umd import DiningHall, Menu
 import db
 
 SOUTH = "South"
@@ -25,7 +24,6 @@ def main():
     # process_commands(dining_halls)
     menu = Menu(dining_halls)
     menu.create_menu()
-    print(str(menu))
 
     conn = db.connect()
     menu.check_for_alerts(conn)
