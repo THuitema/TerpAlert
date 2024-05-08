@@ -7,10 +7,11 @@ from django.db import models
 class User(models.Model):
     id = models.IntegerField(primary_key=True)
     phone = models.CharField(max_length=10)
+    username = models.CharField(max_length=30, default='')
     email = models.EmailField()
 
     def __str__(self):
-        return str(self.id)
+        return str(self.username)
 
 
 class Keyword(models.Model):
