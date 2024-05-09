@@ -28,3 +28,9 @@ def login_user(request):
     else:
         # Load webpage if form hasn't been submitted yet
         return render(request, 'authenticate/login.html', {})
+
+
+def logout_user(request):
+    logout(request)  # Doesn't throw error if user isn't logged in, so no need to check
+    # Redirect to home page
+    return redirect('/')
