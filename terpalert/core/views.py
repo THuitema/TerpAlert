@@ -23,7 +23,7 @@ def login_user(request):
         else:
             # Login failed
             messages.success(request, "Invalid Login")
-            return redirect('login/')
+            return redirect('/login/')
 
     else:
         # Load webpage if form hasn't been submitted yet
