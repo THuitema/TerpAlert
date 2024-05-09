@@ -1,16 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Home</title>
-    {% load bootstrap5 %}
-    {% bootstrap_css %}
-    {% bootstrap_javascript %}
-</head>
-<body>
-  <h1>Welcome to TerpAlert!</h1>
+{% extends 'base.html' %}
 
-  <a class="nav-link" href="{% url 'login' %}">Login</a>
-</body>
-</html>
+{% block title %}TerpAlert{% endblock %}
+
+{% block navlink %}
+<a class="nav-link" href="{% url 'login' %}">Login</a>
+{% endblock %}
+
+{% block content %}
+<h1>Welcome to TerpAlert!</h1>
+
+{% endblock %}

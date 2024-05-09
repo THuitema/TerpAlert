@@ -1,14 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Account</title>
-    {% load bootstrap5 %}
-    {% bootstrap_css %}
-    {% bootstrap_javascript %}
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Account{% endblock %}
+
+{% block navlink %}
+<a class="nav-link" href="{% url 'login' %}">Logout</a>
+{% endblock %}
+
+{% block content %}
 <h1>Welcome to your account</h1>
-</body>
-</html>
+
+{% endblock %}
