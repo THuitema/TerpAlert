@@ -27,6 +27,10 @@ def login_user(request):
             return redirect('/account/login/')
 
     else:
+        if request.user.is_authenticated:
+            # if a logged-in user gets to the login page, redirect to their account
+            return redirect('/account/')
+
         # Load webpage if form hasn't been submitted yet
         return render(request, 'registration/login.html', {})
 
