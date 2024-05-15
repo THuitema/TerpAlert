@@ -3,7 +3,9 @@
 {% block title %}TerpAlert{% endblock %}
 
 {% block navlink %}
-<a class="nav-link" href="{% url 'login' %}">Login</a>
+{% if request.user.is_authenticated %}
+<a class="nav-link" href="/account/">Account</a>
+{% endif %}
 {% endblock %}
 
 {% block content %}
