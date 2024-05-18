@@ -4,10 +4,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.shortcuts import redirect
+from django.contrib.auth.models import User
 
 
 @login_required  #login_url="/login/"
 def account(request):
+    user = User.objects.get(username=request.user.username)
+    phone_number = user.profile.phone
+    print(phone_number)
     return render(request, 'account.html')
 
 
@@ -39,5 +43,9 @@ def logout_user(request):
     logout(request)  # Doesn't throw error if user isn't logged in, so no need to check
     # Redirect to home page
     return redirect('/')
+
+
+def signup_user(request):
+    return render(request, 'registration/signup.html')
 
 
