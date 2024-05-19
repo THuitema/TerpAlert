@@ -141,4 +141,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #
 # AUTHENTICATION_BACKENDS = ['path.to.auth.module.EmailAuthBackend']
 
-AUTH_USER_MODEL = "accounts.User"  # Setting our custom User model to replace the default
+AUTH_USER_MODEL = "accounts.Profile"  # Setting our custom User model to replace the default
