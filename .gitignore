@@ -12,5 +12,3 @@ database.ini
 .venv
 .env
 
-# for now after securing sensitive data
-settings.py
