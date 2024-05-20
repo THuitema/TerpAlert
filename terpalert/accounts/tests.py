@@ -15,6 +15,7 @@ class ProfileManagerTests(TestCase):
         Profile = get_user_model()
         user = Profile.objects.create_user(email="test@test.com", phone="1112223333", password="foo")
         self.assertEqual(user.email, "test@test.com")
+        self.assertEqual(user.phone, "1112223333")
         self.assertTrue(user.is_active)
         self.assertFalse(user.is_staff)
         self.assertFalse(user.is_superuser)
