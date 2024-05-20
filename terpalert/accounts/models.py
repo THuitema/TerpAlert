@@ -5,18 +5,26 @@ from django.conf import settings
 
 # Overriding Django's default UserManager with our own, since we are customizing the User model
 class ProfileManager(BaseUserManager):
-    def create_user(self, email, phone, password=None):
+    def create_user(self, email, password, **extra_fields):
         if not email:
             raise ValueError("The given email must be set")
 
-        email = BaseUserManager.normalize_email(email)
-        user = self.model(email=email, phone=phone)
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, phone, password=None):
-        pass
+    def create_superuser(self, email, phone, password, **extra_fields):
+        extra_fields.setdefault("is_active", True)
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff set to True")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser set to True")
+        return self.create_user(email, password, **extra_fields)
 
 
 # Overriding Django's auth User model with our own, using email as the identifier
