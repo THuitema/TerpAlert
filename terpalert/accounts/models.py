@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.conf import settings
+from django.utils import timezone
 
 
 # Overriding Django's default UserManager with our own, since we are customizing the User model
@@ -38,16 +39,32 @@ class ProfileManager(BaseUserManager):
 
 # Overriding Django's auth User model with our own, using email as the identifier
 class Profile(AbstractBaseUser):
+    """
+    Custom user model in replacement of Django's default auth User model
+    We are using email as a user's identifier
+    """
+    # Attributes
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=40)
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    date_joined = models.DateTimeField(default=timezone.now)
+
     USERNAME_FIELD = "email"
     EMAIL_FIELD = "email"
     REQUIRED_FIELDS = ["phone"]  # email already required b/c it is the USERNAME_FIELD
 
     objects = ProfileManager()  # links custom user to custom manager, so we can call Profile.objects.create_user()
 
+    def __str__(self):
+        return self.email
+
 
 class Keyword(models.Model):
+    """
+    Tracks a keyword associated with a user
+    """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     keyword = models.CharField(max_length=255)
 
