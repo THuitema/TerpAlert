@@ -5,7 +5,13 @@ from django.conf import settings
 
 # Overriding Django's default UserManager with our own, since we are customizing the User model
 class ProfileManager(BaseUserManager):
+    """
+    Custom user model manager thta uses email as identification rather than usernames
+    """
     def create_user(self, email, password, **extra_fields):
+        """
+        Create and save a user with the given information
+        """
         if not email:
             raise ValueError("The given email must be set")
 
@@ -16,6 +22,9 @@ class ProfileManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, phone, password, **extra_fields):
+        """
+        Create a superuser with the given information
+        """
         extra_fields.setdefault("is_active", True)
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
