@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.http import HttpResponse
 from .forms import ProfileCreationForm
 from .models import Profile
@@ -32,6 +32,11 @@ def create_profile(request):
         # context['form'] = ProfileCreationForm()
 
     return render(request, 'registration/signup.html', context)
+
+
+def logout_profile(request):
+    logout(request)
+    return redirect('/')
 
 
 def account(request):
