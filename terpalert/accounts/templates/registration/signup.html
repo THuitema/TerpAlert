@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}TerpAlert{% endblock %}
+{% block title %}- Signup{% endblock %}
 
 {% block content %}
 <h1>Sign up</h1>
@@ -20,12 +20,5 @@
     <input type="submit" value="Submit">
 </form>
 
-{% for field in registration_form %}
-<p>
-    {% for error in field.errors %}
-    <p style="color: red">{{ error }}</p>
-    {% endfor %}
-</p>
-{% endfor %}
 
 {% endblock %}
