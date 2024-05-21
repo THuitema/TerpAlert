@@ -2,14 +2,16 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.http import HttpResponse
 from .forms import ProfileCreationForm
+from django.contrib.auth.forms import AuthenticationForm
 from .models import Profile
+from django.contrib import messages
 
 
 # Create your views here.
 def create_profile(request):
     context = {'form': ProfileCreationForm()}
 
-    if request.method == "POST":
+    if request.method == 'POST':
         form = ProfileCreationForm(request.POST)
         if form.is_valid():
             form.save()
@@ -32,6 +34,22 @@ def create_profile(request):
         # context['form'] = ProfileCreationForm()
 
     return render(request, 'registration/signup.html', context)
+
+
+def login_profile(request):
+    # context = {'form': AuthenticationForm()}
+
+    if request.method == 'POST':
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            return redirect('account')
+
+        return render(request, 'registration/login.html', {'form': form})
+
+    else:
+        form = AuthenticationForm()
+
+        return render(request, 'registration/login.html', {'form': form})
 
 
 def logout_profile(request):
