@@ -1,10 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Home</title>
-</head>
-<body>
-    <h1>Welcome!</h1>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}TerpAlert{% endblock %}
+
+{% block navlink %}
+{% if request.user.is_authenticated %}
+<!--<a class="nav-link" href="/account/">Account</a>-->
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<h1>Welcome to TerpAlert!</h1>
+
+{% endblock %}
