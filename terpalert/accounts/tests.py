@@ -10,6 +10,7 @@ class ProfileManagerTests(TestCase):
     """
     Tests for the custom user model manager ProfileManager
     """
+
     def test_create_user(self):
         """
         Testing if create_user() functions as expected
@@ -51,27 +52,51 @@ class ProfileManagerTests(TestCase):
 
 
 class ProfileCreationFormTests(TestCase):
+    """
+    Tests for ProfileCreationForm, which is used to sign-up users
+    """
+
     def test_valid_form(self):
-        form_data = {'email': 'foo@bar.com', 'phone': '1112223333', 'password1': 'foobarpass1', 'password2': 'foobarpass1'}
+        """
+        Test that valid inputs result in a valid form
+        """
+        form_data = {'email': 'foo@bar.com', 'phone': '1112223333', 'password1': 'foobarpass1',
+                     'password2': 'foobarpass1'}
         form = ProfileCreationForm(data=form_data)
         self.assertTrue(form.is_valid())
 
     def test_invalid_email(self):
-        form_data = {'email': 'foobar.com', 'phone': '1112223333', 'password1': 'foobarpass1', 'password2': 'foobarpass1'}
+        """
+        Test that an email missing an '@' results in an invalid form
+        """
+        form_data = {'email': 'foobar.com', 'phone': '1112223333', 'password1': 'foobarpass1',
+                     'password2': 'foobarpass1'}
         form = ProfileCreationForm(data=form_data)
         self.assertFalse(form.is_valid())
 
     def test_invalid_phone(self):
-        form_data = {'email': 'foo@bar.com', 'phone': '111222333', 'password1': 'foobarpass1', 'password2': 'foobarpass1'}
+        """
+        Test that a phone number that is not 10 digits results in an invalid form
+        """
+        form_data = {'email': 'foo@bar.com', 'phone': '111222333', 'password1': 'foobarpass1',
+                     'password2': 'foobarpass1'}
         form = ProfileCreationForm(data=form_data)
         self.assertFalse(form.is_valid())
 
     def test_invalid_password(self):
-        form_data = {'email': 'foo@bar.com', 'phone': '1112223333', 'password1': 'foobarpass1', 'password2': 'foobarpass2'}
+        """
+        Test that if the passwords don't match, then the form is invalid
+        """
+        form_data = {'email': 'foo@bar.com', 'phone': '1112223333', 'password1': 'foobarpass1',
+                     'password2': 'foobarpass2'}
         form = ProfileCreationForm(data=form_data)
         self.assertFalse(form.is_valid())
 
     def test_clean_email(self):
+        """
+        Test clean_email(), making sure that emails are turned to lowercase, and that the form is
+        invalid the same email is used in the form again
+        """
         email1 = 'TESTING@test.com'
         form_data = {'email': email1, 'phone': '1112223333', 'password1': 'foobarpass1', 'password2': 'foobarpass1'}
         form = ProfileCreationForm(data=form_data)
@@ -85,8 +110,12 @@ class ProfileCreationFormTests(TestCase):
         self.assertFalse(form2.is_valid())  # Email already exists
 
     def test_clean_phone(self):
+        """
+        Test clean_phone(), making sure a phone with any non-number characters results in an invalid form
+        """
         phone1 = '1112223456'
-        form_data = {'email': 'TESTING@test.com', 'phone': phone1, 'password1': 'foobarpass1', 'password2': 'foobarpass1'}
+        form_data = {'email': 'TESTING@test.com', 'phone': phone1, 'password1': 'foobarpass1',
+                     'password2': 'foobarpass1'}
         form = ProfileCreationForm(data=form_data)
         self.assertTrue(form.is_valid())
         self.assertTrue(form.clean_phone() == phone1)
@@ -95,5 +124,3 @@ class ProfileCreationFormTests(TestCase):
 
         form2 = ProfileCreationForm(data=form_data)
         self.assertFalse(form2.is_valid())
-
-
