@@ -33,22 +33,9 @@ class ProfileCreationForm(UserCreationForm):
         raise forms.ValidationError(f"Phone number {phone} already exists")
 
 
-
-
-    # def save(self, commit=True):
-    #     user = super(ProfileCreationForm, self).save(commit=False)
-    #     user.email = self.cleaned_data["email"]
-    #     user.phone = self.phone
-    #
-    #     if commit:
-    #         user.save()
-    #     return user
-
-
 class ProfileChangeForm(UserChangeForm):
 
     class Meta:
         model = Profile
         fields = ("email", "phone")
 
-# Don't need to worry about login form, just use AuthenticationForm in built-in view
