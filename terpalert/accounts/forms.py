@@ -4,8 +4,8 @@ from .models import Profile
 
 
 class ProfileCreationForm(UserCreationForm):
-    email = forms.EmailField(label="email", max_length=255, help_text="Add an email address (Required).")
-    phone = forms.CharField(max_length=10, label="phone")
+    email = forms.EmailField(label="Email", max_length=255)
+    phone = forms.CharField(max_length=10, label="Phone")
 
     class Meta:
         model = Profile
