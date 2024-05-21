@@ -44,8 +44,8 @@ class Profile(AbstractBaseUser):
     We are using email as a user's identifier
     """
     # Attributes
-    email = models.EmailField(unique=True)
-    phone = models.CharField(max_length=40)
+    email = models.EmailField(unique=True, max_length=255)
+    phone = models.CharField(max_length=10)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
