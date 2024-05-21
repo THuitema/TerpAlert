@@ -29,9 +29,8 @@ def create_profile(request):
     else:
         # form has not been submitted yet
         # check if user is authenticated
-        # TODO: either redirect to account page or logout user and allow them to signup
         if request.user.is_authenticated:
-            return HttpResponse(f"You are already authenticated as {request.user.email}")
+            return redirect('account')
 
         # render blank form
         form = ProfileCreationForm()
