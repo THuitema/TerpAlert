@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <title>TerpAlert{% block title %} {% endblock %}</title>
+    {% load static %}
+    <script src="{% static 'main.js' %}"></script>
     {% load bootstrap5 %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
+    <title>TerpAlert{% block title %} {% endblock %}</title>
 </head>
 <body>
 <div class="container">
