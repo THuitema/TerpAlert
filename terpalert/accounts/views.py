@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.http import HttpResponse
 from .forms import ProfileCreationForm
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Profile
+from .models import Profile, Keyword
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
@@ -76,4 +76,16 @@ def logout_profile(request):
 
 @login_required
 def account(request):
-    return render(request, 'home.html')
+    profile = Profile.objects.get(email=request.user.email)
+    email = profile.email
+    phone = profile.phone
+
+    context = {}
+
+    # Gather all keywords associated with user using a QuerySet
+    keywords = Keyword.objects.filter(user__email__exact=email)
+    context['keywords'] = keywords
+    context['email'] = email
+    context['phone'] = phone
+
+    return render(request, 'home.html', context)
