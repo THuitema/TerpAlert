@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.conf import settings
 from django.utils import timezone
+from .fields import LowercaseEmailField
 
 
 # Overriding Django's default UserManager with our own, since we are customizing the User model
@@ -44,7 +45,7 @@ class Profile(AbstractBaseUser):
     We are using email as a user's identifier
     """
     # Attributes
-    email = models.EmailField(unique=True, max_length=255)
+    email = LowercaseEmailField(unique=True, max_length=255)  # models.EmailField
     phone = models.CharField(max_length=10)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
