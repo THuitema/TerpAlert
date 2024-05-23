@@ -1,29 +1,28 @@
 window.onload = function () {
-    const box = document.getElementById('keyword-box');
-    getKeywords(box)
+    const keywordTable = document.getElementById('keyword-table-body');
+    getKeywords(keywordTable)
 }
 
-
-function getKeywords(div) {
+function getKeywords(e) {
     $.ajax({
         type: 'GET',
         url: '/accounts/load-keywords/',
-        success: function(response) {
+        success: function (response) {
             console.log(response.data)
             const data = response.data
             data.forEach(element => {
-                div.innerHTML += `
-                    <div class="keyword" id="${element.id}">${element.keyword}</div>
-             
+                e.innerHTML += `
+                    <tr id="${element.id}">
+                        <td>${element.keyword}</td>
+                        <td><i class="bi bi-trash"></i></td>
+                    </tr>
                 `
                 // ${element.user}
             });
 
-
         },
-        error: function(error) {
+        error: function (error) {
             console.log(error)
-
         }
     })
 }

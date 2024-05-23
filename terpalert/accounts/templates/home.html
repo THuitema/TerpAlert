@@ -2,33 +2,31 @@
 {% load static %}
 
 {% block scripts %}
-<script src="{% static 'main.js' %}"></script>
+    <script src="{% static 'main.js' %}"></script>
 {% endblock scripts %}
 
 {% block title %}- Account{% endblock %}
 
 {% block content %}
-<h1>Account</h1>
-{% for message in messages %}
+    <h1>Account</h1>
+    {% for message in messages %}
 
-<div class="alert alert-danger alert-dismissible fade show" role="alert">
-    {{ message }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-{% endfor %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
 
-    <h2>Keywords</h2>
-{#    {% for keyword in keywords %}#}
-{#    <p>{{ keyword }}</p>#}
-{#    {% endfor %}#}
+    <div id="keyword-box"></div>
+    <table id="keyword-table" class="table table-striped">
+        <thead>
+        <tr>
+            <th>Keywords</th>
+        </tr>
+        </thead>
+        <tbody id="keyword-table-body">
 
+        </tbody>
+    </table>
 
-    <div id="keyword-box">
-    </div>
-{##}
-{#    <script>#}
-{#    const helloWorldBox = document.getElementById('hello-world-box')#}
-{#    helloWorldBox.textContent = 'Hello World'#}
-{##}
-{#    </script>#}
 {% endblock %}
