@@ -1,4 +1,9 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block scripts %}
+<script src="{% static 'main.js' %}"></script>
+{% endblock scripts %}
 
 {% block title %}- Account{% endblock %}
 
@@ -13,7 +18,17 @@
 {% endfor %}
 
     <h2>Keywords</h2>
-    {% for keyword in keywords %}
-    <p>{{ keyword }}</p>
-    {% endfor %}
+{#    {% for keyword in keywords %}#}
+{#    <p>{{ keyword }}</p>#}
+{#    {% endfor %}#}
+
+
+    <div id="keyword-box">
+    </div>
+{##}
+{#    <script>#}
+{#    const helloWorldBox = document.getElementById('hello-world-box')#}
+{#    helloWorldBox.textContent = 'Hello World'#}
+{##}
+{#    </script>#}
 {% endblock %}

@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from .forms import ProfileCreationForm
 from django.contrib.auth.forms import AuthenticationForm
 from .models import Profile, Keyword
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core import serializers
 
 
 def create_profile(request):
@@ -76,16 +77,30 @@ def logout_profile(request):
 
 @login_required
 def account(request):
-    profile = Profile.objects.get(email=request.user.email)
-    email = profile.email
-    phone = profile.phone
-
-    context = {}
+    # profile = Profile.objects.get(email=request.user.email)
+    # email = profile.email
+    # phone = profile.phone
+    #
+    # context = {}
 
     # Gather all keywords associated with user using a QuerySet
-    keywords = Keyword.objects.filter(user__email__exact=email)
-    context['keywords'] = keywords
-    context['email'] = email
-    context['phone'] = phone
+    # keywords = Keyword.objects.filter(user__email__exact=email)
+    # context['keywords'] = keywords
+    # context['email'] = email
+    # context['phone'] = phone
 
-    return render(request, 'home.html', context)
+    return render(request, 'home.html')  # context
+
+
+def load_keywords(request):
+    profile = Profile.objects.get(email=request.user.email)
+    keywords = Keyword.objects.filter(user__email__exact=profile.email)
+    data = []
+    for obj in keywords:
+        item = {
+            'id': obj.id,
+            'user': obj.user.id,
+            'keyword': obj.keyword
+        }
+        data.append(item)
+    return JsonResponse({'data': data})
