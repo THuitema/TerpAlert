@@ -13,8 +13,14 @@ function getKeywords(e) {
             data.forEach(element => {
                 e.innerHTML += `
                     <tr id="${element.id}">
+                        
                         <td>${element.keyword}</td>
-                        <td><i class="bi bi-trash"></i></td>
+                        <td>
+                            <button type="button" class="btn btn-danger" onclick="deleteKeyword()">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                        
                     </tr>
                 `
                 // ${element.user}
@@ -25,6 +31,10 @@ function getKeywords(e) {
             console.log(error)
         }
     })
+}
+
+function deleteKeyword() {
+    console.log('clicked!')
 }
 
 
