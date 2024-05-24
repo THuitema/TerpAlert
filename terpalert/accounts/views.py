@@ -96,13 +96,14 @@ def account(request):
 
 def load_keywords(request):
     profile = Profile.objects.get(email=request.user.email)
-    keywords = Keyword.objects.filter(user__email__exact=profile.email)
+    keywords = Keyword.objects.filter(user__email__exact=profile.email).order_by('-date_created', 'id')
     data = []
     for obj in keywords:
         item = {
             'id': obj.id,
             'user': obj.user.id,
-            'keyword': obj.keyword
+            'keyword': obj.keyword,
+            'date': obj.date_created,
         }
         data.append(item)
     return JsonResponse({'data': data})
