@@ -36,6 +36,10 @@ function getKeywords(e) {
 }
 
 function deleteKeyword(button) {
+    if(confirm("Are you sure want to delete this item?") == false) {
+        return;
+    }
+
     const csrftoken = getCookie('csrftoken');
     const td = button.parentNode;
     const tr = td.parentNode;
