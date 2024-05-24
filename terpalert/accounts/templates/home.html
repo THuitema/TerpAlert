@@ -17,11 +17,15 @@
         </div>
     {% endfor %}
 
-    <div id="keyword-box"></div>
     <table id="keyword-table" class="table table-striped">
         <thead>
         <tr>
             <th>Keywords</th>
+            <th>
+                <button type="button" class="btn btn-info" id="add-button" onclick="this.blur(); addKeyword(this);">
+                    <i class="bi bi-plus-circle"></i>
+                </button>
+            </th>
         </tr>
         </thead>
         <tbody id="keyword-table-body">

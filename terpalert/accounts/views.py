@@ -116,3 +116,22 @@ def delete_keyword(request):
     else:
         return redirect('account')
 
+
+def save_keyword(request):
+    if request.method == 'POST':
+        keyword = request.POST['keyword']
+        saved_obj = Keyword.objects.create(keyword=keyword, user_id=request.user.id)
+        data = {}
+
+        if saved_obj is not None:
+            # Database operation was successful
+            data['success'] = True
+            data['id'] = saved_obj.id
+            data['keyword'] = keyword
+        else:
+            # Something went wrong with create()
+            data['success'] = False
+
+        return JsonResponse(data)
+    else:
+        return redirect('account')

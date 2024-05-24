@@ -9,4 +9,5 @@ urlpatterns = [
     path('login/', views.login_profile, name='login'),
     path('load-keywords/', views.load_keywords, name='load-keywords'),
     path('delete-keyword/', views.delete_keyword, name='delete-keyword'),
+    path('save-keyword/', views.save_keyword, name='save-keyword'),
 ]
