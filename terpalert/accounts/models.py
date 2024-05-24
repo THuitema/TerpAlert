@@ -73,6 +73,7 @@ class Keyword(models.Model):
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     keyword = models.CharField(max_length=255)
+    date_created = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.keyword
