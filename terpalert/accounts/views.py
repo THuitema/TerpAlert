@@ -7,6 +7,7 @@ from .models import Profile, Keyword
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 
 def create_profile(request):
@@ -76,6 +77,7 @@ def logout_profile(request):
 
 
 @login_required
+@ensure_csrf_cookie
 def account(request):
     # profile = Profile.objects.get(email=request.user.email)
     # email = profile.email
@@ -104,3 +106,13 @@ def load_keywords(request):
         }
         data.append(item)
     return JsonResponse({'data': data})
+
+
+def delete_keyword(request):
+    if request.method == 'POST':
+        keyword_to_delete = Keyword.objects.get(pk=request.POST['keyword_id'])
+        data = {'data': keyword_to_delete.delete()}
+        return JsonResponse(data)
+    else:
+        return redirect('account')
+
