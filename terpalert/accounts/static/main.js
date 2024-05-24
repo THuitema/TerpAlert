@@ -20,7 +20,7 @@ function getKeywords(e) {
                         
                         <td>${element.keyword}</td>
                         <td>
-                            <button type="button" class="btn btn-danger" onclick="deleteKeyword(this)">
+                            <button type="button" class="btn btn-danger" onclick="this.blur(); deleteKeyword(this);">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </td>
