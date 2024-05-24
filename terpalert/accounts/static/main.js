@@ -19,7 +19,7 @@ function getKeywords() {
             data.forEach(element => {
                 console.log(element)
                 keywordTableBody.innerHTML += `
-                    <tr id="${element.id}">
+                    <tr data-keyword-id="${element.id}">
                         
                         <td>${element.keyword}</td>
                         <td>
@@ -108,7 +108,8 @@ function saveKeyword(button) {
                 cancelRow(button);
                 const table = document.getElementById('keyword-table');
                 const row = table.insertRow(1);
-                row.id = response.id;
+                // row.id = response.id;
+                row.setAttribute('data-keyword-id', response.id)
                 const cell1 = row.insertCell(0);
                 const cell2 = row.insertCell(1);
 
