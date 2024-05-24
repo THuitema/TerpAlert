@@ -67,13 +67,28 @@ class Profile(AbstractBaseUser):
         return self.email
 
 
+class Menu(models.Model):
+    """
+    Stores all menu items that be chosen as a keyword
+    """
+    item = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.item
+
+
 class Keyword(models.Model):
     """
     Tracks a keyword associated with a user
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    keyword = models.CharField(max_length=255)
+    # keyword = models.CharField(max_length=255)
+    keyword = models.ForeignKey(Menu, on_delete=models.CASCADE)
     date_created = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.keyword
+
+
+
+
