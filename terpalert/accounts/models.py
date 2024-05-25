@@ -77,17 +77,16 @@ class Menu(models.Model):
         return self.item
 
 
-class Keyword(models.Model):
+class Alert(models.Model):
     """
     Tracks a keyword associated with a user
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    # keyword = models.CharField(max_length=255)
-    keyword = models.ForeignKey(Menu, on_delete=models.CASCADE)
+    menu_item = models.ForeignKey(Menu, on_delete=models.CASCADE)
     date_created = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return self.keyword
+        return f"{self.menu_item.item} - {self.user.email}"
 
 
 

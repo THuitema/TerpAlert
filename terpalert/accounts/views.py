@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.http import HttpResponse, JsonResponse
 from .forms import ProfileCreationForm
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Profile, Keyword
+from .models import Profile, Alert, Menu
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
@@ -79,49 +79,36 @@ def logout_profile(request):
 @login_required
 @ensure_csrf_cookie
 def account(request):
-    # profile = Profile.objects.get(email=request.user.email)
-    # email = profile.email
-    # phone = profile.phone
-    #
-    # context = {}
-
-    # Gather all keywords associated with user using a QuerySet
-    # keywords = Keyword.objects.filter(user__email__exact=email)
-    # context['keywords'] = keywords
-    # context['email'] = email
-    # context['phone'] = phone
-
     return render(request, 'home.html')  # context
 
 
-def load_keywords(request):
+def load_alerts(request):
     profile = Profile.objects.get(email=request.user.email)
-    keywords = Keyword.objects.filter(user__email__exact=profile.email).order_by('-date_created', 'id')
+    alerts = Alert.objects.filter(user__email__exact=profile.email).order_by('-date_created', 'id')
     data = []
-    for obj in keywords:
+    for obj in alerts:
         item = {
             'id': obj.id,
             'user': obj.user.id,
-            'keyword': obj.keyword,
+            'alert': obj.menu_item.item,
             'date': obj.date_created,
         }
         data.append(item)
     return JsonResponse({'data': data})
 
 
-def delete_keyword(request):
+def delete_alert(request):
     if request.method == 'POST':
-        keyword_to_delete = Keyword.objects.get(pk=request.POST['keyword_id'])
-        data = {'data': keyword_to_delete.delete()}
+        alert_to_delete = Alert.objects.get(pk=request.POST['alert-id'])
+        data = {'data': alert_to_delete.delete()}
         return JsonResponse(data)
     else:
         return redirect('account')
 
 
-def save_keyword(request):
+def save_alert(request):
     if request.method == 'POST':
-        keyword = request.POST['keyword']
-        saved_obj = Keyword.objects.create(keyword=keyword, user_id=request.user.id)
+        alert_item = request.POST['alert']
         data = {}
 
         if saved_obj is not None:

@@ -1,29 +1,29 @@
-let keywordTableBody;
+let alertTableBody;
 
 window.onload = function () {
-    keywordTableBody = document.getElementById('keyword-table-body');
-    getKeywords();
+    alertTableBody = document.getElementById('alert-table-body');
+    getAlerts();
 }
 
-function getKeywords() {
+function getAlerts() {
     $.ajax({
         type: 'GET',
-        url: '/accounts/load-keywords/',
+        url: '/accounts/load-alerts/',
         success: function (response) {
             const data = response.data;
             if (data.length == 0) {
-                keywordTableBody.innerHTML = `
+                alertTableBody.innerHTML = `
                     <p>Nothing added yet!</p>
                 `
             }
             data.forEach(element => {
                 console.log(element)
-                keywordTableBody.innerHTML += `
-                    <tr data-keyword-id="${element.id}">
+                alertTableBody.innerHTML += `
+                    <tr data-alert-id="${element.id}">
                         
-                        <td>${element.keyword}</td>
+                        <td>${element.alert}</td>
                         <td>
-                            <button type="button" class="btn btn-danger" onclick="this.blur(); deleteKeyword(this);">
+                            <button type="button" class="btn btn-danger" onclick="this.blur(); deleteAlert(this);">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </td>
@@ -38,8 +38,8 @@ function getKeywords() {
     })
 }
 
-function deleteKeyword(button) {
-    if (confirm("Are you sure want to delete this item?") == false) {
+function deleteAlert(button) {
+    if (confirm("Are you sure want to delete this alert?") == false) {
         return;
     }
 
@@ -49,10 +49,10 @@ function deleteKeyword(button) {
 
     $.ajax({
         type: 'POST',
-        url: '/accounts/delete-keyword/',
+        url: '/accounts/delete-alert/',
         headers: {'X-CSRFToken': csrftoken},
         data: {
-            'keyword_id': tr.id,
+            'alert-id': tr.getAttribute('data-alert-id'),
         },
         success: function (response) {
             console.log(response.data)
@@ -65,22 +65,22 @@ function deleteKeyword(button) {
     });
 }
 
-function addKeyword(button) {
+function addAlert(button) {
     button.disabled = true; // don't allow button to be clicked until the form is saved or cancelled
 
-    const table = document.getElementById('keyword-table');
+    const table = document.getElementById('alert-table');
     const row = table.insertRow(1);
     const cell1 = row.insertCell(0);
     const cell2 = row.insertCell(1);
 
     cell1.innerHTML = `
-        <input type="text" name="keyword" id="keyword-input" placeholder="Type here" required>
+        <input type="text" name="alert" id="alert-input" placeholder="Type here" required>
     `;
     cell2.innerHTML = `
         <button type="button" class="btn btn-light rounded-circle" onclick="cancelRow(this);">
             <i class="bi bi-x-circle"></i>
         </button>
-        <button type="button" class="btn btn-success rounded-circle" id="save-btn" onclick="saveKeyword(this);" disabled>
+        <button type="button" class="btn btn-success rounded-circle" id="save-btn" onclick="saveAlert(this);" disabled>
             <i class="bi bi-check2-circle"></i>
         </button>
     `;
@@ -88,44 +88,40 @@ function addKeyword(button) {
     $('#keyword-input').on('keyup', checkKeyworkInput);
 }
 
-function saveKeyword(button) {
-    const input = $('#keyword-input').val();
+function saveAlert(button) {
+    const input = $('#alert-input').val();
     const csrftoken = getCookie('csrftoken');
 
     $.ajax({
         type: 'POST',
-        url: '/accounts/save-keyword/',
+        url: '/accounts/save-alert/',
         headers: {'X-CSRFToken': csrftoken},
         data: {
-            'keyword': input
+            'alert': input
         },
         success: function (response) {
             if (response.success == true) {
-                console.log('Keyword: ', response.keyword);
-                console.log('ID: ', response.id);
-
                 // delete input row and insert new keyword row at top of table
                 cancelRow(button);
-                const table = document.getElementById('keyword-table');
+                const table = document.getElementById('alert-table');
                 const row = table.insertRow(1);
                 // row.id = response.id;
-                row.setAttribute('data-keyword-id', response.id)
+                row.setAttribute('data-alert-id', response.id)
                 const cell1 = row.insertCell(0);
                 const cell2 = row.insertCell(1);
 
-                cell1.innerHTML = response.keyword;
+                cell1.innerHTML = response.alert;
                 cell2.innerHTML = `
-                    <button type="button" class="btn btn-danger" onclick="this.blur(); deleteKeyword(this);">
+                    <button type="button" class="btn btn-danger" onclick="this.blur(); deleteAlert(this);">
                         <i class="bi bi-trash"></i>
                     </button>
                 `
-
             } else {
-                alert('Something went wrong, please try again later');
+                alert(response.message);
             }
         },
         error: function (error) {
-            console.log(error);
+            alert('Something went wrong, please try again later');
         }
     });
 }
@@ -137,7 +133,7 @@ function cancelRow(button) {
 }
 
 function checkKeyworkInput() {
-    if ($('#keyword-input').val().length > 0) {
+    if ($('#alert-input').val().length > 0) {
         $('#save-btn').prop('disabled', false);
     } else {
         $('#save-btn').prop('disabled', true);
