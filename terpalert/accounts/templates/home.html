@@ -9,28 +9,28 @@
 
 {% block content %}
     <h1>Account</h1>
-    {% for message in messages %}
 
+    {% for message in messages %}
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             {{ message }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     {% endfor %}
 
+    {# Table to display the user's alerts #}
     <table id="alert-table" class="table table-striped">
         <thead>
         <tr>
             <th>Alerts</th>
             <th>
+                {# Button to add a new alert#}
                 <button type="button" class="btn btn-info" id="add-button" onclick="this.blur(); addAlert(this);">
                     <i class="bi bi-plus-circle"></i>
                 </button>
             </th>
         </tr>
         </thead>
-        <tbody id="alert-table-body">
-
-        </tbody>
+        <tbody id="alert-table-body"></tbody>
     </table>
 
 {% endblock %}
