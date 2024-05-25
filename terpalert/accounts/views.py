@@ -79,34 +79,52 @@ def logout_profile(request):
 @login_required
 @ensure_csrf_cookie
 def account(request):
+    """
+    Renders the account page
+    Login is required, otherwise user will be redirected to the login page
+    """
     return render(request, 'home.html')  # context
 
 
 def load_alerts(request):
-    profile = Profile.objects.get(email=request.user.email)
-    alerts = Alert.objects.filter(user__email__exact=profile.email).order_by('-date_created', 'id')
+    """
+    Handle the Ajax request to retrieve the alerts for the current user
+    All alerts for that user are returned in order of date created, most recent first
+
+    :return: JsonResponse containing a list with fields "id" and "alert"
+    """
+    alerts = Alert.objects.filter(user__email__exact=request.user.email).order_by('-date_created', 'id')
     data = []
-    for obj in alerts:
+    for alert in alerts:
         item = {
-            'id': obj.id,
-            'user': obj.user.id,
-            'alert': obj.menu_item.item,
-            'date': obj.date_created,
+            'id': alert.id,
+            'alert': alert.menu_item.item,
         }
         data.append(item)
     return JsonResponse({'data': data})
 
 
 def delete_alert(request):
+    """
+    Deletes the alert given by Ajax request
+
+    :return: JsonResponse containing the deleted object
+    """
     if request.method == 'POST':
         alert_to_delete = Alert.objects.get(pk=request.POST['alert-id'])
         data = {'data': alert_to_delete.delete()}
         return JsonResponse(data)
     else:
-        return redirect('account')
+        return redirect('home')  # Redirect any attempts to access this page
 
 
 def save_alert(request):
+    """
+    Saves the alert given by Ajax request
+    Alert won't save if the alert isn't a Menu item or if it is already an alert for the user
+
+    :return: JsonResponse containing the alert and its id. If saving was unsuccessful, message is returned
+    """
     if request.method == 'POST':
         alert_item = request.POST['alert']
         data = {}
@@ -137,4 +155,4 @@ def save_alert(request):
         finally:
             return JsonResponse(data)
     else:
-        return redirect('account')
+        return redirect('account')  # Redirect any attempts to access this page
