@@ -85,7 +85,17 @@ function addAlert(button) {
         </button>
     `;
 
-    $('#keyword-input').on('keyup', checkKeyworkInput);
+    // disable save button if the text box is empty
+    $('#alert-input').on('keyup', checkKeyworkInput);
+
+    const saveBtn = document.getElementById('save-btn');
+    $('#alert-input').keypress(function(event) {
+        if(event.keyCode == 13 || event.which == 13) {
+            if(saveBtn.disabled == false) {
+                saveAlert(saveBtn);
+            }
+        }
+    })
 }
 
 function saveAlert(button) {
