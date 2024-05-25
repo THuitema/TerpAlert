@@ -111,15 +111,30 @@ def save_alert(request):
         alert_item = request.POST['alert']
         data = {}
 
-        if saved_obj is not None:
-            # Database operation was successful
-            data['success'] = True
-            data['id'] = saved_obj.id
-            data['keyword'] = keyword
-        else:
-            # Something went wrong with create()
+        try:
+            menu_item = Menu.objects.get(item=alert_item)
+        except Menu.DoesNotExist:
             data['success'] = False
+            data['message'] = 'This menu item does not exist!'
+        else:
+            # Check if alert already exists for the user
+            if Alert.objects.filter(menu_item_id=menu_item.id, user_id=request.user.id).exists():
+                data['success'] = False
+                data['message'] = 'This alert has already been added!'
 
-        return JsonResponse(data)
+            else:
+                saved_alert = Alert.objects.create(menu_item_id=menu_item.id, user_id=request.user.id)
+
+                if saved_alert is not None:
+                    # Database operation was successful
+                    data['success'] = True
+                    data['id'] = saved_alert.id
+                    data['alert'] = alert_item
+                else:
+                    # Something went wrong with create()
+                    data['success'] = False
+                    data['message'] = 'Something went wrong with saving this alert'
+        finally:
+            return JsonResponse(data)
     else:
         return redirect('account')
