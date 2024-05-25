@@ -150,7 +150,9 @@ function saveAlert(button) {
                     </button>
                 `
             } else {
+                // invalid submission occurred
                 alert(response.message);
+                $('#alert-input').val('') // clear input field after invalid submission
             }
         },
         error: function (error) {
