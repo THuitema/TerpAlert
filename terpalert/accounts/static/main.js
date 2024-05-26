@@ -92,6 +92,8 @@ function addAlert(button) {
     cell1.innerHTML = `
         <input type="text" name="alert" id="alert-input" placeholder="Type here" required>
     `;
+
+
     // cell2 contains the cancel and save buttons
     cell2.innerHTML = `
         <button type="button" class="btn btn-light rounded-circle" onclick="removeRow(this);">
@@ -101,6 +103,27 @@ function addAlert(button) {
             <i class="bi bi-check2-circle"></i>
         </button>
     `;
+
+    $('#alert-input').autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                type: 'GET',
+                url: '/accounts/load-menu/',
+                data: {
+                    'term': request.term,
+                },
+                success: function (data) {
+                    response($.map(data.data, function(value, key) {
+                        return {
+                            label: value.label,
+                            value: value.label
+                        }
+                    }))
+                }
+            })
+        },
+        delay: 500
+    });
 
     // disable save button if the text box is empty
     $('#alert-input').on('keyup', checkKeywordInput);
@@ -115,6 +138,7 @@ function addAlert(button) {
         }
     })
 }
+
 
 /**
  * Sends an Ajax request to save the alert entered by the user

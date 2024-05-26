@@ -10,4 +10,5 @@ urlpatterns = [
     path('load-alerts/', views.load_alerts, name='load-alerts'),
     path('delete-alert/', views.delete_alert, name='delete-alert'),
     path('save-alert/', views.save_alert, name='save-alert'),
+    path('load-menu/', views.load_menu, name='load-menu'),
 ]

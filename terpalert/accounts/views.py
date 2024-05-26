@@ -86,6 +86,7 @@ def account(request):
     return render(request, 'home.html')  # context
 
 
+@login_required
 def load_alerts(request):
     """
     Handle the Ajax request to retrieve the alerts for the current user
@@ -156,3 +157,16 @@ def save_alert(request):
             return JsonResponse(data)
     else:
         return redirect('account')  # Redirect any attempts to access this page
+
+
+def load_menu(request):
+    term = request.GET['term']
+    menu = Menu.objects.filter(item__icontains=term).order_by('item', 'id')
+    data = []
+    for item in menu:
+        item = {
+            'label': item.item,
+            'value': item.id,
+        }
+        data.append(item)
+    return JsonResponse({'data': data})
