@@ -107,26 +107,10 @@ function addAlert(button) {
     // Autocomplete for input
     $('#alert-input').autocomplete({
         // Sends an Ajax request to gather menu items matching user's input
-        source: function (request, response) {
-            $.ajax({
-                type: 'GET',
-                url: '/accounts/load-menu/',
-                data: {
-                    'term': request.term,
-                },
-                success: function (data) {
-                    let results = $.map(data.data, function (value, key) {
-                        return {
-                            label: value.label, // label and value is the name of the menu item
-                            value: value.label
-                        }
-                    });
-                    response(results.slice(0, 10)); // limit to 10 results
-                }
-            })
-        },
+        source: getMenu,
         delay: 200,
-        minLength: 2
+        minLength: 1,
+
     });
 
     // disable save button if the text box is empty
@@ -143,6 +127,29 @@ function addAlert(button) {
     })
 }
 
+/**
+ * Sends an Ajax request to get relevant menu items based on the search term
+ * @param request Contains the search term from the user
+ * @param response Callback function to send labels and values to the autocomplete menu
+ */
+function getMenu(request, response) {
+    return $.ajax({
+        type: 'GET',
+        url: '/accounts/load-menu/',
+        data: {
+            'term': request.term,
+        },
+        success: function (data) {
+            let results = $.map(data.data, function (value, key) {
+                return {
+                    label: value.label, // label and value is the name of the menu item
+                    value: value.label
+                }
+            });
+            response(results.slice(0, 10)); // limit to 10 results
+        }
+    })
+}
 
 /**
  * Sends an Ajax request to save the alert entered by the user
