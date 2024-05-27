@@ -88,6 +88,8 @@ function addAlert(button) {
     const cell1 = row.insertCell(0);
     const cell2 = row.insertCell(1);
 
+    row.id = 'input-row';
+
     // cell1 contains the input field for the new alert
     cell1.innerHTML = `
         <input type="text" name="alert" id="alert-input" placeholder="Type here" required>
@@ -96,35 +98,36 @@ function addAlert(button) {
 
     // cell2 contains the cancel and save buttons
     cell2.innerHTML = `
-        <button type="button" class="btn btn-light rounded-circle" onclick="removeRow(this);">
+        <button type="button" class="btn btn-light rounded-circle" onclick="removeInputRow();">
             <i class="bi bi-x-circle"></i>
         </button>
-        <button type="button" class="btn btn-success rounded-circle" id="save-btn" onclick="saveAlert(this);" disabled>
-            <i class="bi bi-check2-circle"></i>
-        </button>
     `;
+
 
     // Autocomplete for input
     $('#alert-input').autocomplete({
         // Sends an Ajax request to gather menu items matching user's input
         source: getMenu,
+        select: function (event, ui) {
+            $('#alert-input').val(ui.item.label);
+            saveAlert($('#save-btn'));
+        },
         delay: 200,
         minLength: 1,
-
     });
 
-    // disable save button if the text box is empty
-    $('#alert-input').on('keyup', checkKeywordInput);
-
     // allow user to save alert by pressing enter key in addition to the save button
-    const saveBtn = document.getElementById('save-btn');
-    $('#alert-input').keypress(function (event) {
+    const saveBtn = $('#save-btn')
+
+    $('#alert-input').keyup(function (event) {
         if (event.keyCode == 13 || event.which == 13) { // 13 is the code for ENTER
-            if (saveBtn.disabled == false) {
+            if (saveBtn.is(':disabled')) {
                 saveAlert(saveBtn);
             }
+        } else {
+            saveBtn.prop('disabled', true);
         }
-    })
+    });
 }
 
 /**
@@ -153,9 +156,8 @@ function getMenu(request, response) {
 
 /**
  * Sends an Ajax request to save the alert entered by the user
- * @param button Button clicked to save alert
  */
-function saveAlert(button) {
+function saveAlert() {
     const input = $('#alert-input').val(); // alert entered by user
     const csrftoken = getCookie('csrftoken');
 
@@ -169,7 +171,7 @@ function saveAlert(button) {
         success: function (response) {
             if (response.success == true) {
                 // delete input row and insert new alert row at top of table
-                removeRow(button);
+                removeInputRow();
                 const table = document.getElementById('alert-table');
                 const row = table.insertRow(1);
                 row.setAttribute('data-alert-id', response.id)
@@ -197,12 +199,10 @@ function saveAlert(button) {
 }
 
 /**
- * Deletes row containing button
- * @param button Button in row to be removed
+ * Removes alert input row
  */
-function removeRow(button) {
-    const tr = button.parentNode.parentNode;
-    tr.parentNode.removeChild(tr);
+function removeInputRow() {
+    $('#input-row').remove();
     document.getElementById('add-button').disabled = false;
 }
 
