@@ -104,7 +104,9 @@ function addAlert(button) {
         </button>
     `;
 
+    // Autocomplete for input
     $('#alert-input').autocomplete({
+        // Sends an Ajax request to gather menu items matching user's input
         source: function (request, response) {
             $.ajax({
                 type: 'GET',
@@ -113,16 +115,18 @@ function addAlert(button) {
                     'term': request.term,
                 },
                 success: function (data) {
-                    response($.map(data.data, function(value, key) {
+                    let results = $.map(data.data, function (value, key) {
                         return {
-                            label: value.label,
+                            label: value.label, // label and value is the name of the menu item
                             value: value.label
                         }
-                    }))
+                    });
+                    response(results.slice(0, 10)); // limit to 10 results
                 }
             })
         },
-        delay: 500
+        delay: 200,
+        minLength: 2
     });
 
     // disable save button if the text box is empty

@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.db.models import Case, Value, When, CharField
 
 
 def create_profile(request):
@@ -160,8 +161,21 @@ def save_alert(request):
 
 
 def load_menu(request):
+    """
+    Handle the Ajax request to retrieve search results for autocomplete
+    Menu items are ordered based on where search term appears in name, then alphabetical order
+
+    :return: JsonResponse containing a list with fields "label" and "value"
+    """
     term = request.GET['term']
-    menu = Menu.objects.filter(item__icontains=term).order_by('item', 'id')
+    menu = Menu.objects.annotate(
+        order_by_position=Case(
+            When(item__startswith=term, then=Value(3)),
+            When(item__contains=term, then=Value(2)),
+            default=Value(1),
+            output_field=CharField(),
+        )
+    ).filter(item__icontains=term).order_by('order_by_position', 'item')
     data = []
     for item in menu:
         item = {
