@@ -95,38 +95,23 @@ function addAlert(button) {
         <input type="text" name="alert" id="alert-input" placeholder="Type here" required>
     `;
 
-
-    // cell2 contains the cancel and save buttons
+    // cell2 contains the cancel button
     cell2.innerHTML = `
         <button type="button" class="btn btn-light rounded-circle" onclick="removeInputRow();">
             <i class="bi bi-x-circle"></i>
         </button>
     `;
 
-
-    // Autocomplete for input
+    // Autocomplete dropdown for input
     $('#alert-input').autocomplete({
         // Sends an Ajax request to gather menu items matching user's input
         source: getMenu,
-        select: function (event, ui) {
+        select: function (event, ui) { // save selection
             $('#alert-input').val(ui.item.label);
             saveAlert($('#save-btn'));
         },
         delay: 200,
         minLength: 1,
-    });
-
-    // allow user to save alert by pressing enter key in addition to the save button
-    const saveBtn = $('#save-btn')
-
-    $('#alert-input').keyup(function (event) {
-        if (event.keyCode == 13 || event.which == 13) { // 13 is the code for ENTER
-            if (saveBtn.is(':disabled')) {
-                saveAlert(saveBtn);
-            }
-        } else {
-            saveBtn.prop('disabled', true);
-        }
     });
 }
 
@@ -199,22 +184,11 @@ function saveAlert() {
 }
 
 /**
- * Removes alert input row
+ * Removes alert input row and reenables the add alert button
  */
 function removeInputRow() {
     $('#input-row').remove();
     document.getElementById('add-button').disabled = false;
-}
-
-/**
- * Disabled save button as long as the input field is empty
- */
-function checkKeywordInput() {
-    if ($('#alert-input').val().length > 0) {
-        $('#save-btn').prop('disabled', false);
-    } else {
-        $('#save-btn').prop('disabled', true);
-    }
 }
 
 /**
@@ -237,4 +211,3 @@ function getCookie(name) {
     }
     return cookieValue;
 }
-
