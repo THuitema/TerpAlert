@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from db import db_select
+from db import db_select, db_write
 
 # Constants for web scraping
 BASE_URL = "https://nutrition.umd.edu"
@@ -37,7 +37,7 @@ class DiningHall:
         :return: str, the url
         """
         month = 5  # TODO: make these dynamic dates
-        day = 6
+        day = 29
         year = 2024
         return BASE_URL + "/?locationNum=" + str(self.location_num) + "&dtdate=" + str(month) + "/" + str(
                day) + "/" + str(year)
@@ -111,9 +111,10 @@ class Menu:
             item_name = item_name.replace("'", "''")  # replaces single quotes w/ double quotes (SQL req.)
 
             # Get users from database that want to be alerted to the current item
+            # TODO: update this method to the correct tables
             query = '''
                 SELECT *
-                FROM account_user
+                FROM accounts_profile
                 WHERE id IN (
                     SELECT user_id
                     FROM account_keyword
@@ -141,6 +142,15 @@ class Menu:
         for user_id, obj in self.users_to_alert.items():
             out += str(obj) + '\n'
         print(out)
+
+    def update_db_menu(self, conn):
+        for key in self.total_menu.keys():
+            query = '''
+                INSERT INTO accounts_menu (item)
+                SELECT %s
+                WHERE NOT EXISTS (SELECT * FROM accounts_menu WHERE item=%s)
+            '''
+            db_write(conn, query, key, key)
 
     def __str__(self):
         """Returns each item from menu, along with which dining halls are serving them

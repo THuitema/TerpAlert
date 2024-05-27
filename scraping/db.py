@@ -14,10 +14,10 @@ def connect():
         print(e)
 
 
-def execute_write(db: psycopg2.extensions.connection, sql_query):
+def db_write(db: psycopg2.extensions.connection, query, *args):
     cur = db.cursor()
     try:
-        cur.execute(sql_query)
+        cur.execute(query, tuple(args))
     except Exception as e:
         print("Query execution unsuccessful: {0}".format(e))
 
