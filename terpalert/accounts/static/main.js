@@ -18,11 +18,6 @@ function getAlerts() {
         url: '/accounts/load-alerts/',
         success: function (response) {
             const data = response.data;
-            if (data.length == 0) {
-                alertTableBody.innerHTML = `
-                    <p>Nothing added yet!</p>
-                `
-            }
 
             // Display each alert in a row in the table
             data.forEach(alert => {
