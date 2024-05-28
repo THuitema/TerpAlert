@@ -163,16 +163,17 @@ def save_alert(request):
 def load_menu(request):
     """
     Handle the Ajax request to retrieve search results for autocomplete
-    Menu items are ordered based on where search term appears in name, then alphabetical order
+    Results are ordered starting with ones starting with the search term,
+    followed by ones containing the term in alphabetical order
 
     :return: JsonResponse containing a list with fields "label" and "value"
     """
     term = request.GET['term']
     menu = Menu.objects.annotate(
         order_by_position=Case(
-            When(item__startswith=term, then=Value(3)),
-            When(item__contains=term, then=Value(2)),
-            default=Value(1),
+            When(item__istartswith=term, then=Value(1)),
+            When(item__icontains=term, then=Value(2)),
+            default=Value(3),
             output_field=CharField(),
         )
     ).filter(item__icontains=term).order_by('order_by_position', 'item')
@@ -183,4 +184,5 @@ def load_menu(request):
             'value': item.id,
         }
         data.append(item)
+
     return JsonResponse({'data': data})
