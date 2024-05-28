@@ -37,7 +37,7 @@ class DiningHall:
         :return: str, the url
         """
         month = 5  # TODO: make these dynamic dates
-        day = 29
+        day = 28
         year = 2024
         return BASE_URL + "/?locationNum=" + str(self.location_num) + "&dtdate=" + str(month) + "/" + str(
                day) + "/" + str(year)
@@ -117,8 +117,12 @@ class Menu:
                 FROM accounts_profile
                 WHERE id IN (
                     SELECT user_id
-                    FROM account_keyword
-                    WHERE keyword = %s
+                    FROM accounts_alert
+                    WHERE menu_item_id in (
+                        SELECT id
+                        FROM accounts_menu
+                        WHERE item=%s
+                    )
                 )
             '''
 
@@ -144,6 +148,10 @@ class Menu:
         print(out)
 
     def update_db_menu(self, conn):
+        """Insert new menu items to Menu table in database
+
+        :param conn: psycopg2.extensions.connection
+        """
         for key in self.total_menu.keys():
             query = '''
                 INSERT INTO accounts_menu (item)
