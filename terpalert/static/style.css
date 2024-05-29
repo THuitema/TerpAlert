@@ -1,10 +1,18 @@
+* {
+    font-family: Inter, sans-serif;
+}
+
 .navbar-nav li a, .navbar-brand span {
-  color: white;
+  color: white !important;
 }
 
 .navbar-nav li a:hover, .navbar-nav li a:focus, .navbar-nav li a:active,
 .navbar-brand span:hover, .navbar-brand span:focus, .navbar-brand span:active {
-    color: #cccccc;
+    color: #cccccc !important;
+}
+
+.btn-warning {
+    background-color: #ffd200 !important;
 }
 
 /* UMD COLORS

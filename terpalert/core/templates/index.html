@@ -1,8 +1,29 @@
 {% extends 'base.html' %}
 
-{% block title %}TerpAlert{% endblock %}
+{% block title %}Home | TerpAlert{% endblock %}
 
 {% block content %}
-    <h1>Welcome to TerpAlert!</h1>
+
+    <div class="container-md my-3">
+        <!-- Header text -->
+        <div class="row text-center">
+            <h1>Welcome to TerpAlert</h1>
+            <p><i>Know when your favorite foods are being served at University of Maryland dining halls!</i></p>
+        </div>
+
+        <!-- Seach bar -->
+        <div class="row text-center my-3">
+            <form action="" method="get">
+                <label for="food-input" style="font-size: xx-large; font-weight: 500">Search for a food</label>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control form-control-lg" name="food-input" id="food-input"
+                           placeholder="Recipient's username" required>
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-warning btn-lg">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
 {% endblock %}
