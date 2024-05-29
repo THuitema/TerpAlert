@@ -1,3 +1,15 @@
-.navbar-nav li a {
-    color: white;
+.navbar-nav li a, .navbar-brand span {
+  color: white;
 }
+
+.navbar-nav li a:hover, .navbar-nav li a:focus, .navbar-nav li a:active,
+.navbar-brand span:hover, .navbar-brand span:focus, .navbar-brand span:active {
+    color: #cccccc;
+}
+
+/* UMD COLORS
+RED: #e21833
+GOLD #ffd200
+WHITE: #ffffff
+BLACK: #000000
+*/
