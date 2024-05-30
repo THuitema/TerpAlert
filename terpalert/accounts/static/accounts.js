@@ -208,3 +208,26 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+function formatPhoneNumber(value) {
+    if (!value) {
+        return value
+    }
+    const phoneNumber = value.replace(/\D/g, ''); // /[^/d]/g
+    const length = phoneNumber.length;
+    if (length < 4) {
+        return phoneNumber;
+    }
+    if (length < 7) {
+        return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
+    }
+    return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(
+        3,
+        6,
+    )}-${phoneNumber.slice(6, 10)}`;
+}
+
+function phoneNumberFormatter() {
+    const phoneInput = document.getElementById('id_phone');
+    phoneInput.value = formatPhoneNumber(phoneInput.value);
+}
