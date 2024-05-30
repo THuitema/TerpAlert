@@ -209,6 +209,11 @@ function getCookie(name) {
     return cookieValue;
 }
 
+/**
+ * Formats a raw phone number to (XXX) XXX-XXXX
+ * @param value Raw phone number typed by user
+ * @returns {*|string} Formatted phone number
+ */
 function formatPhoneNumber(value) {
     if (!value) {
         return value
@@ -227,6 +232,10 @@ function formatPhoneNumber(value) {
     )}-${phoneNumber.slice(6, 10)}`;
 }
 
+/**
+ * Formats phone number as user is typing
+ * Retrieves raw phone number from HTML element with id 'id_phone'
+ */
 function phoneNumberFormatter() {
     const phoneInput = document.getElementById('id_phone');
     phoneInput.value = formatPhoneNumber(phoneInput.value);
