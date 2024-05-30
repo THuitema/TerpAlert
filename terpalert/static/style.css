@@ -15,6 +15,10 @@
     background-color: #ffd200 !important;
 }
 
+.auth-form-error {
+    color: red;
+}
+
 /* UMD COLORS
 RED: #e21833
 GOLD #ffd200

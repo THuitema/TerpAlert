@@ -1,24 +1,54 @@
 {% extends 'base.html' %}
 
-{% block title %}- Login{% endblock %}
+{% block title %}Login | TerpAlert{% endblock %}
 
 {% block content %}
-<h1>Login</h1>
-{% for message in messages %}
+    <div class="container-md my-3">
+        <!-- Header text -->
+        <div class="row text-center">
+            <h1>Login</h1>
+        </div>
 
-<div class="alert alert-danger alert-dismissible fade show" role="alert">
-    {{ message }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
+        <!-- Login form -->
+        <div class="row mb-3 justify-content-center">
+            <div class="col-md-6 col-sm-12">
+                <form action="" method="post">
+                    {% csrf_token %}
 
-{% endfor %}
+                    <!-- Email -->
+                    <div class="form-group mb-3">
+                        <label for="{{ form.username.id_for_label }}"
+                               class="col-sm-2 mx-auto col-form-label">Email</label>
+                        <input type="email" class="form-control" id="{{ form.username.id_for_label }}"
+                               name="{{ form.username.html_name }}" required>
+                        {{ form.username.errors }}
+                    </div>
 
-<form action="" method="post">
-    {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Submit">
-</form>
+                    <!-- Password -->
+                    <div class="form-group mb-3">
+                        <label for="{{ form.password.id_for_label }}"
+                               class="col-sm-2 mx-auto col-form-label">Password</label>
+                        <input type="password" class="form-control" id="{{ form.password.id_for_label }}"
+                               name="{{ form.password.html_name }}" required>
+                        {{ form.password.errors }}
+                    </div>
 
+                    <!-- Show error message if invalid username/password -->
+                    {% if form.errors %}
+                        <p class="auth-form-error">Your username and password didn't match, please try again.</p>
+                    {% endif %}
 
+                    <!-- Submit button -->
+                    <button type="submit" class="btn btn-warning">Sign in</button>
+                </form>
+            </div>
+        </div>
 
+        <!-- Link to sign up page -->
+        <div class="row justify-content-center my-3">
+            <div class="col-md-6 col-sm-12">
+                <p>Don't have an account? <a href="{% url 'signup' %}">Sign up</a></p>
+            </div>
+        </div>
+    </div>
 {% endblock %}
