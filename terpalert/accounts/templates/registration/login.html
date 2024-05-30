@@ -18,19 +18,17 @@
                     <!-- Email -->
                     <div class="form-group mb-3">
                         <label for="{{ form.username.id_for_label }}"
-                               class="col-sm-2 mx-auto col-form-label">Email</label>
+                               class="col-sm-4 mx-auto col-form-label">Email</label>
                         <input type="email" class="form-control" id="{{ form.username.id_for_label }}"
                                name="{{ form.username.html_name }}" required>
-                        {{ form.username.errors }}
                     </div>
 
                     <!-- Password -->
                     <div class="form-group mb-3">
                         <label for="{{ form.password.id_for_label }}"
-                               class="col-sm-2 mx-auto col-form-label">Password</label>
+                               class="col-sm-4 mx-auto col-form-label">Password</label>
                         <input type="password" class="form-control" id="{{ form.password.id_for_label }}"
                                name="{{ form.password.html_name }}" required>
-                        {{ form.password.errors }}
                     </div>
 
                     <!-- Show error message if invalid username/password -->
@@ -39,7 +37,7 @@
                     {% endif %}
 
                     <!-- Submit button -->
-                    <button type="submit" class="btn btn-warning">Sign in</button>
+                    <button type="submit" class="btn btn-warning">Log in</button>
                 </form>
             </div>
         </div>
