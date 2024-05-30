@@ -26,6 +26,9 @@
                                class="col-sm-4 mx-auto col-form-label">Email</label>
                         <input type="email" class="form-control" id="{{ form.email.id_for_label }}"
                                name="{{ form.email.html_name }}" required>
+                        {% for error in form.email.errors %}
+                            <p class="auth-form-error">{{ error }}</p>
+                        {% endfor %}
                     </div>
 
                     <!-- Phone -->
@@ -35,6 +38,9 @@
                         <input type="tel" class="form-control" id="{{ form.phone.id_for_label }}"
                                name="{{ form.phone.html_name }}" onkeyup="phoneNumberFormatter()"
                                maxlength="14" required>
+                        {% for error in form.phone.errors %}
+                            <p class="auth-form-error">{{ error }}</p>
+                        {% endfor %}
                     </div>
 
                     <!-- Password -->
@@ -43,6 +49,9 @@
                                class="col-sm-4 mx-auto col-form-label">Password</label>
                         <input type="password" class="form-control" id="{{ form.password1.id_for_label }}"
                                name="{{ form.password1.html_name }}" required>
+                        {% for error in form.password1.errors %}
+                            <p class="auth-form-error">{{ error }}</p>
+                        {% endfor %}
                     </div>
 
                     <!-- Confirm Password -->
@@ -51,18 +60,17 @@
                                class="col-sm-4 mx-auto col-form-label">Confirm Password</label>
                         <input type="password" class="form-control" id="{{ form.password2.id_for_label }}"
                                name="{{ form.password2.html_name }}" required>
+                        {% for error in form.password2.errors %}
+                            <p class="auth-form-error">{{ error }}</p>
+                        {% endfor %}
                     </div>
-
-                    <!-- Show error message(s) -->
-                    {% if form.errors %}
-                        <p class="auth-form-error">{{ form.errors }}</p>
-                    {% endif %}
 
                     <!-- Submit button -->
                     <button type="submit" class="btn btn-warning">Sign up</button>
                 </form>
             </div>
         </div>
+
         <!-- Link to login page -->
         <div class="row justify-content-center my-3">
             <div class="col-md-6 col-sm-12">

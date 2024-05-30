@@ -7,9 +7,18 @@ class ProfileCreationForm(UserCreationForm):
     email = forms.EmailField(label="Email", max_length=255)
     phone = forms.CharField(label="Phone", max_length=14)
 
+    error_messages = {
+        'password_mismatch': 'The provided passwords do not match',
+    }
+
     class Meta:
         model = Profile
         fields = ("email", "phone", "password1", "password2")
+        error_messages = {
+            'email': {
+                'invalid': 'Invalid email address',
+            },
+        }
 
     def clean_email(self):
         email = self.cleaned_data["email"].lower()
