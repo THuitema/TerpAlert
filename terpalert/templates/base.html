@@ -8,15 +8,14 @@
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 
-    {% block scripts %}
-    {% endblock scripts %}
-
     {% load bootstrap5 %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{% static 'style.css' %}"/>
     <script src="{% static 'main.js' %}"></script>
+    {% block scripts %}
+    {% endblock scripts %}
 
 
     <title>{% block title %}{% endblock %}</title>
@@ -33,7 +32,8 @@
         </a>
 
         <!-- toggle button for mobile devices -->
-        <button class="navbar-toggler" id="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav">
+        <button class="navbar-toggler" id="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#main-nav">
             <span class="navbar-toggler-icon"></span>
         </button>
 
