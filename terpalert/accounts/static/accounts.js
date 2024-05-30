@@ -5,7 +5,9 @@ let alertTableBody;
  */
 window.onload = function () {
     alertTableBody = document.getElementById('alert-table-body');
-    getAlerts();
+    if (alertTableBody != null) {
+        getAlerts();
+    }
 }
 
 /**
