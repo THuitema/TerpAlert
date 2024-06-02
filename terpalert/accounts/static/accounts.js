@@ -28,7 +28,7 @@ function getAlerts() {
                         <!-- Cell 1 contains the alert -->
                         <td>${alert.alert}</td>
                         <!-- Cell 2 contains the delete button -->
-                        <td>
+                        <td class="col-right">
                             <button type="button" class="btn btn-danger" onclick="this.blur(); deleteAlert(this);">
                                 <i class="bi bi-trash"></i>
                             </button>
@@ -94,10 +94,11 @@ function addAlert(button) {
 
     // cell2 contains the cancel button
     cell2.innerHTML = `
-        <button type="button" class="btn btn-light rounded-circle" onclick="removeInputRow();">
+        <button type="button" class="btn btn-light rounded-circle col-right" onclick="removeInputRow();">
             <i class="bi bi-x-circle"></i>
         </button>
     `;
+    cell2.className = 'col-right'
 
     // Autocomplete dropdown for input
     $('#alert-input').autocomplete({
