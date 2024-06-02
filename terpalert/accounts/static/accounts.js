@@ -29,8 +29,8 @@ function getAlerts() {
                         <td>${alert.alert}</td>
                         <!-- Cell 2 contains the delete button -->
                         <td class="col-right">
-                            <button type="button" class="btn btn-danger" onclick="this.blur(); deleteAlert(this);">
-                                <i class="bi bi-trash"></i>
+                            <button type="button" class="btn btn-outline-danger" onclick="this.blur(); deleteAlert(this);">
+                                <i class="bi bi-trash3-fill"></i>
                             </button>
                         </td>
                     </tr>
@@ -78,8 +78,8 @@ function deleteAlert(button) {
  * @param button Button clicked to add alert
  */
 function addAlert(button) {
-    button.disabled = true; // don't allow the add button to be clicked until the new alert is saved or cancelled
-
+    // button.disabled = true; // don't allow the add button to be clicked until the new alert is saved or cancelled
+    document.getElementsByName('add-button').disabled = true;
     const table = document.getElementById('alert-table');
     const row = table.insertRow(1);
     const cell1 = row.insertCell(0);
@@ -94,11 +94,13 @@ function addAlert(button) {
 
     // cell2 contains the cancel button
     cell2.innerHTML = `
-        <button type="button" class="btn btn-light rounded-circle col-right" onclick="removeInputRow();">
+        <button type="button" class="btn rounded-circle" style="background-color: transparent;"
+         onclick="removeInputRow();">
             <i class="bi bi-x-circle"></i>
         </button>
     `;
     cell2.className = 'col-right'
+    // cell2.style.backgroundColor = 'transparent';
 
     // Autocomplete dropdown for input
     $('#alert-input').autocomplete({
@@ -165,10 +167,11 @@ function saveAlert() {
                 cell1.innerHTML = response.alert;
                 // cell2 contains the delete button
                 cell2.innerHTML = `
-                    <button type="button" class="btn btn-danger" onclick="this.blur(); deleteAlert(this);">
-                        <i class="bi bi-trash"></i>
+                    <button type="button" class="btn btn-outline-danger" onclick="this.blur(); deleteAlert(this);">
+                        <i class="bi bi-trash3-fill"></i>
                     </button>
                 `
+                cell2.className = 'col-right'
             } else {
                 // invalid submission occurred
                 alert(response.message);

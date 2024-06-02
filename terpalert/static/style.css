@@ -28,11 +28,21 @@ BLACK: #000000
     border-color: #ad7231 !important;
 }
 
-.auth-form-error {
-    color: red;
+.btn-danger {
+    background-color: #e21833 !important;
+    border-color: #e21833 !important;
 }
 
-@media screen and (max-width: 600px) {
+.btn-danger:hover {
+    background-color: #b5162e !important;
+    border-color: #b5162e !important;
+}
+
+.auth-form-error {
+    color: #e21833;
+}
+
+@media screen and (max-width: 768px) {
     .btn-wide {
         display: none;
     }
@@ -42,7 +52,7 @@ BLACK: #000000
     }
 }
 
-@media screen and (min-width: 600px) {
+@media screen and (min-width: 768px) {
     .btn-narrow {
         display: none;
     }
@@ -55,4 +65,9 @@ BLACK: #000000
 .col-right {
     text-align: right;
 }
+
+button[class*='btn-outline-'] {
+    border-color: transparent !important;
+}
+
 
