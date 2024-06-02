@@ -1,3 +1,10 @@
+/* UMD COLORS
+RED: #e21833
+GOLD #ffd200
+WHITE: #ffffff
+BLACK: #000000
+*/
+
 * {
     font-family: Inter, sans-serif;
 }
@@ -25,9 +32,23 @@
     color: red;
 }
 
-/* UMD COLORS
-RED: #e21833
-GOLD #ffd200
-WHITE: #ffffff
-BLACK: #000000
-*/
+@media screen and (max-width: 600px) {
+    .btn-wide {
+        display: none;
+    }
+
+    .btn-narrow {
+        display: inline;
+    }
+}
+
+@media screen and (min-width: 600px) {
+    .btn-narrow {
+        display: none;
+    }
+
+    .btn-wide {
+        display: inline;
+    }
+}
+
