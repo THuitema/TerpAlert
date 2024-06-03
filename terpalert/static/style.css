@@ -74,7 +74,7 @@ BLACK: #000000
     }
 
     .input-width {
-        width: 50%;
+        width: 75%;
     }
 
 }
@@ -97,8 +97,22 @@ button[class*='btn-outline-'] {
     border-color: var(--umd-gold);
 }
 
-/*.input-width {*/
-/*    width: 50%;*/
-/*}*/
+ul.ui-autocomplete {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    float: left;
+    display: none;
+    min-width: 160px;
+    margin: 0 0 10px 25px;
+    list-style: none;
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    *border-right-width: 2px;
+    *border-bottom-width: 2px;
 
-
+    li.ui-menu-item {
+        line-height: 2em;
+    }
+}

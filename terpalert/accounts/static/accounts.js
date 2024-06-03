@@ -27,6 +27,7 @@ window.onload = function () {
             button.blur();
             deleteAlert(button);
         });
+
     }
 }
 
@@ -127,7 +128,20 @@ function addAlert(button) {
     $('#alert-input').autocomplete({
         // Sends an Ajax request to gather menu items matching user's input
         source: getMenu,
-        select: function (event, ui) { // save selection
+        // Bold characters in results that match search term (case-insensitive)
+        open: function (event, ui) {
+            const data = $(this).data('ui-autocomplete');
+            data.menu.element.find('li').each(function () {
+                const me = $(this);
+                const keywords = data.term.split(' ').join('|');
+                let textWrapper = me.find('.ui-menu-item-wrapper');
+                let text = textWrapper.text();
+                let newTextHtml = text.replace(new RegExp("(" + keywords + ")", "gi"), '<b>$1</b>');
+                textWrapper.html(newTextHtml);
+            });
+        },
+        // Save item when selected
+        select: function (event, ui) {
             $('#alert-input').val(ui.item.label);
             saveAlert($('#save-btn'));
         },
