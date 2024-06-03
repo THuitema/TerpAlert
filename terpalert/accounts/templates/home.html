@@ -1,36 +1,60 @@
 {% extends 'base.html' %}
+
 {% load static %}
 
 {% block scripts %}
-    <script src="{% static 'main.js' %}"></script>
+    <script src="{% static 'accounts.js' %}"></script>
 {% endblock scripts %}
 
-{% block title %}- Account{% endblock %}
+{% block title %}Account | TerpAlert{% endblock %}
 
 {% block content %}
-    <h1>Account</h1>
-
-    {% for message in messages %}
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="container-md my-3">
+        <!-- Header text -->
+        <div class="row text-center">
+            <h1>Account</h1>
         </div>
-    {% endfor %}
 
-    {# Table to display the user's alerts #}
-    <table id="alert-table" class="table table-striped">
-        <thead>
-        <tr>
-            <th>Alerts</th>
-            <th>
-                {# Button to add a new alert#}
-                <button type="button" class="btn btn-info" id="add-button" onclick="this.blur(); addAlert(this);">
-                    <i class="bi bi-plus-circle"></i>
-                </button>
-            </th>
-        </tr>
-        </thead>
-        <tbody id="alert-table-body"></tbody>
-    </table>
+        <!-- User alert table -->
+        <div class="row justify-content-center">
+            <table class="table table-striped align-middle" id="alert-table">
+                <thead>
+                <tr>
+                    <th scope="col" class="col-9">Your alerts</th>
+                    <th scope="col" class="col-3 col-right">
+                        <button type="button" class="btn btn-success btn-wide" id="add-button-wide"
+                                name="add-button" onclick="this.blur(); addAlert(this);">
+                            New alert
+                        </button>
+                        <button type="button" class="btn btn-outline-success btn-narrow" id="add-button-narrow"
+                                name="add-button" onclick="this.blur(); addAlert(this);">
+                            <i class="bi bi-plus-circle-fill"></i>
+                        </button>
+                    </th>
+                </tr>
+                </thead>
+                <tbody id="alert-table-body" class="table-group-divider"></tbody>
+            </table>
+        </div>
+
+        <!-- Delete alert confirmation dialogue -->
+        <div class="modal" tabindex="-1" id="delete-modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete alert</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}

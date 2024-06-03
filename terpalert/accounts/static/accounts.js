@@ -8,6 +8,26 @@ window.onload = function () {
     if (alertTableBody != null) {
         getAlerts();
     }
+
+    // Delete alert confirmation dialogue
+    const deleteModal = document.getElementById('delete-modal');
+    if (deleteModal) {
+        let button;
+        deleteModal.addEventListener('show.bs.modal', event => {
+            button = event.relatedTarget;
+            const modalBody = deleteModal.querySelector('.modal-body');
+            const alert = button.getAttribute('data-bs-alert');
+            modalBody.textContent = `Are you sure you want to delete "${alert}"?`;
+
+
+        });
+
+        const deleteBtn = deleteModal.querySelector('.btn-danger');
+        deleteBtn.addEventListener('click', e => {
+            button.blur();
+            deleteAlert(button);
+        });
+    }
 }
 
 /**
@@ -22,6 +42,7 @@ function getAlerts() {
             const data = response.data;
 
             // Display each alert in a row in the table
+            alertTableBody.innerHTML = '';
             data.forEach(alert => {
                 alertTableBody.innerHTML += `
                     <tr data-alert-id="${alert.id}">
@@ -29,7 +50,8 @@ function getAlerts() {
                         <td>${alert.alert}</td>
                         <!-- Cell 2 contains the delete button -->
                         <td class="col-right">
-                            <button type="button" class="btn btn-outline-danger" onclick="this.blur(); deleteAlert(this);">
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" 
+                            data-bs-target="#delete-modal" data-bs-alert="${alert.alert}">
                                 <i class="bi bi-trash3-fill"></i>
                             </button>
                         </td>
@@ -48,11 +70,6 @@ function getAlerts() {
  * @param button Button clicked to delete alert
  */
 function deleteAlert(button) {
-    // Show popup for user to confirm they want to delete alert
-    if (confirm("Are you sure want to delete this alert?") == false) {
-        return;
-    }
-
     const csrftoken = getCookie('csrftoken');
     const td = button.parentNode;
     const tr = td.parentNode;
@@ -78,8 +95,9 @@ function deleteAlert(button) {
  * @param button Button clicked to add alert
  */
 function addAlert(button) {
-    // button.disabled = true; // don't allow the add button to be clicked until the new alert is saved or cancelled
-    document.getElementsByName('add-button').disabled = true;
+    document.getElementsByName('add-button').forEach(btn => {
+        btn.disabled = true;
+    });
     const table = document.getElementById('alert-table');
     const row = table.insertRow(1);
     const cell1 = row.insertCell(0);
@@ -100,7 +118,6 @@ function addAlert(button) {
         </button>
     `;
     cell2.className = 'col-right'
-    // cell2.style.backgroundColor = 'transparent';
 
     // Autocomplete dropdown for input
     $('#alert-input').autocomplete({
@@ -157,21 +174,7 @@ function saveAlert() {
             if (response.success == true) {
                 // delete input row and insert new alert row at top of table
                 removeInputRow();
-                const table = document.getElementById('alert-table');
-                const row = table.insertRow(1);
-                row.setAttribute('data-alert-id', response.id)
-                const cell1 = row.insertCell(0);
-                const cell2 = row.insertCell(1);
-
-                // cell1 contains the alert
-                cell1.innerHTML = response.alert;
-                // cell2 contains the delete button
-                cell2.innerHTML = `
-                    <button type="button" class="btn btn-outline-danger" onclick="this.blur(); deleteAlert(this);">
-                        <i class="bi bi-trash3-fill"></i>
-                    </button>
-                `
-                cell2.className = 'col-right'
+                getAlerts();
             } else {
                 // invalid submission occurred
                 alert(response.message);
@@ -189,7 +192,9 @@ function saveAlert() {
  */
 function removeInputRow() {
     $('#input-row').remove();
-    document.getElementById('add-button').disabled = false;
+    document.getElementsByName('add-button').forEach(btn => {
+        btn.disabled = false;
+    });
 }
 
 /**
