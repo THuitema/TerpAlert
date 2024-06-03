@@ -18,6 +18,8 @@ BLACK: #000000
 
 .navbar-nav li a, .navbar-brand span {
     color: white !important;
+    margin-left: 1em;
+    margin-right: 1em;
 }
 
 .navbar-nav li a:hover, .navbar-nav li a:focus, .navbar-nav li a:active,
