@@ -98,8 +98,8 @@ function addAlert(button) {
     document.getElementsByName('add-button').forEach(btn => {
         btn.disabled = true;
     });
-    const table = document.getElementById('alert-table');
-    const row = table.insertRow(1);
+
+    const row = alertTableBody.insertRow(0);
     const cell1 = row.insertCell(0);
     const cell2 = row.insertCell(1);
 
@@ -107,7 +107,8 @@ function addAlert(button) {
 
     // cell1 contains the input field for the new alert
     cell1.innerHTML = `
-        <input type="text" name="alert" id="alert-input" placeholder="Type here" required>
+        <input type="text" class="form-control no-border shadow-none input-width" name="alert" id="alert-input" 
+        placeholder="Type here" required>
     `;
 
     // cell2 contains the cancel button
@@ -118,6 +119,9 @@ function addAlert(button) {
         </button>
     `;
     cell2.className = 'col-right'
+
+    // set focus to input text box
+    document.getElementById('alert-input').focus();
 
     // Autocomplete dropdown for input
     $('#alert-input').autocomplete({

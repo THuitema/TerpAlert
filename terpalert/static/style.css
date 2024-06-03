@@ -57,6 +57,11 @@ BLACK: #000000
     .btn-narrow {
         display: inline;
     }
+
+    .input-width {
+        width: 100%;
+    }
+
 }
 
 @media screen and (min-width: 768px) {
@@ -67,6 +72,11 @@ BLACK: #000000
     .btn-wide {
         display: inline;
     }
+
+    .input-width {
+        width: 50%;
+    }
+
 }
 
 .col-right {
@@ -76,5 +86,19 @@ BLACK: #000000
 button[class*='btn-outline-'] {
     border-color: transparent !important;
 }
+
+.no-border {
+    border-width: 0 0 2px;
+    box-shadow: none; /* You may want to include this as bootstrap applies these styles too */
+    padding-left: 0;
+}
+
+.no-border:focus {
+    border-color: var(--umd-gold);
+}
+
+/*.input-width {*/
+/*    width: 50%;*/
+/*}*/
 
 
