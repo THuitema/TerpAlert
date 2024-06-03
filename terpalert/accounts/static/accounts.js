@@ -18,8 +18,6 @@ window.onload = function () {
             const modalBody = deleteModal.querySelector('.modal-body');
             const alert = button.getAttribute('data-bs-alert');
             modalBody.textContent = `Are you sure you want to delete "${alert}"?`;
-
-
         });
 
         const deleteBtn = deleteModal.querySelector('.btn-danger');
@@ -27,8 +25,11 @@ window.onload = function () {
             button.blur();
             deleteAlert(button);
         });
-
     }
+
+    // Alert already exists popup modal
+    $('#already-exists-modal').modal({ show: false})
+
 }
 
 /**
@@ -195,7 +196,7 @@ function saveAlert() {
                 getAlerts();
             } else {
                 // invalid submission occurred
-                alert(response.message);
+                $('#already-exists-modal').modal('show');
                 $('#alert-input').val('') // clear input field after invalid submission
             }
         },
