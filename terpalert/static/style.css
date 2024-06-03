@@ -5,12 +5,19 @@ WHITE: #ffffff
 BLACK: #000000
 */
 
+:root {
+    --umd-red: #e21833;
+    --umd-red-hover: #b5162e;
+    --umd-gold: #ffd200;
+    --umd-gold-hover: #ad7231;
+}
+
 * {
     font-family: Inter, sans-serif;
 }
 
 .navbar-nav li a, .navbar-brand span {
-  color: white !important;
+    color: white !important;
 }
 
 .navbar-nav li a:hover, .navbar-nav li a:focus, .navbar-nav li a:active,
@@ -19,27 +26,27 @@ BLACK: #000000
 }
 
 .btn-warning {
-    background-color: #ffd200 !important;
-    border-color: #ffd200 !important;
+    background-color: var(--umd-gold) !important;
+    border-color: var(--umd-gold) !important;
 }
 
 .btn-warning:hover {
-    background-color: #ad7231 !important;
-    border-color: #ad7231 !important;
+    background-color: var(--umd-gold-hover) !important;
+    border-color: var(--umd-gold-hover) !important;
 }
 
 .btn-danger {
-    background-color: #e21833 !important;
-    border-color: #e21833 !important;
+    background-color: var(--umd-red) !important;
+    border-color: var(--umd-red) !important;
 }
 
 .btn-danger:hover {
-    background-color: #b5162e !important;
-    border-color: #b5162e !important;
+    background-color: var(--umd-red-hover) !important;
+    border-color: var(--umd-red-hover) !important;
 }
 
 .auth-form-error {
-    color: #e21833;
+    color: var(--umd-red);
 }
 
 @media screen and (max-width: 768px) {
