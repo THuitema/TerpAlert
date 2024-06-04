@@ -25,14 +25,14 @@ def main():
     menu = Menu(dining_halls)
     menu.create_menu()
 
-    # conn = db.connect()
-    # # menu.update_db_menu(conn)
-    # conn.close()
-
     conn = db.connect()
-    menu.check_for_alerts(conn)
+    menu.update_db_menu(conn)
     conn.close()
-    menu.alert_users()
+
+    # conn = db.connect()
+    # menu.check_for_alerts(conn)
+    # conn.close()
+    # menu.alert_users()
 
 
 if __name__ == "__main__":

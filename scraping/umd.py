@@ -82,6 +82,7 @@ class Menu:
     alert_users()
         Notifies users that have alerts
     """
+
     def __init__(self, dining_halls: [DiningHall]):
         """Initializes the Menu object
 
@@ -154,12 +155,45 @@ class Menu:
         :param conn: psycopg2.extensions.connection
         """
         for key in self.total_menu.keys():
-            query = '''
+            # Insert distinct items to Menu table
+            add_total_menu_query = '''
                 INSERT INTO accounts_menu (item)
                 SELECT %s
                 WHERE NOT EXISTS (SELECT * FROM accounts_menu WHERE item=%s)
             '''
-            db_write(conn, query, key, key)
+            db_write(conn, add_total_menu_query, key, key)
+
+            # Insert all items to DailyMenu table
+            at_y = False
+            at_south = False
+            at_251 = False
+
+            if 'Yahentamitsi' in self.total_menu[key].dining_halls:
+                at_y = True
+            if 'South' in self.total_menu[key].dining_halls:
+                at_south = True
+            if '251' in self.total_menu[key].dining_halls:
+                at_251 = True
+
+            # Get foreign key to menu item
+            get_menu_item_query = '''
+                SELECT * 
+                FROM accounts_menu
+                WHERE item=%s
+            '''
+
+            rows = db_select(conn, get_menu_item_query, key)
+            menu_item_id = rows[0][0]
+
+            add_daily_menu_query = '''
+                INSERT INTO accounts_dailymenu 
+                    (menu_item_id, date, yahentamitsi_dining_hall, south_dining_hall, two_fifty_one_dining_hall)
+                VALUES
+                    (%s, %s, %s, %s, %s)
+            '''
+
+            db_write(conn, add_daily_menu_query, menu_item_id, date.today(), at_y, at_south, at_251)
+
 
     def __str__(self):
         """Returns each item from menu, along with which dining halls are serving them
@@ -183,6 +217,7 @@ class Item:
     dining_halls : [str]
         names of the dining halls at which the item is being served
     """
+
     def __init__(self, name: str):
         """Initializes Item object
 
@@ -212,6 +247,7 @@ class User:
         list of Item objects that the user should receive an alert for
 
     """
+
     def __init__(self, info: object):
         """Initializes User object
 
@@ -230,5 +266,3 @@ class User:
         for alert in self.alerts:
             out += '\t{0}\n'.format(str(alert))
         return out
-
-
