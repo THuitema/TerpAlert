@@ -30,6 +30,11 @@ window.onload = function () {
     // Alert already exists popup modal
     $('#already-exists-modal').modal({ show: false})
 
+    // Alert notification button animation - shake when page loads
+    const alertNotificationBtn = document.getElementById('show-notifications-button')
+    if(alertNotificationBtn != null) {
+        alertNotificationBtn.classList.add('apply-shake')
+    }
 }
 
 /**
