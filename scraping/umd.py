@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from db import db_select, db_write
+from datetime import date
 
 # Constants for web scraping
 BASE_URL = "https://nutrition.umd.edu"
@@ -36,11 +37,11 @@ class DiningHall:
 
         :return: str, the url
         """
-        month = 5  # TODO: make these dynamic dates
-        day = 28
-        year = 2024
+        month = date.today().month
+        day = date.today().day
+        year = date.today().year
         return BASE_URL + "/?locationNum=" + str(self.location_num) + "&dtdate=" + str(month) + "/" + str(
-               day) + "/" + str(year)
+            day) + "/" + str(year)
 
     def __get_menu(self) -> set[str]:
         """Scrapes each menu item from the dining hall website
