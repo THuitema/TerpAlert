@@ -85,14 +85,19 @@ def account(request):
     """
     Renders the account page
     Login is required, otherwise user will be redirected to the login page
+    Context includes alert notifications for user
     """
     context = {'notifications': False, 'data': [], 'date': date.today()}
 
+    # Find today's alerts (if any) for user
     alerts = Alert.objects.filter(user__email__exact=request.user.email).order_by('menu_item')
-    for alert in alerts:
+    for alert in alerts:  # All the user's alerts
         daily_menu_item = DailyMenu.objects.filter(menu_item_id=alert.menu_item.id, date=date.today())
-        if daily_menu_item.exists():
+
+        if daily_menu_item.exists():  # Alert is in the daily menu for today's date
             context['notifications'] = True
+
+            # Add dining halls the alert is applicable to
             dining_halls = []
             if daily_menu_item[0].yahentamitsi_dining_hall:
                 dining_halls.append('Yahentamitsi')
@@ -103,7 +108,7 @@ def account(request):
 
             context['data'].append([alert.menu_item.item, ', '.join(dining_halls)])
 
-    return render(request, 'home.html', context)  # context
+    return render(request, 'home.html', context)
 
 
 @login_required
