@@ -3,12 +3,13 @@ from django.contrib.auth import login, authenticate, logout
 from django.http import HttpResponse, JsonResponse
 from .forms import ProfileCreationForm
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Profile, Alert, Menu
+from .models import Profile, Alert, Menu, DailyMenu
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db.models import Case, Value, When, CharField
+from datetime import date
 
 
 def create_profile(request):
@@ -85,7 +86,24 @@ def account(request):
     Renders the account page
     Login is required, otherwise user will be redirected to the login page
     """
-    return render(request, 'home.html')  # context
+    context = {'notifications': False, 'data': [], 'date': date.today()}
+
+    alerts = Alert.objects.filter(user__email__exact=request.user.email).order_by('menu_item')
+    for alert in alerts:
+        daily_menu_item = DailyMenu.objects.filter(menu_item_id=alert.menu_item.id, date=date.today())
+        if daily_menu_item.exists():
+            context['notifications'] = True
+            dining_halls = []
+            if daily_menu_item[0].yahentamitsi_dining_hall:
+                dining_halls.append('Yahentamitsi')
+            if daily_menu_item[0].south_dining_hall:
+                dining_halls.append('South')
+            if daily_menu_item[0].two_fifty_one_dining_hall:
+                dining_halls.append('251')
+
+            context['data'].append([alert.menu_item.item, ', '.join(dining_halls)])
+
+    return render(request, 'home.html', context)  # context
 
 
 @login_required

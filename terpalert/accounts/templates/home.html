@@ -15,6 +15,18 @@
             <h1>Welcome to your account</h1>
         </div>
 
+        <!-- Alert notifications -->
+        <div class="row mt-3 justify-content-center">
+            {% if notifications %}
+                <button class="btn btn-danger" id="show-notifications-button" data-bs-toggle="modal"
+                        data-bs-target="#notification-modal">
+                    <i class="bi bi-bell-fill"></i> {{ data|length }} Alerts
+                </button>
+            {% else %}
+                <p style="text-align: center"><b>No alert notifications for today</b></p>
+            {% endif %}
+        </div>
+
         <!-- User alert table -->
         <div class="row justify-content-center">
             <table class="table align-middle" id="alert-table">
@@ -63,6 +75,28 @@
                     <div class="modal-header">
                         <h5 class="modal-title">You have already added this alert!</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert notifications popup -->
+        <div class="modal fade" tabindex="-1" id="notification-modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Your alerts for {{ date }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" style="padding-bottom: 0; padding-top: 0">
+                        <ul class="list-group list-group-flush">
+                            {% for alert in data %}
+                                <li class="list-group-item">{{ alert.0 }} @ {{ alert.1 }}</li>
+                            {% endfor %}
+                        </ul>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
