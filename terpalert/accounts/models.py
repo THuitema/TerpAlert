@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.conf import settings
 from django.utils import timezone
+from datetime import date
 from .fields import LowercaseEmailField
 
 
@@ -89,5 +90,15 @@ class Alert(models.Model):
         return f"{self.menu_item.item} - {self.user.email}"
 
 
+class DailyMenu(models.Model):
+    """
+    Stores dining hall menu for each day
+    """
+    menu_item = models.ForeignKey(Menu, on_delete=models.CASCADE)
+    date = models.DateField(default=date.today)
+    yahentamitsi_dining_hall = models.BooleanField(default=False)
+    south_dining_hall = models.BooleanField(default=False)
+    two_fifty_one_dining_hall = models.BooleanField(default=False)
 
-
+    def __str__(self):
+        return f"{self.date}: {self.menu_item}"
