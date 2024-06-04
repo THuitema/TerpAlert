@@ -38,8 +38,9 @@ BLACK: #000000
 }
 
 .btn-danger {
-    background-color: var(--umd-red) !important;
+    background-color: var(--umd-red); /*  !important */
     border-color: var(--umd-red) !important;
+    width: fit-content !important;
 }
 
 .btn-danger:hover {
@@ -117,4 +118,9 @@ ul.ui-autocomplete {
     li.ui-menu-item {
         line-height: 2em;
     }
+}
+
+.modal-footer {
+    border: 0;
+    padding-top: 0
 }
