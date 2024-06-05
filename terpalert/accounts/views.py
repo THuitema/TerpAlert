@@ -1,12 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from .forms import ProfileCreationForm
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Profile, Alert, Menu, DailyMenu
-from django.contrib import messages
+from .models import Alert, Menu, DailyMenu
 from django.contrib.auth.decorators import login_required
-from django.core import serializers
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db.models import Case, Value, When, CharField
 from datetime import date
