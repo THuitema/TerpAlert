@@ -1,5 +1,7 @@
+/**
+ * Apply autocomplete functionality to search bar
+ */
 window.onload = function () {
-    // const searchInput = document.getElementById()
     $('#food-input').autocomplete({
         // Sends an Ajax request to gather menu items matching user's input
         source: getMenu,
@@ -15,7 +17,7 @@ window.onload = function () {
                 textWrapper.html(newTextHtml);
             });
         },
-        // Save item when selected
+        // Check if item is being served today, when selected
         select: function (event, ui) {
             const input = $('#food-input');
             input.val(ui.item.label);
@@ -50,6 +52,10 @@ function getMenu(request, response) {
     })
 }
 
+/**
+ * Sends an Ajax request to check if item is being served today, and renders the appropriate response
+ * @param input Search term
+ */
 function checkAlertExists(input) {
     $.ajax({
         type: 'GET',
@@ -61,11 +67,14 @@ function checkAlertExists(input) {
             $('#food-input').val('');
             const result = document.getElementById('food-input-results') // $('#food-input-results');
 
-            if (data.found == true) {
+            if (data.found == true) { // Item is being served today
                 result.innerHTML = '🚨 ' + data.item + ' is being served at ' + data.dining_halls + ' 🚨';
-            } else {
+            } else { // Item is not being served today
                 result.innerHTML = "Sorry, " + data.item + " isn't being served today";
             }
+        },
+        error: function (error) {
+            alert('Something went wrong, please try again later');
         }
     })
 }
