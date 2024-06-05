@@ -192,7 +192,7 @@ def load_menu(request):
 
     :return: JsonResponse containing a list with fields "label" and "value"
     """
-    if 'term' in request.headers:
+    if 'term' in request.GET:
         term = request.GET['term']
         menu = Menu.objects.annotate(
             order_by_position=Case(
