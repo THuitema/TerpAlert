@@ -19,7 +19,7 @@
 
         <!-- Search bar -->
         <div class="row text-center my-3">
-            <h2>Search for what's being served today!</h2>
+            <h3>Search for what's being served today!</h3>
             <div class="input-group mb-3">
                 <input type="text" class="form-control form-control-lg" name="food-input" id="food-input"
                        placeholder="Orange Tempura Chicken">
@@ -28,6 +28,13 @@
             <h4 id="food-input-results"></h4>
         </div>
 
+        <!-- Link to Signup Page -->
+        <div class="row text-center my-3 justify-content-center">
+            <h3>Want to save alerts and receive daily notifications?</h3>
+            <div class="col-3">
+                <a class="btn btn-warning" href="{% url 'signup' %}">Sign up</a>
+            </div>
+        </div>
 
     </div>
 
