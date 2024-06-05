@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
+{% block scripts %}
+    <script src="{% static 'core.js' %}"></script>
+{% endblock scripts %}
+
 {% block title %}Home | TerpAlert{% endblock %}
 
 {% block content %}
@@ -8,10 +14,10 @@
         <!-- Header text -->
         <div class="row text-center">
             <h1>Welcome to TerpAlert</h1>
-            <p><i>Know when your favorite foods are being served at University of Maryland dining halls!</i></p>
+            <p><i>Get the scoop on your favorite foods being served at University of Maryland dining halls!</i></p>
         </div>
 
-        <!-- Seach bar -->
+        <!-- Search bar -->
         <div class="row text-center my-3">
             <form action="" method="get">
                 <label for="food-input" style="font-size: xx-large; font-weight: 500">Search for a food</label>
