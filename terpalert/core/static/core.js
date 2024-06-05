@@ -1,7 +1,16 @@
 /**
+ * Constants for placeholder animation
+ */
+let i = 0;
+let placeholder = "";
+const txt = "Old Fashioned Texas Fried Chicken";
+const speed = 45;
+
+/**
  * Apply autocomplete functionality to search bar
  */
 window.onload = function () {
+    // Autocomplete
     $('#food-input').autocomplete({
         // Sends an Ajax request to gather menu items matching user's input
         source: getMenu,
@@ -26,6 +35,9 @@ window.onload = function () {
         delay: 200,
         minLength: 1,
     })
+
+    // Animate search bar placeholder
+    animatePlaceholder();
 }
 
 /**
@@ -77,4 +89,17 @@ function checkAlertExists(input) {
             alert('Something went wrong, please try again later');
         }
     })
+}
+
+/**
+ * Animate the placeholder of food search bar by "typing" an example phrase
+ */
+function animatePlaceholder() {
+    console.log(i);
+    placeholder += txt.charAt(i);
+    document.getElementById('food-input').setAttribute('placeholder', placeholder);
+    i++;
+    if (i < txt.length) {
+        setTimeout(animatePlaceholder, speed);
+    }
 }
