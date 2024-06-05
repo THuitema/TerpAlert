@@ -4,7 +4,8 @@
 let i = 0;
 let placeholder = "";
 const txt = "Old Fashioned Texas Fried Chicken";
-const speed = 45;
+let speed = 45;
+let cursorOn = false;
 
 /**
  * Apply autocomplete functionality to search bar
@@ -95,11 +96,22 @@ function checkAlertExists(input) {
  * Animate the placeholder of food search bar by "typing" an example phrase
  */
 function animatePlaceholder() {
-    console.log(i);
-    placeholder += txt.charAt(i);
-    document.getElementById('food-input').setAttribute('placeholder', placeholder);
-    i++;
+    // "typing" the placeholder out
     if (i < txt.length) {
-        setTimeout(animatePlaceholder, speed);
+        placeholder += txt.charAt(i);
+        i++;
     }
+    // after "typing", show a blinking cursor after
+    else {
+        speed = 420;
+        if(cursorOn == true) {
+            placeholder = placeholder.substring(0, placeholder.length - 1);
+            cursorOn = false;
+        } else {
+            placeholder += '|';
+            cursorOn = true;
+        }
+    }
+    document.getElementById('food-input').setAttribute('placeholder', placeholder);
+    setTimeout(animatePlaceholder, speed)
 }
