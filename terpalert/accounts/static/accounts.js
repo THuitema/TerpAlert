@@ -149,7 +149,7 @@ function addAlert(button) {
         // Save item when selected
         select: function (event, ui) {
             $('#alert-input').val(ui.item.label);
-            saveAlert($('#save-btn'));
+            saveAlert();
         },
         delay: 200,
         minLength: 1,
