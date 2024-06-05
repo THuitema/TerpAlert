@@ -19,17 +19,16 @@
 
         <!-- Search bar -->
         <div class="row text-center my-3">
-            <form action="" method="get">
-                <label for="food-input" style="font-size: xx-large; font-weight: 500">Search for a food</label>
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control form-control-lg" name="food-input" id="food-input"
-                           placeholder="Recipient's username" required>
-                    <div class="input-group-append">
-                        <button type="submit" class="btn btn-warning btn-lg">Search</button>
-                    </div>
-                </div>
-            </form>
+            <h2>Search for what's being served today!</h2>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control form-control-lg" name="food-input" id="food-input"
+                       placeholder="Orange Tempura Chicken">
+            </div>
+            <!-- Search results -->
+            <h4 id="food-input-results"></h4>
         </div>
+
+
     </div>
 
 {% endblock %}
