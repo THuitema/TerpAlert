@@ -192,21 +192,24 @@ def load_menu(request):
 
     :return: JsonResponse containing a list with fields "label" and "value"
     """
-    term = request.GET['term']
-    menu = Menu.objects.annotate(
-        order_by_position=Case(
-            When(item__istartswith=term, then=Value(1)),
-            When(item__icontains=term, then=Value(2)),
-            default=Value(3),
-            output_field=CharField(),
-        )
-    ).filter(item__icontains=term).order_by('order_by_position', 'item')
-    data = []
-    for item in menu:
-        item = {
-            'label': item.item,
-            'value': item.id,
-        }
-        data.append(item)
+    if 'term' in request.headers:
+        term = request.GET['term']
+        menu = Menu.objects.annotate(
+            order_by_position=Case(
+                When(item__istartswith=term, then=Value(1)),
+                When(item__icontains=term, then=Value(2)),
+                default=Value(3),
+                output_field=CharField(),
+            )
+        ).filter(item__icontains=term).order_by('order_by_position', 'item')
+        data = []
+        for item in menu:
+            item = {
+                'label': item.item,
+                'value': item.id,
+            }
+            data.append(item)
 
-    return JsonResponse({'data': data})
+        return JsonResponse({'data': data})
+    else:
+        return redirect('account')
