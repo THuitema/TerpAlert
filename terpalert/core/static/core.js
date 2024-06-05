@@ -78,6 +78,7 @@ function checkAlertExists(input) {
         },
         success: function (data) {
             $('#food-input').val('');
+            $('#food-input').attr('placeholder', '')
             const result = document.getElementById('food-input-results') // $('#food-input-results');
 
             if (data.found == true) { // Item is being served today
@@ -96,22 +97,25 @@ function checkAlertExists(input) {
  * Animate the placeholder of food search bar by "typing" an example phrase
  */
 function animatePlaceholder() {
-    // "typing" the placeholder out
-    if (i < txt.length) {
-        placeholder += txt.charAt(i);
-        i++;
-    }
-    // after "typing", show a blinking cursor after
-    else {
-        speed = 420;
-        if(cursorOn == true) {
-            placeholder = placeholder.substring(0, placeholder.length - 1);
-            cursorOn = false;
-        } else {
-            placeholder += '|';
-            cursorOn = true;
+    // only show animation before user types any input
+    if ($('#food-input').val() === '') {
+        // "typing" the placeholder out
+        if (i < txt.length) {
+            placeholder += txt.charAt(i);
+            i++;
         }
+        // after "typing", show a blinking cursor after
+        else {
+            speed = 420;
+            if (cursorOn == true) {
+                placeholder = placeholder.substring(0, placeholder.length - 1);
+                cursorOn = false;
+            } else {
+                placeholder += '|';
+                cursorOn = true;
+            }
+        }
+        document.getElementById('food-input').setAttribute('placeholder', placeholder);
+        setTimeout(animatePlaceholder, speed)
     }
-    document.getElementById('food-input').setAttribute('placeholder', placeholder);
-    setTimeout(animatePlaceholder, speed)
 }
