@@ -11,4 +11,13 @@ urlpatterns = [
     path('delete-alert/', views.delete_alert, name='delete-alert'),
     path('save-alert/', views.save_alert, name='save-alert'),
     path('load-menu/', views.load_menu, name='load-menu'),
+    path('password-reset/', auth_views.PasswordResetView.as_view(template_name='registration/password_reset_form.html'),
+         name='password_reset'),
+    path('password-reset/done', auth_views.PasswordResetDoneView.as_view(),
+         name='password_reset_done'),
+    path('reset/<uidb64>/<token>', auth_views.PasswordResetConfirmView.as_view(),
+         name='password_reset_confirm'),
+    path('reset/done', auth_views.PasswordResetCompleteView.as_view(),
+         name='password_reset_complete'),
+
 ]
