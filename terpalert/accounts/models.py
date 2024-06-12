@@ -24,7 +24,7 @@ class ProfileManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, phone, password, **extra_fields):
+    def create_superuser(self, email, password, **extra_fields):  # phone
         """
         Create a superuser with the given information
         """
@@ -47,14 +47,15 @@ class Profile(AbstractBaseUser):
     """
     # Attributes
     email = LowercaseEmailField(unique=True, max_length=255)  # models.EmailField
-    phone = models.CharField(max_length=10)
+    # phone = models.CharField(max_length=10)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)
+    receive_email_alerts = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["phone"]  # email already required b/c it is the USERNAME_FIELD
+    # REQUIRED_FIELDS = ["phone"]  # email already required b/c it is the USERNAME_FIELD
 
     objects = ProfileManager()  # links custom user to custom manager, so we can call Profile.objects.create_user()
 
