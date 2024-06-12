@@ -9,6 +9,19 @@
             <h1>Login</h1>
         </div>
 
+        <!-- Success message if redirected here after email activation -->
+        <div class="row mb-3 justify-content-center">
+            <div class="col-md-6 col-sm-12">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-success">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
         <!-- Login form -->
         <div class="row mb-3 justify-content-center">
             <div class="col-md-6 col-sm-12">
@@ -31,8 +44,8 @@
                                name="{{ form.password.html_name }}" required>
                     </div>
 
-                    <!-- Show error message if invalid username/password -->
-                    {% if form.errors %}
+                    <!-- Show error message if invalid username/password or account still needs to be activated -->
+                    {% if form.errors or verify_email %}
                         <p class="auth-form-error">Your username and password didn't match, please try again.</p>
                     {% endif %}
 
