@@ -12,14 +12,5 @@
         <div class="row text-center">
             <p>An email has been sent to <b>{{ request.user.email }}</b> with instructions to verify your email</p>
         </div>
-
-        <!-- Link to resend email -->
-{#        <div class="row text-center mb-3 justify-content-center">#}
-{#            <div class="col-3">#}
-{#                <form action="{% url 'verify-email' %}" method="post">#}
-{#                    <button type="submit" class="btn btn-warning">Resend email</button>#}
-{#                </form>#}
-{#            </div>#}
-{#        </div>#}
     </div>
 {% endblock %}
