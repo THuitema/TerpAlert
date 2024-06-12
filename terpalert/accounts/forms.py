@@ -5,15 +5,20 @@ from .models import Profile
 
 class ProfileCreationForm(UserCreationForm):
     email = forms.EmailField(label="Email", max_length=255)
-    phone = forms.CharField(label="Phone", max_length=14)
+    # phone = forms.CharField(label="Phone", max_length=14)
+    receive_email_alerts = forms.BooleanField(label="Receive email alerts")
 
     error_messages = {
         'password_mismatch': 'The provided passwords do not match',
     }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['receive_email_alerts'].initial = True  # Autopopulate checkbox to being checked
+
     class Meta:
         model = Profile
-        fields = ("email", "phone", "password1", "password2")
+        fields = ("email", "password1", "password2", "receive_email_alerts")  # , "phone"
         error_messages = {
             'email': {
                 'invalid': 'Invalid email address',
@@ -28,23 +33,23 @@ class ProfileCreationForm(UserCreationForm):
             return email
         raise forms.ValidationError(f"Email {email} already exists")
 
-    def clean_phone(self):
-        phone = self.cleaned_data["phone"]
-        phone = ''.join(c for c in phone if c.isdigit())  # remove all extra characters (parenthesis, dashes, etc)
-
-        if len(phone) != 10:
-            raise forms.ValidationError(f"Phone number {phone} is invalid")
-
-        try:
-            user = Profile.objects.get(phone=phone)
-        except Exception as e:
-            return phone
-        raise forms.ValidationError(f"Phone number {phone} already exists")
+    # def clean_phone(self):
+    #     phone = self.cleaned_data["phone"]
+    #     phone = ''.join(c for c in phone if c.isdigit())  # remove all extra characters (parenthesis, dashes, etc)
+    #
+    #     if len(phone) != 10:
+    #         raise forms.ValidationError(f"Phone number {phone} is invalid")
+    #
+    #     try:
+    #         user = Profile.objects.get(phone=phone)
+    #     except Exception as e:
+    #         return phone
+    #     raise forms.ValidationError(f"Phone number {phone} already exists")
 
 
 class ProfileChangeForm(UserChangeForm):
 
     class Meta:
         model = Profile
-        fields = ("email", "phone")
+        fields = ("email",)  # , "phone"
 
