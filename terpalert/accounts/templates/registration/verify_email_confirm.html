@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify Email | TerpAlert{% endblock %}
+
+{% block content %}
+    <div class="container-md my-3">
+        <!-- Header text -->
+        <div class="row text-center">
+            <h1>Verify your email</h1>
+        </div>
+
+        <div class="row text-center">
+            {% if messages %}
+                {% for message in messages %}
+                    <p style="color: var(--umd-red)">
+                        {{ message }}
+                    </p>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

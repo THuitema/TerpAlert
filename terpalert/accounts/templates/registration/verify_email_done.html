@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify Email | TerpAlert{% endblock %}
+
+{% block content %}
+    <div class="container-md my-3">
+        <!-- Header text -->
+        <div class="row text-center">
+            <h1>Email verification sent</h1>
+        </div>
+
+        <div class="row text-center">
+            <p>An email has been sent to <b>{{ request.user.email }}</b> with instructions to verify your email</p>
+        </div>
+
+        <!-- Link to resend email -->
+{#        <div class="row text-center mb-3 justify-content-center">#}
+{#            <div class="col-3">#}
+{#                <form action="{% url 'verify-email' %}" method="post">#}
+{#                    <button type="submit" class="btn btn-warning">Resend email</button>#}
+{#                </form>#}
+{#            </div>#}
+{#        </div>#}
+    </div>
+{% endblock %}
