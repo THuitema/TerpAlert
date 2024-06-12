@@ -32,16 +32,16 @@
                     </div>
 
                     <!-- Phone -->
-                    <div class="form-group mb-3">
-                        <label for="{{ form.phone.id_for_label }}"
-                               class="col-sm-4 mx-auto col-form-label">Phone</label>
-                        <input type="tel" class="form-control" id="{{ form.phone.id_for_label }}"
-                               name="{{ form.phone.html_name }}" onkeyup="phoneNumberFormatter()"
-                               maxlength="14" required>
-                        {% for error in form.phone.errors %}
-                            <p class="auth-form-error">{{ error }}</p>
-                        {% endfor %}
-                    </div>
+                    {#                    <div class="form-group mb-3">#}
+                    {#                        <label for="{{ form.phone.id_for_label }}"#}
+                    {#                               class="col-sm-4 mx-auto col-form-label">Phone</label>#}
+                    {#                        <input type="tel" class="form-control" id="{{ form.phone.id_for_label }}"#}
+                    {#                               name="{{ form.phone.html_name }}" onkeyup="phoneNumberFormatter()"#}
+                    {#                               maxlength="14" required>#}
+                    {#                        {% for error in form.phone.errors %}#}
+                    {#                            <p class="auth-form-error">{{ error }}</p>#}
+                    {#                        {% endfor %}#}
+                    {#                    </div>#}
 
                     <!-- Password -->
                     <div class="form-group mb-3">
@@ -63,6 +63,17 @@
                         {% for error in form.password2.errors %}
                             <p class="auth-form-error">{{ error }}</p>
                         {% endfor %}
+                    </div>
+
+                    <!-- Receive email alerts checkbox-->
+                    <div class="form-check mb-3">
+                        <label for="{{ form.receive_email_alerts.id_for_label }}"
+                               class="form-check-label mx-auto">Receive email alerts? (you can change this at any
+                            time)
+                        </label>
+                        <input type="checkbox" class="form-check-input"
+                               id="{{ form.receive_email_alerts.id_for_label }}"
+                               name="{{ form.receive_email_alerts.html_name }}" checked>
                     </div>
 
                     <!-- Submit button -->
