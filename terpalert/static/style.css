@@ -16,6 +16,10 @@ BLACK: #000000
     font-family: Inter, sans-serif;
 }
 
+body {
+    margin-top: 10ex;
+}
+
 .navbar-nav li a, .navbar-brand span {
     color: white !important;
     margin-left: 1em;
