@@ -4,6 +4,7 @@ from . import views
 
 
 urlpatterns = [
+    # General URLs
     path('account/', views.account, name='account'),
     path('signup/', views.create_profile, name='signup'),
     path('logout/', views.logout_profile, name='logout'),
@@ -12,6 +13,7 @@ urlpatterns = [
     path('delete-alert/', views.delete_alert, name='delete-alert'),
     path('save-alert/', views.save_alert, name='save-alert'),
     path('load-menu/', views.load_menu, name='load-menu'),
+    path('set-receive-alerts/', views.set_receive_alerts, name='set-receive-alerts'),
 
     # Password reset
     path('password_reset/', auth_views.PasswordResetView.as_view(
@@ -29,5 +31,5 @@ urlpatterns = [
 
     # Email verification
     path('verify-email-done/', views.verify_email_done, name='verify-email-done'),
-    path('verify-email-confirm/<uidb64>/<token>', views.verify_email_confirm, name='verify-email-confirm')
+    path('verify-email-confirm/<uidb64>/<token>', views.verify_email_confirm, name='verify-email-confirm'),
 ]
