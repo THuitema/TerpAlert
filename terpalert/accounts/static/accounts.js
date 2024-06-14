@@ -28,13 +28,20 @@ window.onload = function () {
     }
 
     // Alert already exists popup modal
-    $('#already-exists-modal').modal({ show: false})
+    $('#already-exists-modal').modal({show: false})
 
     // Alert notification button animation - shake when page loads
     const alertNotificationBtn = document.getElementById('show-notifications-button')
-    if(alertNotificationBtn != null) {
+    if (alertNotificationBtn != null) {
         alertNotificationBtn.classList.add('apply-shake')
     }
+
+    // Settings - receive email alerts checkbox
+    const receiveAlertsCheckbox = document.getElementById('id_receive_email_alerts');
+    receiveAlertsCheckbox.addEventListener('change', function () {
+        const isChecked = receiveAlertsCheckbox.checked;
+        setReceiveAlertCheckbox(isChecked);
+    });
 }
 
 /**
@@ -272,4 +279,28 @@ function formatPhoneNumber(value) {
 function phoneNumberFormatter() {
     const phoneInput = document.getElementById('id_phone');
     phoneInput.value = formatPhoneNumber(phoneInput.value);
+}
+
+/**
+ * Sends an Ajax POST request to set the user's receive email alerts setting to value of the checkbox
+ * @param isChecked true or false, from the checkbox
+ */
+function setReceiveAlertCheckbox(isChecked) {
+    const csrftoken = getCookie('csrftoken');
+
+    return $.ajax({
+        type: 'POST',
+        url: '/accounts/set-receive-alerts/',
+        headers: {'X-CSRFToken': csrftoken},
+        data: { // 'true' or 'false', must convert to boolean in view
+            'is_checked': isChecked
+        },
+        success: function (response) {
+            // Display the alert saying the preference has been saved
+            $('#setting-saved-alert').show();
+        },
+        error: function (error) {
+            console.log(error)
+        }
+    })
 }
