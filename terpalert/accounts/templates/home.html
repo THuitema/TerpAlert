@@ -28,7 +28,7 @@
         </div>
 
         <!-- User alert table header and new alert button -->
-        <div class="row mt-3">
+        <div class="row mt-3 heading-border">
             <div class="col-9">
                 <h3 class="col-9">Your alerts</h3>
             </div>
@@ -47,7 +47,7 @@
         <!-- User alert table -->
         <div class="row justify-content-center mb-3">
             <table class="table align-middle table-hover" id="alert-table">
-                <thead></thead>
+                {#                <thead></thead>#}
                 <tbody id="alert-table-body" class="table-group-divider"></tbody>
             </table>
         </div>
@@ -76,6 +76,18 @@
                        name="receive_email_alerts" {% if request.user.receive_email_alerts %} checked {% endif %}>
                 <label for="id_receive_email_alerts" class="form-check-label mx-auto">Receive email alerts?</label>
 
+            </div>
+        </div>
+
+        <!-- Delete account button -->
+        <div class="row mb-3">
+            <h4>Account</h4>
+            <div class="col-3">
+                <button type="button" class="btn btn-danger" id="delete_account_btn"
+                        name="delete_account_btn" data-bs-toggle="modal"
+                        data-bs-target="#delete-account-modal">
+                    Delete Account
+                </button>
             </div>
         </div>
 
@@ -135,6 +147,29 @@
                 </div>
             </div>
         </div>
-    </div>
 
+        <!-- Delete account confirmation dialogue -->
+        <div class="modal fade" tabindex="-1" id="delete-account-modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete account</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete your account? <br>
+                            <b>This action cannot be undone.</b></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Go back</button>
+
+                        <form action="{% url 'delete-account' %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
