@@ -298,4 +298,19 @@ def set_receive_alerts(request):
         Profile.objects.filter(pk=request.user.id).update(receive_email_alerts=is_checked)
         return JsonResponse({'success': True})
     else:
+        return redirect('account')
+
+
+@login_required
+def delete_account(request):
+    if request.method == 'POST':
+        try:
+            user = Profile.objects.get(pk=request.user.id)
+            user.delete()
+
+        except Exception as e:
+            return redirect('account')
+
         return redirect('home')
+    else:
+        return redirect('account')
