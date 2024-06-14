@@ -14,6 +14,7 @@ urlpatterns = [
     path('save-alert/', views.save_alert, name='save-alert'),
     path('load-menu/', views.load_menu, name='load-menu'),
     path('set-receive-alerts/', views.set_receive_alerts, name='set-receive-alerts'),
+    path('delete-account/', views.delete_account, name='delete-account'),
 
     # Password reset
     path('password_reset/', auth_views.PasswordResetView.as_view(
