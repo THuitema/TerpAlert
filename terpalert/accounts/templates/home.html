@@ -16,7 +16,7 @@
         </div>
 
         <!-- Alert notifications -->
-        <div class="row mt-3 justify-content-center">
+        <div class="row my-3 justify-content-center">
             {% if notifications %}
                 <button class="btn btn-danger" id="show-notifications-button" data-bs-toggle="modal"
                         data-bs-target="#notification-modal">
@@ -27,27 +27,59 @@
             {% endif %}
         </div>
 
+        <!-- User alert table header and new alert button -->
+        <div class="row mt-3">
+            <div class="col-9">
+                <h3 class="col-9">Your alerts</h3>
+            </div>
+            <div class="col-3 col-right">
+                <button type="button" class="btn btn-success btn-wide" id="add-button-wide"
+                        name="add-button" onclick="this.blur(); addAlert(this);">
+                    New alert
+                </button>
+                <button type="button" class="btn btn-outline-success btn-narrow" id="add-button-narrow"
+                        name="add-button" onclick="this.blur(); addAlert(this);">
+                    <i class="bi bi-plus-circle-fill"></i>
+                </button>
+            </div>
+        </div>
+
         <!-- User alert table -->
-        <div class="row justify-content-center">
-            <table class="table align-middle" id="alert-table">
-                <thead>
-                <tr>
-                    <th scope="col" class="col-9">Your alerts</th>
-                    <th scope="col" class="col-3 col-right">
-                        <button type="button" class="btn btn-success btn-wide" id="add-button-wide"
-                                name="add-button" onclick="this.blur(); addAlert(this);">
-                            New alert
-                        </button>
-                        <button type="button" class="btn btn-outline-success btn-narrow" id="add-button-narrow"
-                                name="add-button" onclick="this.blur(); addAlert(this);">
-                            <i class="bi bi-plus-circle-fill"></i>
-                        </button>
-                    </th>
-                </tr>
-                </thead>
+        <div class="row justify-content-center mb-3">
+            <table class="table align-middle table-hover" id="alert-table">
+                <thead></thead>
                 <tbody id="alert-table-body" class="table-group-divider"></tbody>
             </table>
         </div>
+
+        <!-- Settings -->
+
+        <!-- Settings header -->
+        <div class="row my-3 heading-border">
+            <h3>Account Settings</h3>
+        </div>
+
+        <!-- Setting saved alert -->
+        <div class="row mb-3" style="display: none" id="setting-saved-alert">
+            <div class="column-md-6 col-sm-12">
+                <div class="alert alert-success">
+                    Your preferences have been saved
+                </div>
+            </div>
+        </div>
+
+        <!-- Change receive email alert preference -->
+        <div class="row mb-3">
+            <h4>Notifications</h4>
+            <div class="form-check indent-form">
+                <input type="checkbox" class="form-check-input" id="id_receive_email_alerts"
+                       name="receive_email_alerts" {% if request.user.receive_email_alerts %} checked {% endif %}>
+                <label for="id_receive_email_alerts" class="form-check-label mx-auto">Receive email alerts?</label>
+
+            </div>
+        </div>
+
+        <!-- Bootstrap modals -->
 
         <!-- Delete alert confirmation dialogue -->
         <div class="modal fade" tabindex="-1" id="delete-modal">
