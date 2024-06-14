@@ -280,3 +280,22 @@ def verify_email_confirm(request, uidb64, token):
 
     # If verification wasn't successful, render template with error messages
     return render(request, 'registration/verify_email_confirm.html')
+
+
+@login_required
+def set_receive_alerts(request):
+    """
+    Sets the user's receive email alerts preference
+    :return: JsonResponse with 'success': True if the setting was saved
+    """
+    if request.method == 'POST':
+        is_checked = False
+
+        # Have to convert string to boolean
+        if request.POST['is_checked'] == 'true':
+            is_checked = True
+
+        Profile.objects.filter(pk=request.user.id).update(receive_email_alerts=is_checked)
+        return JsonResponse({'success': True})
+    else:
+        return redirect('home')
