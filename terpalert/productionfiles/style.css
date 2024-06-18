@@ -1,0 +1,181 @@
+/* UMD COLORS
+RED: #e21833
+GOLD #ffd200
+WHITE: #ffffff
+BLACK: #000000
+*/
+
+:root {
+    --umd-red: #e21833;
+    --umd-red-hover: #b5162e;
+    --umd-gold: #ffd200;
+    --umd-gold-hover: #ad7231;
+}
+
+* {
+    font-family: Inter, sans-serif;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 100px;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    background-color: var(--umd-red);
+    color: white;
+}
+
+body {
+    margin-top: 10ex;
+}
+
+.navbar-nav li a, .navbar-brand span {
+    color: white !important;
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
+.navbar-nav li a:hover, .navbar-nav li a:focus, .navbar-nav li a:active,
+.navbar-brand span:hover, .navbar-brand span:focus, .navbar-brand span:active {
+    color: #cccccc !important;
+}
+
+.btn-warning {
+    background-color: var(--umd-gold) !important;
+    border-color: var(--umd-gold) !important;
+}
+
+.btn-warning:hover {
+    background-color: var(--umd-gold-hover) !important;
+    border-color: var(--umd-gold-hover) !important;
+}
+
+.btn-danger {
+    background-color: var(--umd-red); /*  !important */
+    border-color: var(--umd-red) !important;
+    width: fit-content !important;
+}
+
+.btn-danger:hover {
+    background-color: var(--umd-red-hover) !important;
+    border-color: var(--umd-red-hover) !important;
+}
+
+.auth-form-error {
+    color: var(--umd-red);
+}
+
+@media screen and (max-width: 768px) {
+    .btn-wide {
+        display: none;
+    }
+
+    .btn-narrow {
+        display: inline;
+    }
+
+    .input-width {
+        width: 100%;
+    }
+
+}
+
+@media screen and (min-width: 768px) {
+    .btn-narrow {
+        display: none;
+    }
+
+    .btn-wide {
+        display: inline;
+    }
+
+    .input-width {
+        width: 75%;
+    }
+
+}
+
+.col-right {
+    text-align: right;
+}
+
+button[class*='btn-outline-'] {
+    border-color: transparent !important;
+}
+
+.no-border {
+    border-width: 0 0 2px;
+    box-shadow: none; /* You may want to include this as bootstrap applies these styles too */
+    padding-left: 0;
+}
+
+.no-border:focus {
+    border-color: var(--umd-gold);
+}
+
+ul.ui-autocomplete {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    float: left;
+    display: none;
+    min-width: 160px;
+    margin: 0 0 10px 25px;
+    list-style: none;
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    *border-right-width: 2px;
+    *border-bottom-width: 2px;
+
+    li.ui-menu-item {
+        line-height: 2em;
+    }
+}
+
+.modal-footer {
+    border: 0;
+    padding-top: 0
+}
+
+/* Standard syntax */
+@keyframes shake {
+    10%, 90% {
+        transform: translate3d(-1px, 0, 0);
+    }
+
+    20%, 80% {
+        transform: translate3d(2px, 0, 0);
+    }
+
+    30%, 50%, 70% {
+        transform: translate3d(-4px, 0, 0);
+    }
+
+    40%, 60% {
+        transform: translate3d(4px, 0, 0);
+    }
+}
+
+.apply-shake {
+    animation: shake 1s cubic-bezier(.36, .07, .19, .97) both !important;
+}
+
+.heading-border {
+    border-bottom: 2px solid black;
+}
+
+.indent-form {
+    padding-left: 60px;
+}
+
+
