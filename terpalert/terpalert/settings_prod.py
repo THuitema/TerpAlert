@@ -1,6 +1,10 @@
+import environ
+
+env = environ.Env()
+
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [env("ALLOWED_HOSTS")]
 
 # HTTPS Settings
 SESSION_COOKIE_SECURE = True
