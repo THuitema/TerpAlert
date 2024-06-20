@@ -1,0 +1,19 @@
+{% load static %}
+
+{% block title %}500 Error | TerpAlert{% endblock %}
+
+{% block content %}
+    <div class="container-md my-3">
+        <div class="row text-center">
+            <h1>500 Error</h1>
+            <p>Something went wrong on our end, please try again later</p>
+        </div>
+
+        <!-- Link to home -->
+        <div class="row text-center my-3 justify-content-center">
+            <div class="col-3">
+                <a class="btn btn-warning" href="{% url 'home' %}">Home</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
