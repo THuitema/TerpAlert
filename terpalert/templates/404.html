@@ -1,0 +1,18 @@
+{% load static %}
+
+{% block title %}Page Not Found | TerpAlert{% endblock %}
+
+{% block content %}
+    <div class="container-md my-3">
+        <div class="row text-center">
+            <h1>Page Not Found</h1>
+        </div>
+
+        <!-- Link to home -->
+        <div class="row text-center my-3 justify-content-center">
+            <div class="col-3">
+                <a class="btn btn-warning" href="{% url 'home' %}">Home</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
