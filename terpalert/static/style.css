@@ -178,4 +178,9 @@ ul.ui-autocomplete {
     padding-left: 60px;
 }
 
+img.image {
+    height: 50%;
+    width: 50%;
+}
+
 
