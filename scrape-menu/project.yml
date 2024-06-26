@@ -5,6 +5,11 @@ packages:
           runtime: python:default
           web: false
           environment:
+            DB_NAME: "${terpalert.DATABASE}"
+            DB_PASSWORD: "${terpalert.PASSWORD}"
+            DB_USER: "${terpalert.USERNAME}"
+            DB_HOST: "${terpalert.HOSTNAME}"
+            DB_PORT: "DB_PORT=${terpalert.PORT}"
           limits:
             timeout: 30000
             memory: 512
