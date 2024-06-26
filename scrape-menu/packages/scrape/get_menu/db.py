@@ -11,7 +11,7 @@ def connect():
             os.environ.get('DB_HOST'),
             os.environ.get('DB_PORT')
         )
-        return {'config': config}
+        return {'env': str(os.environ)}
         with psycopg.connect(config) as conn:
             return conn
 
