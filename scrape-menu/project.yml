@@ -1,19 +1,12 @@
-parameters: {}
-environment: {}
 packages:
-    - name: sample
-      shared: false
-      environment: {}
-      parameters: {}
-      annotations: {}
+    - name: scrape
       functions:
-        - name: hello
-          binary: false
-          main: ""
+        - name: get_menu
           runtime: python:default
-          web: true
-          webSecure: false
-          parameters: {}
-          environment: {}
-          annotations: {}
-          limits: {}
+          web: false
+          environment:
+          limits:
+            timeout: 30000
+            memory: 512
+
+
