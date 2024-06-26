@@ -3,7 +3,7 @@ packages:
       functions:
         - name: get_menu
           runtime: python:default
-          web: false
+          web: true
           environment:
             DB_NAME: "${DB_NAME}"
             DB_PASSWORD: "${DB_PASSWORD}"

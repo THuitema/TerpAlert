@@ -13,7 +13,7 @@ HALLS = {SOUTH: 16, YAHENTAMITSI: 19, TWO_FIFTY_ONE: 51}
 
 
 def main(args):
-    return connect()
+    return {"conn: ": str(connect())}
     # the_y = DiningHall(name=YAHENTAMITSI, location_num=HALLS[YAHENTAMITSI])
     # south = DiningHall(name=SOUTH, location_num=HALLS[SOUTH])
     # two_fifty_one = DiningHall(name=TWO_FIFTY_ONE, location_num=HALLS[TWO_FIFTY_ONE])
