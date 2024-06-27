@@ -7,7 +7,7 @@ packages:
           environment:
             DATABASE_URL: "${DATABASE_URL}"
           limits:
-            timeout: 30000
+            timeout: 60000
             memory: 512
 
 
