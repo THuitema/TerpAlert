@@ -5,12 +5,7 @@ packages:
           runtime: python:default
           web: true
           environment:
-            DB_NAME: "${DB_NAME}"
-            DB_PASSWORD: "${DB_PASSWORD}"
-            DB_USER: "${DB_USER}"
-            DB_HOST: "${DB_HOST}"
-            DB_PORT: "${DB_PORT}"
-            DB_URL: "${DB_URL}"
+            DATABASE_URL: "${DATABASE_URL}"
           limits:
             timeout: 30000
             memory: 512
