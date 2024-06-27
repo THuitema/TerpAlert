@@ -4,20 +4,51 @@ import psycopg2
 DATABASE_URL = os.environ['DATABASE_URL']
 
 
-def connect():
+def connect() -> psycopg2.extensions.connection:
+    """
+    :return: conection to PostgreSQL database
+    """
     try:
-        # config = 'dbname={0} user={1} password={2} host={3} port={4} sslmode=require'.format(
-        #     os.environ.get('DB_NAME'),
-        #     os.environ.get('DB_USER'),
-        #     os.environ.get('DB_PASSWORD'),
-        #     os.environ.get('DB_HOST'),
-        #     os.environ.get('DB_PORT')
-        # )
-
-        with psycopg2.connect(DATABASE_URL, sslmode='require') as conn: # os.environ.get('DB_URL')
+        with psycopg2.connect(DATABASE_URL, sslmode='require') as conn:
             return conn
 
     except (psycopg2.DatabaseError, Exception) as e:
         print(e)
 
 
+def db_write(db: psycopg2.extensions.connection, query, *args):
+    """
+    Execute a write operation on the database connection
+    :param db: PostgreSQL database connection
+    :param query: SQL query
+    :param args: variables for query
+    """
+    cur = db.cursor()
+    try:
+        cur.execute(query, tuple(args))
+    except Exception as e:
+        print("Query execution unsuccessful: {0}".format(e))
+
+    db.commit()
+    cur.close()
+
+
+def db_select(db: psycopg2.extensions.connection, query, *args):
+    """
+    Execute read operation on the database connection
+    :param db: PostgreSQL database connection
+    :param query: SQL query
+    :param args: variables for query
+    :return:
+    """
+    result = []
+    cur = db.cursor()
+
+    try:
+        cur.execute(query, tuple(args))
+        result = cur.fetchall()
+    except Exception as e:
+        print("Query execution unsuccessful: {0}".format(e))
+
+    cur.close()
+    return result
