@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 import environ
 import socket
+import dj_database_url
 
 # Gather environmental variables
 env = environ.Env()
@@ -96,6 +97,11 @@ DATABASES = {
         'PORT': env("DB_PORT"),
     }
 }
+
+# Connect Heroku DB
+heroku_db = dj_database_url.config(conn_max_age=600)
+DATABASES['default'].update(heroku_db)
+
 
 
 # Password validation
