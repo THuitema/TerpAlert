@@ -1,6 +1,7 @@
 from datetime import date
 import requests
 from bs4 import BeautifulSoup
+from db import db_select, db_write
 
 # Constants for web scraping
 BASE_URL = "https://nutrition.umd.edu"
@@ -30,7 +31,8 @@ class DiningHall:
     """
 
     def __init__(self, name: str, location_num: int):
-        """Initializes the DiningHall object and generates menu
+        """
+        Initializes the DiningHall object and generates menu
         :param name: name of the dining hall
         :param location_num: identifier used by the dining hall website
         """
@@ -62,7 +64,8 @@ class DiningHall:
 
 
 class Menu:
-    """Represents the combined menu of all dining halls and interacts with database
+    """
+    Represents the combined menu of all dining halls and interacts with database
 
     Attributes
     __________
@@ -84,7 +87,8 @@ class Menu:
     """
 
     def __init__(self, dining_halls):
-        """Initializes the Menu object
+        """
+        Initializes the Menu object
 
         :param dining_halls: list of DiningHall objects
         """
@@ -93,7 +97,9 @@ class Menu:
         self.users_to_alert = {}
 
     def create_menu(self):
-        """Combines menus from each dining hall into one, storing result in total_menu"""
+        """
+        Combines menus from each dining hall into one, storing result in total_menu
+        """
         for dining_hall in self.dining_halls:
             for item in dining_hall.menu:
                 if item in self.total_menu:
@@ -104,8 +110,25 @@ class Menu:
                     self.total_menu[item] = Item(item)
                     self.total_menu[item].dining_halls = [dining_hall.name]
 
+    def update_db_menu(self, conn):
+        """
+        Insert new menu items to Menu table and all items to Daily Menu table
+        :param conn: PostgreSQL database connection
+        """
+
+        for key in self.total_menu.keys():
+            # Insert new items to Menu table
+            menu_insert_query = '''
+                INSERT INTO accounts_menu (item)
+                SELECT %s
+                WHERE NOT EXISTS (SELECT * FROM accounts_menu WHERE item=%s)
+            '''
+            db_write(conn, menu_insert_query, key, key)
+        return {'Completed': True}
+
     def __str__(self):
-        """Returns each item from menu, along with which dining halls are serving them
+        """
+        Returns each item from menu, along with which dining halls are serving them
 
         :return: str
         """
@@ -117,7 +140,8 @@ class Menu:
 
 
 class Item:
-    """Represents a menu item and dining halls associated with it
+    """
+    Represents a menu item and dining halls associated with it
 
     Attributes
     __________
@@ -128,7 +152,8 @@ class Item:
     """
 
     def __init__(self, name: str):
-        """Initializes Item object
+        """
+        Initializes Item object
 
         :param name: str
         """
@@ -136,7 +161,8 @@ class Item:
         self.dining_halls = []
 
     def __str__(self):
-        """Returns item name, along with which dining halls are serving it
+        """
+        Returns item name, along with which dining halls are serving it
 
         :return: str
         """
