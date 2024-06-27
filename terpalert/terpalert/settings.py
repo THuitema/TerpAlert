@@ -14,7 +14,6 @@ from pathlib import Path
 import os
 import environ
 import socket
-import dj_database_url
 
 # Gather environmental variables
 env = environ.Env()
@@ -87,22 +86,16 @@ WSGI_APPLICATION = 'terpalert.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 # PostgreSQL Database Configuration
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env("DB_NAME"),
-        'USER': env("DB_USER"),
-        'PASSWORD': env("DB_PASSWORD"),
-        'HOST': env("DB_HOST"),
-        'PORT': env("DB_PORT"),
-    }
-}
-
-# Connect Heroku DB
-heroku_db = dj_database_url.config(conn_max_age=600)
-DATABASES['default'].update(heroku_db)
-
-
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         # 'NAME': env("DB_NAME"),
+#         # 'USER': env("DB_USER"),
+#         # 'PASSWORD': env("DB_PASSWORD"),
+#         # 'HOST': env("DB_HOST"),
+#         # 'PORT': env("DB_PORT"),
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

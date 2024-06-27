@@ -1,10 +1,18 @@
 import environ
+import dj_database_url
 
 env = environ.Env()
 
 DEBUG = False
 
 ALLOWED_HOSTS = [env("ALLOWED_HOSTS")]
+
+# Connect to Heroku DB
+DATABASES = {
+
+}
+heroku_db = dj_database_url.config(conn_max_age=600)
+DATABASES['default'].update(heroku_db)
 
 # HTTPS Settings
 SESSION_COOKIE_SECURE = True
