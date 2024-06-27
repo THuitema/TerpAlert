@@ -21,7 +21,7 @@ def main(args):
     menu.get_alerts(conn)
     conn.close()
 
-    return {'Alerts: ': menu.users_to_alert}
+    return {'Alerts: ': menu.alert_users()}
 
 
 

@@ -188,6 +188,16 @@ class Menu:
 
         return self.users_to_alert
 
+    def alert_users(self):
+        """
+        Notify users that have alerts for the current day menu
+        """
+        out = ''
+        for user_id, user_obj in self.users_to_alert.items():
+            out += str(user_obj) + '/n'
+
+        return out
+
     def __str__(self):
         """
         Returns each item from menu, along with which dining halls are serving them
