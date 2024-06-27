@@ -37,11 +37,13 @@ window.onload = function () {
     }
 
     // Settings - receive email alerts checkbox
-    const receiveAlertsCheckbox = document.getElementById('id_receive_email_alerts');
-    receiveAlertsCheckbox.addEventListener('change', function () {
-        const isChecked = receiveAlertsCheckbox.checked;
-        setReceiveAlertCheckbox(isChecked);
-    });
+    if (window.location.href.indexOf("accounts/account") > -1) {
+        const receiveAlertsCheckbox = document.getElementById('id_receive_email_alerts');
+        receiveAlertsCheckbox.addEventListener('change', function () {
+            const isChecked = receiveAlertsCheckbox.checked;
+            setReceiveAlertCheckbox(isChecked);
+        });
+    }
 }
 
 /**

@@ -6,15 +6,11 @@ from .models import Profile
 class ProfileCreationForm(UserCreationForm):
     email = forms.EmailField(label="Email", max_length=255)
     # phone = forms.CharField(label="Phone", max_length=14)
-    receive_email_alerts = forms.BooleanField(label="Receive email alerts")
+    receive_email_alerts = forms.BooleanField(label="Receive email alerts", required=False)
 
     error_messages = {
         'password_mismatch': 'The provided passwords do not match',
     }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['receive_email_alerts'].initial = True  # Autopopulate checkbox to being checked
 
     class Meta:
         model = Profile
