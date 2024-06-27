@@ -193,3 +193,38 @@ class Item:
         out = '{0} at '.format(self.name)
         out += ', '.join(self.dining_halls)
         return out
+
+
+class User:
+    """
+    Represents a User of the app
+
+    Attributes
+    __________
+    info : object
+        any information pertaining to user that is returned by database
+    alerts : [Item]
+        list of Item objects that the user should receive an alert for
+
+    """
+
+    def __init__(self, info: object):
+        """
+        Initializes User object
+
+        :param info: any information pertaining to user, returned by database
+        """
+        self.info = info
+        self.alerts = []
+
+    def __str__(self):  # use this to alert user by email/sms later?
+        """
+        Returns the alert(s) for the user
+
+        :return: str
+        """
+        out = 'Alert(s) for {0}\n'.format(self.info)
+        # Calls __str__() of each Item object in alerts
+        for alert in self.alerts:
+            out += '\t{0}\n'.format(str(alert))
+        return out
