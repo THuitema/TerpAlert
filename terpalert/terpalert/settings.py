@@ -30,12 +30,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
 
-# Load local settings
-if 'MacBook-Pro-175' in socket.gethostname():
-    from .settings_dev import *
-# Load production settings
-else:
-    from .settings_prod import *
+
 
 # Application definition
 
@@ -86,16 +81,26 @@ WSGI_APPLICATION = 'terpalert.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 # PostgreSQL Database Configuration
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         # 'NAME': env("DB_NAME"),
-#         # 'USER': env("DB_USER"),
-#         # 'PASSWORD': env("DB_PASSWORD"),
-#         # 'HOST': env("DB_HOST"),
-#         # 'PORT': env("DB_PORT"),
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        # 'NAME': env("DB_NAME"),
+        # 'USER': env("DB_USER"),
+        # 'PASSWORD': env("DB_PASSWORD"),
+        # 'HOST': env("DB_HOST"),
+        # 'PORT': env("DB_PORT"),
+    }
+}
+
+# Load local settings
+if 'MacBook-Pro-175' in socket.gethostname():
+    from .settings_dev import *
+# Load production settings
+else:
+    from .settings_prod import *
+    heroku_db = dj_database_url.config(conn_max_age=600)
+    DATABASES['default'].update(heroku_db)
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
