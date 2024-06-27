@@ -151,6 +151,43 @@ class Menu:
 
         return {'Completed': True}
 
+    def get_alerts(self, conn):
+        """
+        Appends to users_to_alert users with alerts for the current menu
+        :param conn: PostgreSQL database connection
+        :return dictionary with key = user id, value = list of alerts
+        """
+        for item_name, item_obj in self.total_menu.items():
+            item_name = item_name.replace("'", "''")
+
+            # Returns rows from Profile table that have alerts for current item
+            get_alerts_query = '''
+                SELECT *
+                FROM accounts_profile
+                WHERE id IN (
+                    SELECT user_id
+                    FROM accounts_alert
+                    WHERE menu_item_id in (
+                        SELECT id
+                        FROM accounts_menu
+                        WHERE item=%s
+                    )
+                )
+            '''
+
+            rows = db_select(conn, get_alerts_query, item_name)
+
+            # Append users & alerts to users_to_alert dict
+            for row in rows:
+                user_id = row[0]
+                if user_id in self.users_to_alert:
+                    self.users_to_alert[user_id].alerts.append(item_obj)
+                else:
+                    self.users_to_alert[user_id] = User(row)
+                    self.users_to_alert[user_id].alerts = [item_obj]
+
+        return self.users_to_alert
+
     def __str__(self):
         """
         Returns each item from menu, along with which dining halls are serving them

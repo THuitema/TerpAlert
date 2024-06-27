@@ -17,9 +17,11 @@ def main(args):
     menu.create_menu()
 
     conn = connect()
-    res = menu.update_db_menu(conn)
+    # res = menu.update_db_menu(conn)
+    menu.get_alerts(conn)
     conn.close()
-    return res
+
+    return {'Alerts: ': menu.users_to_alert}
 
 
 
