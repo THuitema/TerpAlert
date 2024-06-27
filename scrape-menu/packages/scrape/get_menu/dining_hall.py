@@ -124,6 +124,31 @@ class Menu:
                 WHERE NOT EXISTS (SELECT * FROM accounts_menu WHERE item=%s)
             '''
             db_write(conn, menu_insert_query, key, key)
+
+            # Insert all items to Daily Menu table
+            at_y = 'Yahentamitsi' in self.total_menu[key].dining_halls
+            at_south = 'South' in self.total_menu[key].dining_halls
+            at_251 = '251' in self.total_menu[key].dining_halls
+
+            # Get foreign key for menu item
+            get_menu_item_query = '''
+                SELECT * 
+                FROM accounts_menu
+                WHERE item=%s
+            '''
+
+            rows = db_select(conn, get_menu_item_query, key)
+            menu_item_id = rows[0][0]
+
+            daily_menu_insert_query = '''
+                INSERT INTO accounts_dailymenu 
+                    (menu_item_id, date, yahentamitsi_dining_hall, south_dining_hall, two_fifty_one_dining_hall)
+                VALUES
+                    (%s, %s, %s, %s, %s)
+            '''
+
+            db_write(conn, daily_menu_insert_query, menu_item_id, date.today(), at_y, at_south, at_251)
+
         return {'Completed': True}
 
     def __str__(self):
@@ -133,8 +158,7 @@ class Menu:
         :return: str
         """
         out = ''
-        # Calls the __str__() for each Item in total_menu
-        for item_name, obj in self.total_menu.items():  # item_list
+        for item_name, obj in self.total_menu.items():
             out += str(obj) + '\n'
         return out
 
