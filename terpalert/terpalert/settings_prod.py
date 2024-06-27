@@ -9,7 +9,9 @@ ALLOWED_HOSTS = [env("ALLOWED_HOSTS")]
 
 # Connect to Heroku DB
 DATABASES = {
+    'default': {
 
+    }
 }
 heroku_db = dj_database_url.config(conn_max_age=600)
 DATABASES['default'].update(heroku_db)
