@@ -84,7 +84,8 @@ function checkAlertExists(input) {
             if (data.found == true) { // Item is being served today
                 result.innerHTML = '🚨 ' + data.item + ' is being served at ' + data.dining_halls + ' 🚨';
             } else { // Item is not being served today
-                result.innerHTML = "Sorry, " + data.item + " isn't being served today";
+                result.innerHTML = "Sorry, no dining halls have " + data.item + " today";
+                result.classList.add('auth-form-error')
             }
         },
         error: function (error) {
