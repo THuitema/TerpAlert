@@ -212,7 +212,6 @@ def save_alert(request):
         return redirect('account')  # Redirect any attempts to access this page
 
 
-@login_required
 def load_menu(request):
     """
     Handle the Ajax request to retrieve search results for autocomplete
