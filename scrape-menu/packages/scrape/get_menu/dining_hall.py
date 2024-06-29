@@ -2,6 +2,7 @@ from datetime import date
 import requests
 from bs4 import BeautifulSoup
 from db import db_select, db_write
+from send_email import send_simple_message
 
 # Constants for web scraping
 BASE_URL = "https://nutrition.umd.edu"
@@ -195,6 +196,8 @@ class Menu:
         out = ''
         for user_id, user_obj in self.users_to_alert.items():
             out += str(user_obj) + '/n'
+
+        send_simple_message()
 
         return out
 
