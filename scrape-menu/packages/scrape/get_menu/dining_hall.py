@@ -2,7 +2,7 @@ from datetime import date
 import requests
 from bs4 import BeautifulSoup
 from db import db_select, db_write
-from send_email import send_simple_message
+from send_email import send_simple_message, send_alert
 
 # Constants for web scraping
 BASE_URL = "https://nutrition.umd.edu"
@@ -194,15 +194,15 @@ class Menu:
 
     def alert_users(self):
         """
-        Notify users that have alerts for the current day menu
+        Email users that have alerts for the current day menu
         """
-        out = ''
+        alerted_emails = []
         for user_id, user_obj in self.users_to_alert.items():
-            out += str(user_obj) + '/n'
+            if user_obj.receive_email_alerts:
+                send_alert('thuitema35@gmail.com', user_obj.get_alert_list())
+                alerted_emails.append(user_obj.email)
 
-        send_simple_message()
-
-        return out
+        return alerted_emails
 
     def __str__(self):
         """
