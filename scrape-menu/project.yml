@@ -6,6 +6,9 @@ packages:
           web: true
           environment:
             DATABASE_URL: "${DATABASE_URL}"
+            MAILGUN_API: "${MAILGUN_API}"
+            MAILGUN_URL: "${MAILGUN_URL}"
+            MAILGUN_EMAIL: "${MAILGUN_EMAIL}"
           limits:
             timeout: 60000
             memory: 512
