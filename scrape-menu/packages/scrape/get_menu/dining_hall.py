@@ -181,10 +181,13 @@ class Menu:
             # Append users & alerts to users_to_alert dict
             for row in rows:
                 user_id = row[0]
+                email = str(row[3])
+                receive_email_alerts = row[8]  # == 'True'
+
                 if user_id in self.users_to_alert:
                     self.users_to_alert[user_id].alerts.append(item_obj)
                 else:
-                    self.users_to_alert[user_id] = User(row)
+                    self.users_to_alert[user_id] = User(row, email, receive_email_alerts)
                     self.users_to_alert[user_id].alerts = [item_obj]
 
         return self.users_to_alert
@@ -258,14 +261,23 @@ class User:
 
     """
 
-    def __init__(self, info: object):
+    def __init__(self, info: object, email: str, receive_email_alerts: bool):
         """
         Initializes User object
 
         :param info: any information pertaining to user, returned by database
         """
         self.info = info
+        self.email = email
         self.alerts = []
+        self.receive_email_alerts = receive_email_alerts
+
+    def get_alert_list(self):
+        alert_list = []
+        for alert in self.alerts:
+            alert_list.append(str(alert))
+
+        return alert_list
 
     def __str__(self):  # use this to alert user by email/sms later?
         """
@@ -273,7 +285,7 @@ class User:
 
         :return: str
         """
-        out = 'Alert(s) for {0}\n'.format(self.info)
+        out = 'Alert(s) for {0}\n'.format(self.email)
         # Calls __str__() of each Item object in alerts
         for alert in self.alerts:
             out += '\t{0}\n'.format(str(alert))
