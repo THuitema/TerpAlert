@@ -196,13 +196,13 @@ class Menu:
         """
         Email users that have alerts for the current day menu
         """
-        alerted_emails = []
+        alerts_sent = []
         for user_id, user_obj in self.users_to_alert.items():
             if user_obj.receive_email_alerts:
-                send_alert('thuitema35@gmail.com', user_obj.get_alert_list())
-                alerted_emails.append(user_obj.email)
+                response = send_alert('thuitema35@gmail.com', user_obj.get_alert_list())
+                alerts_sent.append([user_obj.email, response])
 
-        return alerted_emails
+        return alerts_sent
 
     def __str__(self):
         """
