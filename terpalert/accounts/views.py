@@ -15,6 +15,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from .tokens import account_activation_token
 from django.contrib import messages
+from rest_framework.authtoken.models import Token
 
 
 def create_profile(request):
@@ -34,6 +35,9 @@ def create_profile(request):
             # Disable user from logging in until their email is verified
             profile.is_active = False
             profile.save()
+
+            # Create authentication token
+            Token.objects.create(user=profile)
 
             # Send verification email
             current_site = get_current_site(request)
