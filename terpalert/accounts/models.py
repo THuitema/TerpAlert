@@ -4,6 +4,15 @@ from django.conf import settings
 from django.utils import timezone
 from datetime import date
 from .fields import LowercaseEmailField
+from django.contrib.admin import ModelAdmin
+
+
+class ProfileAdmin(ModelAdmin):
+    """
+    Add user id as a read only field in the Accounts-Profile table
+    """
+
+    readonly_fields = ('id',)
 
 
 # Overriding Django's default UserManager with our own, since we are customizing the User model
