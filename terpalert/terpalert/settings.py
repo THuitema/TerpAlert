@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'bootstrap5',
+    'rest_framework.authtoken'
 ]
 
 MIDDLEWARE = [
