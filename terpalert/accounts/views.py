@@ -306,6 +306,10 @@ def set_receive_alerts(request):
 
 @login_required
 def delete_account(request):
+    """
+    Deletes the currently logged-in account
+    :return: redirect to home page if deleting was successful, account page if not
+    """
     if request.method == 'POST':
         try:
             user = Profile.objects.get(pk=request.user.id)
@@ -320,6 +324,11 @@ def delete_account(request):
 
 
 def auth(request, token):
+    """
+    Log in user by their authentication token
+    :param token: unique auth token
+    :return: redirect to account page if successful, home page if invalid token
+    """
     tokens = Token.objects.filter(key=token)
     if tokens.count() == 1:
         profile = tokens[0].user
@@ -330,6 +339,11 @@ def auth(request, token):
 
 
 def unsubscribe(request, token):
+    """
+    Unsubscribe user from receiving email alerts
+    :param token: token to authenticate user
+    :return: redirect to unsubscribe-done page if action was a successful POST request, render unsubscribe page if GET
+    """
     if request.method == 'GET':
         tokens = Token.objects.filter(key=token)
         if tokens.count() == 1:
