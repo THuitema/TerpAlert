@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block scripts %}
+    <script src="{% static 'accounts.js' %}"></script>
+{% endblock scripts %}
+
+{% block title %}Unsubscribe | TerpAlert{% endblock %}
+
+{% block content %}
+    <div class="container-md my-3">
+        <!-- Header text -->
+        <div class="row text-center">
+            <h1>Unsubscribe</h1>
+            <p>Are you sure you want to unsubscribe {{ email }} from alerts?</p>
+        </div>
+
+        <!-- Unsubscribe form -->
+        <div class="row text-center my-3 justify-content-center">
+            <div class="col-6">
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning">Unsubscribe</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
