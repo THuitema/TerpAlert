@@ -201,7 +201,7 @@ class Menu:
         for user_id, user_obj in self.users_to_alert.items():
             if user_obj.receive_email_alerts:
                 token = user_obj.get_auth_token(conn)
-                response = send_alert('thuitema35@gmail.com', user_obj.get_alert_list(), token)
+                response = send_alert(user_obj.email, user_obj.get_alert_list(), token)
                 alerts_sent.append([user_obj.email, response.json()])
 
         return alerts_sent

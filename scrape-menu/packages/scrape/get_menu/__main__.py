@@ -17,11 +17,12 @@ def main(args):
     menu.create_menu()
 
     conn = connect()
-    # res = menu.update_db_menu(conn)
+    menu.update_db_menu(conn)
     menu.get_alerts(conn)
+    alerted_emails = menu.alert_users(conn)
     conn.close()
-    alerted_emails = menu.alert_users()
-    return {'Alerted Emails': str(alerted_emails)}
+
+    return {'Alert responses': str(alerted_emails)}
 
 
 
