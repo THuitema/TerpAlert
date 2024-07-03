@@ -19,7 +19,8 @@ def send_simple_message():
 def send_alert(to_email: str, alerts: list[str], token: str):
     from_email = "TerpAlert <" + os.environ['MAILGUN_EMAIL'] + ">"
     template = "Alert email 2"
-    account_auth_url = 'https://terpalert.com/accounts/auth/' + token
+    account_auth_url = 'https://terpalert.xyz/accounts/auth/' + token
+    unsubscribe_url = 'https://terpalert.xyz/accounts/unsubscribe/' + token
 
     return requests.post(
         os.environ['MAILGUN_URL'],
@@ -28,5 +29,5 @@ def send_alert(to_email: str, alerts: list[str], token: str):
               "to": [to_email],
               "subject": "You have dining hall alerts!",
               "template": template,
-              "t:variables": '{"alerts": ' + json.dumps(alerts) + ', "account_auth_url": ' + json.dumps(account_auth_url) + '}'
+              "t:variables": '{"alerts": ' + json.dumps(alerts) + ', "account_auth_url": ' + json.dumps(account_auth_url) + ', "unsubscribe_url": ' + json.dumps(unsubscribe_url) + '}'
               })
