@@ -327,3 +327,17 @@ def auth(request, token):
         return redirect('account')
     else:
         return redirect('home')
+
+
+def unsubscribe(request, token):
+    if request.method == 'GET':
+        tokens = Token.objects.filter(key=token)
+        if tokens.count() == 1:
+            profile = tokens[0].user
+            login(request, profile)
+            return render(request, 'unsubscribe.html', {'email': profile.email})
+        else:
+            return redirect('home')
+    else:
+        Profile.objects.filter(pk=request.user.id).update(receive_email_alerts=False)
+        return render(request, 'unsubscribe_done.html')

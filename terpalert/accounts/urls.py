@@ -35,5 +35,6 @@ urlpatterns = [
     path('verify-email-confirm/<uidb64>/<token>', views.verify_email_confirm, name='verify-email-confirm'),
 
     # Token auth
-    path('auth/<token>/', views.auth, name='auth')
+    path('auth/<token>/', views.auth, name='auth'),
+    path('unsubscribe/<token>/', views.unsubscribe, name='unsubscribe'),
 ]
