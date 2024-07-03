@@ -320,9 +320,9 @@ def delete_account(request):
 
 
 def auth(request, token):
-    profile = Token.objects.get(key=token).user
-    print(token, profile)
-    if profile is not None and profile.is_active:
+    tokens = Token.objects.filter(key=token)
+    if tokens.count() == 1:
+        profile = tokens[0].user
         login(request, profile)
         return redirect('account')
     else:
