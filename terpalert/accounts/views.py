@@ -317,3 +317,13 @@ def delete_account(request):
         return redirect('home')
     else:
         return redirect('account')
+
+
+def auth(request, token):
+    profile = Token.objects.get(key=token).user
+    print(token, profile)
+    if profile is not None and profile.is_active:
+        login(request, profile)
+        return redirect('account')
+    else:
+        return redirect('home')
