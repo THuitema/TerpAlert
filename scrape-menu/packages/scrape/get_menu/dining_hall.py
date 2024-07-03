@@ -187,20 +187,22 @@ class Menu:
                 if user_id in self.users_to_alert:
                     self.users_to_alert[user_id].alerts.append(item_obj)
                 else:
-                    self.users_to_alert[user_id] = User(row, email, receive_email_alerts)
+                    self.users_to_alert[user_id] = User(row, int(user_id), email, receive_email_alerts)
                     self.users_to_alert[user_id].alerts = [item_obj]
 
         return self.users_to_alert
 
-    def alert_users(self):
+    def alert_users(self, conn):
         """
         Email users that have alerts for the current day menu
         """
         alerts_sent = []
+
         for user_id, user_obj in self.users_to_alert.items():
             if user_obj.receive_email_alerts:
-                response = send_alert('thuitema35@gmail.com', user_obj.get_alert_list())
-                alerts_sent.append([user_obj.email, response])
+                token = user_obj.get_auth_token(conn)
+                response = send_alert('thuitema35@gmail.com', user_obj.get_alert_list(), token)
+                alerts_sent.append([user_obj.email, response.json()])
 
         return alerts_sent
 
@@ -261,13 +263,14 @@ class User:
 
     """
 
-    def __init__(self, info: object, email: str, receive_email_alerts: bool):
+    def __init__(self, info: object, user_id: int, email: str, receive_email_alerts: bool):
         """
         Initializes User object
 
         :param info: any information pertaining to user, returned by database
         """
         self.info = info
+        self.user_id = user_id
         self.email = email
         self.alerts = []
         self.receive_email_alerts = receive_email_alerts
@@ -278,6 +281,17 @@ class User:
             alert_list.append(str(alert))
 
         return alert_list
+
+    def get_auth_token(self, conn):
+        get_token_query = '''
+            SELECT key
+            FROM authtoken_token
+            WHERE user_id=%s
+        '''
+
+        rows = db_select(conn, get_token_query, self.user_id)
+
+        return rows[0][0]
 
     def __str__(self):  # use this to alert user by email/sms later?
         """
