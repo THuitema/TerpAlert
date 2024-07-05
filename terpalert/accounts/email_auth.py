@@ -11,13 +11,13 @@ def send_verification_email(to_email: str, token: str):
     verification_url = 'https://terpalert.xyz/accounts/verify-email-confirm/' + token
 
     return requests.post(
-        os.environ['MAILGUN_URL'],
+        url=os.environ['MAILGUN_URL'],
         auth=("api", MAILGUN_API),
         data={"from": from_email,
               "to": [to_email],
               "subject": "Verify your account",
               "template": template,
-              "t:variables": '{"alerts": ' + json.dumps(verification_url) + '}'
+              # "t:variables": '{"alerts": ' + json.dumps(verification_url) + '}'
               })
 
     # return requests.post(
