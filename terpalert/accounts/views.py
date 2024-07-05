@@ -44,7 +44,7 @@ def create_profile(request):
 
             # Send verification email
             print(email, token)
-            response = send_verification_email(email, token)
+            response = send_verification_email(email, str(token))
             print(response)
             # current_site = get_current_site(request)
             # subject = 'Verify Email'
