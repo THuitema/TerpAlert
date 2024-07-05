@@ -7,7 +7,7 @@ MAILGUN_API = os.environ['MAILGUN_API']
 
 def send_verification_email(to_email: str, token: str):
     try:
-        from_email = os.environ['MAILGUN_EMAIL']
+        from_email = "TerpAlert <" + os.environ['MAILGUN_EMAIL'] + ">"
         template = "email verification"
         verification_url = 'https://terpalert.xyz/accounts/verify-email-confirm/' + token
 
@@ -16,9 +16,9 @@ def send_verification_email(to_email: str, token: str):
             auth=("api", MAILGUN_API),
             data={"from": from_email,
                   "to": [to_email],
-                  "subject": "Verify your account",
+                  "subject": "Verify your email",
                   "template": template,
-                  # "t:variables": '{"alerts": ' + json.dumps(verification_url) + '}'
+                  "t:variables": '{"alerts": ' + json.dumps(verification_url) + '}'
                   })
     except Exception as e:
         return e
