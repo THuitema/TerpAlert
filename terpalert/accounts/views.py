@@ -39,9 +39,11 @@ def create_profile(request):
 
             # Create authentication token
             token = Token.objects.create(user=profile)
+            print('SENDING EMAIL VERIFICATION HERE')
 
             # Send verification email
-            send_verification_email(email, token.key)
+            response = send_verification_email(email, token.key)
+            print(response)
             # current_site = get_current_site(request)
             # subject = 'Verify Email'
             # body = render_to_string('registration/verify_email_message.html', {
