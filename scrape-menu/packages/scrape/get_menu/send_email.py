@@ -29,5 +29,6 @@ def send_alert(to_email: str, alerts: list[str], token: str):
               "to": [to_email],
               "subject": "You have dining hall alerts!",
               "template": template,
-              "t:variables": '{"alerts": ' + json.dumps(alerts) + ', "account_auth_url": ' + json.dumps(account_auth_url) + ', "unsubscribe_url": ' + json.dumps(unsubscribe_url) + '}'
+              "t:variables": '{"alerts": ' + json.dumps(alerts) + ', "account_auth_url": ' + json.dumps(
+                  account_auth_url) + ', "unsubscribe_url": ' + json.dumps(unsubscribe_url) + '}'
               })
