@@ -81,10 +81,12 @@ class Menu:
     _________
     create_menu()
         Combines menus from each dining hall into one, storing result in total_menu
-    check_for_alerts(conn)
+    update_db_menu(conn)
+        Insert new menu items to Menu table and all items to Daily Menu table
+    get_alerts(conn)
         Checks with database if there are users to alert, storing result in users_to_alert
     alert_users()
-        Notifies users that have alerts
+        Send alert emails to users
     """
 
     def __init__(self, dining_halls):
@@ -258,15 +260,26 @@ class User:
     __________
     info : object
         any information pertaining to user that is returned by database
+    user_id : int
+        user id stored in the database
+    email : str
+        user email
     alerts : [Item]
         list of Item objects that the user should receive an alert for
+    receive_email_alerts : bool
+        true if user wants to receive email notifications
 
+    Methods
+    _________
+    get_alert_list()
+        get the list of alert messages for user
+    get_auth_token(conn)
+        Get the user's authentication token
     """
 
     def __init__(self, info: object, user_id: int, email: str, receive_email_alerts: bool):
         """
         Initializes User object
-
         :param info: any information pertaining to user, returned by database
         """
         self.info = info
@@ -276,6 +289,9 @@ class User:
         self.receive_email_alerts = receive_email_alerts
 
     def get_alert_list(self):
+        """
+        :return: list of alert messages for user
+        """
         alert_list = []
         for alert in self.alerts:
             alert_list.append(str(alert))
@@ -283,6 +299,11 @@ class User:
         return alert_list
 
     def get_auth_token(self, conn):
+        """
+        Get the user's authentication token
+        :param conn: PostgreSQL database connection
+        :return: Django REST authentication token for user
+        """
         get_token_query = '''
             SELECT key
             FROM authtoken_token
