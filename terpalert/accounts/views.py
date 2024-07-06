@@ -8,15 +8,9 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db.models import Case, Value, When, CharField
 from datetime import date
-from django.core.mail import EmailMessage
-from django.contrib.sites.shortcuts import get_current_site
-from django.template.loader import render_to_string
-from django.utils.encoding import force_bytes, force_str
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib import messages
 from rest_framework.authtoken.models import Token
 from .email_auth import send_verification_email
-import json
 
 
 def create_profile(request):
