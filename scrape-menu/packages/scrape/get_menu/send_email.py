@@ -6,6 +6,13 @@ MAILGUN_API = os.environ['MAILGUN_API']
 
 
 def send_alert(to_email: str, alerts: list[str], token: str):
+    """
+    Sends alert email to user using the Mailgun API
+    :param to_email: user's email
+    :param alerts: list of user's alerts
+    :param token: user's authentication token
+    :return: JSON response from Mailgun API
+    """
     from_email = "TerpAlert <" + os.environ['MAILGUN_EMAIL'] + ">"
     template = "Alert email 2"
     account_auth_url = 'https://terpalert.xyz/accounts/auth/' + token
