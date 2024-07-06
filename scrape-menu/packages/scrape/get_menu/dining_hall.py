@@ -2,7 +2,7 @@ from datetime import date
 import requests
 from bs4 import BeautifulSoup
 from db import db_select, db_write
-from send_email import send_simple_message, send_alert
+from send_email import send_alert
 
 # Constants for web scraping
 BASE_URL = "https://nutrition.umd.edu"
