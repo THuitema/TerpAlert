@@ -18,7 +18,7 @@ def send_verification_email(to_email: str, token: str):
               "to": [to_email],
               "subject": "Verify your email",
               "template": template,
-              "t:variables": '{"verfication_url": ' + json.dumps(verification_url) + '}'
+              "t:variables": '{"verification_url": ' + json.dumps(verification_url) + '}'
               })
 
 
