@@ -1,35 +1,46 @@
 <img src="images/logo.png" alt="logo" width="200" style="display: block; margin-left: auto; margin-right: auto; width: 40%"/> <br>
 
 # TerpAlert
-A web application to track foods being served at University of Maryland dining halls
+[https://terpalert.xyz](https://terpalert.xyz)
 
-[Live site](https://terpalert.xyz)
+TerpAlert is a web application to designed to help students at the University of Maryland track foods being served at dining halls
 
 ## About The Project
 ![Screenshot of website landing page](images/landing_page.png)
 
-During my freshman year at the University of Maryland, I discovered my favorite food at the dining halls: Orange Tempura Chicken.
+During my freshman year at the University of Maryland, I discovered my favorite food in the dining halls: Orange Tempura Chicken.
 If I could, I would eat it for every meal. However, the dining halls did not serve it every day, so I was often left guessing what I would have for my next meal.
 After bringing this issue up with my friends, I found that we shared a common desire: to know when the dining halls are serving our favorite foods.
 Thus, TerpAlert was born.
 
 ### Built With
 * [![Django][Django.com]][Django-url]
-* [![Bootstrap][Bootstrap.com]][Bootstrap-url]
-* [![JQuery][JQuery.com]][JQuery-url]
-* [![BeautifulSoup][BeautifulSoup.com]][BeautifulSoup-url]
 * [![PostgreSQL][Postgres.com]][Postgres-url]
-* [![DigitalOcean][DigitalOcean.com]][DigitalOcean-url]
+* [![BeautifulSoup][BeautifulSoup.com]][BeautifulSoup-url]
 * [![Python][Python.com]][Python-url]
+* [![Bootstrap][Bootstrap.com]][Bootstrap-url]
 * [![JS][JS.com]][JS-url]
+* [![JQuery][JQuery.com]][JQuery-url]
+* [![DigitalOcean][DigitalOcean.com]][DigitalOcean-url]
 
-## Project Screen Shot(s)
 
-#### Example:   
+### Features 
 
-[ PRETEND SCREEN SHOT IS HERE ]
+#### Automated Web Scraping
+  
+-  Scrapes menu for each dining hall every morning using BeautifulSoup
+-  Updates PostgreSQL database
+-  Automated utilizing Digital Ocean's serverless functions
 
-[ PRETEND OTHER SCREEN SHOT IS HERE ]
+#### Account Creation
+-  Users can create accounts to set alerts for certain foods
+-  Email verification using Mailgun API
+-  Option to receive emails for their alerts
+
+#### Alerts
+-  Stored in PostgreSQL database
+-  After the daily menu scraping is complete, users with alerts present in the menu are notified
+-  Alert emails sent using Mailgun API
 
 ## Reflection
 
