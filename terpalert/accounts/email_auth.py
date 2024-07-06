@@ -6,7 +6,12 @@ MAILGUN_API = os.environ['MAILGUN_API']
 
 
 def send_verification_email(to_email: str, token: str):
-
+    """
+    Sends account verification email to user using the Mailgun API
+    :param to_email: user's email
+    :param token: user's authentication token
+    :return: JSON response from Mailgun API
+    """
     from_email = "TerpAlert <" + os.environ['MAILGUN_EMAIL'] + ">"
     template = "email verification"
     verification_url = 'https://terpalert.xyz/accounts/verify-email-confirm/' + token
