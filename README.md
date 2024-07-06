@@ -24,23 +24,27 @@ Thus, TerpAlert was born.
 * [![DigitalOcean][DigitalOcean.com]][DigitalOcean-url]
 
 
-### Features 
+## Features 
 
-#### Automated Web Scraping
+### Automated Web Scraping
   
 -  Scrapes menu for each dining hall every morning using BeautifulSoup
 -  Updates PostgreSQL database
 -  Automated utilizing Digital Ocean's serverless functions
 
-#### Account Creation
+### Account Creation
 -  Users can create accounts to set alerts for certain foods
 -  Email verification using Mailgun API
 -  Option to receive emails for their alerts
 
-#### Alerts
+![Gif of a user adding an alert to their account and deleting another](/images/terpalert.gif)
+
+### Alerts
 -  Stored in PostgreSQL database
 -  After the daily menu scraping is complete, users with alerts present in the menu are notified
 -  Alert emails sent using Mailgun API
+
+<img src="images/alert.png" alt="Example of an email a user would receive with their alerts" width="500" /> <br>
 
 ## Reflection
 
@@ -51,7 +55,6 @@ Thus, TerpAlert was born.
   - What tools did you use to implement this project?
       - This might seem obvious because you are IN this codebase, but to all other humans now is the time to talk about why you chose webpack instead of create react app, or D3, or vanilla JS instead of a framework etc. Brag about your choices and justify them here.  
 
-#### Example:  
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
