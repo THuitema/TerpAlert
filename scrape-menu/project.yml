@@ -10,7 +10,7 @@ packages:
             MAILGUN_URL: "${MAILGUN_URL}"
             MAILGUN_EMAIL: "${MAILGUN_EMAIL}"
           limits:
-            timeout: 3000000
+            timeout: 300000
             memory: 1024
 
 
