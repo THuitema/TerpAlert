@@ -13,7 +13,6 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from .tokens import account_activation_token
 from django.contrib import messages
 from rest_framework.authtoken.models import Token
 from .email_auth import send_verification_email
@@ -279,26 +278,6 @@ def verify_email_confirm(request, token):
 
     messages.warning(request, 'This activation link is invalid. Please retry the link sent to your email.')
     return render(request, 'registration/verify_email_confirm.html')
-
-    # try:
-    #     # Attempt to get Profile object with the uidb64 component of the url, if it exists
-    #     user = Profile.objects.get(pk=uid)
-    # except (TypeError, ValueError, OverflowError, Profile.DoesNotExist):
-    #     # Invalid user id
-    #     user = None
-    #
-    # # Attempt to check the token against the Profile object if the Profile exists
-    # if user is not None and account_activation_token.check_token(user, token):
-    #     # Verify email by activating user account
-    #     user.is_active = True
-    #     user.save()
-    #     messages.success(request, 'Your email has been verified.')
-    #     return redirect('login')
-    # else:
-    #     messages.warning(request, 'This activation link is invalid. Please retry the link sent to your email.')
-    #
-    # # If verification wasn't successful, render template with error messages
-    # return render(request, 'registration/verify_email_confirm.html')
 
 
 @login_required
