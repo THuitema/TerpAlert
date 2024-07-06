@@ -21,14 +21,3 @@ def send_verification_email(to_email: str, token: str):
               "t:variables": '{"verification_url": ' + json.dumps(verification_url) + '}'
               })
 
-
-    # return requests.post(
-    #     os.environ['MAILGUN_URL'],
-    #     auth=("api", MAILGUN_API),
-    #     data={"from": from_email,
-    #           "to": [to_email],
-    #           "subject": "Verify email",
-    #           "template": template,
-    #           "t:variables": '{"verification_url": ' + verification_url + '}'
-    #           }
-    # )
