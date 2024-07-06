@@ -6,7 +6,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-# PostgreSQL Localhost Database Configuration
+# PostgreSQL localhost database configuration
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -27,7 +27,7 @@ SECURE_SSL_REDIRECT = False
 SECURE_HSTS_PRELOAD = False
 SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 
-# SMTP Configuration
+# SMTP Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587

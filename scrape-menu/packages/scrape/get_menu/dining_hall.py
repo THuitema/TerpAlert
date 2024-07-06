@@ -28,7 +28,7 @@ class DiningHall:
     get_url()
         Returns the url to the current dining hall's menu for today
     scrape_menu()
-        Returns a set of each menu item
+        Web-scrapes the menu of the dining hall for the current day, returning a set of items
     """
 
     def __init__(self, name: str, location_num: int):
@@ -43,6 +43,9 @@ class DiningHall:
         self.menu = self.scrape_menu()
 
     def get_url(self) -> str:
+        """
+        :return: url to the current dining hall's menu for today
+        """
         month = date.today().month
         day = date.today().day
         year = date.today().year
@@ -51,6 +54,10 @@ class DiningHall:
             day) + "/" + str(year)
 
     def scrape_menu(self) -> set[str]:
+        """
+        Web-scrapes the menu of the dining hall for the current day
+        :return: set of items on the menu
+        """
         # Set up web scraper
         page = requests.get(self.url)
         soup = BeautifulSoup(page.content, "html.parser")
@@ -197,6 +204,8 @@ class Menu:
     def alert_users(self, conn):
         """
         Email users that have alerts for the current day menu
+        :param conn: PostgreSQL database connection
+        :return list containing each email alerted and their alert message(s)
         """
         alerts_sent = []
 
