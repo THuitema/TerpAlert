@@ -59,7 +59,7 @@ class DiningHall:
         :return: set of items on the menu
         """
         # Set up web scraper
-        page = requests.get(self.url)
+        page = requests.get(self.url, verify=False)
         soup = BeautifulSoup(page.content, "html.parser")
 
         items = set()
