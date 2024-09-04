@@ -4,7 +4,7 @@ env = environ.Env()
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # PostgreSQL localhost database configuration
 DATABASES = {

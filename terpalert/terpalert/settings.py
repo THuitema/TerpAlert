@@ -24,7 +24,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load local settings
-if 'MacBook-Pro-175' in socket.gethostname():
+if 'macbook-pro' in socket.gethostname().lower():
     from .settings_dev import *
 # Load production settings
 else:
