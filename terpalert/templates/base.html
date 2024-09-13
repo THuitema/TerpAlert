@@ -26,18 +26,11 @@
 <!-- navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: #e21833;">
     <div class="container-fluid">
-        <a href="{% url 'home' %}" class="navbar-brand">
+        <a href="{% url 'home' %}" class="navbar-brand flex-grow-1">
             <span class="fw-bold">
                 TerpAlert
             </span>
         </a>
-
-        <!-- GitHub link -->
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a href="https://github.com/THuitema/TerpAlert" class="nav-link">GitHub</a>
-            </li>
-        </ul>
 
         <!-- toggle button for mobile devices -->
         <button class="navbar-toggler" id="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -46,19 +39,35 @@
         </button>
 
         <!-- nav links -->
-        <div class="collapse navbar-collapse justify-content-end align-center" id="main-nav">
-            <ul class="navbar-nav">
+        <div class="navbar-collapse collapse w-100" id="main-nav">
+            <ul class="navbar-nav justify-content-start">
+                <!-- About -->
+                <li class="nav-item">
+                    <a href="{% url 'about' %}" class="nav-link">About</a>
+                </li>
+
+                <!-- GitHub link -->
+                <li class="nav-item">
+                    <a href="https://github.com/THuitema/TerpAlert" class="nav-link">GitHub</a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ms-auto justify-content-end">
                 {% if request.user.is_authenticated %}
+                    <!-- Account -->
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'account' %}">Account</a>
                     </li>
+                    <!-- Logout -->
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'logout' %}">Logout</a>
                     </li>
                 {% else %}
+                    <!-- Login -->
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'login' %}">Login</a>
                     </li>
+                    <!-- Sign up -->
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'signup' %}">Sign up</a>
                     </li>
