@@ -24,7 +24,7 @@ def check_for_alert(request):
     if 'item' in request.GET:
         item = request.GET['item']
 
-        menu_item = UniqueMenuItem.objects.get(item=item)  # Get Menu object for that item
+        menu_item = UniqueMenuItem.objects.get(name=item)  # Get Menu object for that item
         daily_menu_item = DailyMenuItem.objects.filter(menu_item_id=menu_item.id, date=date.today())
 
         if daily_menu_item.exists():

@@ -118,7 +118,7 @@ def account(request):
             if daily_menu_item[0].two_fifty_one_dining_hall:
                 dining_halls.append('251')
 
-            context['data'].append([alert.menu_item.item, ', '.join(dining_halls)])
+            context['data'].append([alert.menu_item.name, ', '.join(dining_halls)])
 
     return render(request, 'home.html', context)
 
@@ -136,7 +136,7 @@ def load_alerts(request):
     for alert in alerts:
         item = {
             'id': alert.id,
-            'alert': alert.menu_item.item,
+            'alert': alert.menu_item.name,
         }
         data.append(item)
     return JsonResponse({'data': data})
@@ -219,7 +219,7 @@ def load_menu(request):
         data = []
         for item in menu:
             item = {
-                'label': item.item,
+                'label': item.name,
                 'value': item.id,
             }
             data.append(item)
