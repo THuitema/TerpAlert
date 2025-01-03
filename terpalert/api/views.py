@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Case, Value, When, CharField
+from datetime import date
 
 
 class UniqueMenuItemList(APIView):
@@ -35,8 +36,22 @@ class UniqueMenuItemList(APIView):
 class DailyMenuItemList(APIView):
     """
     Get all items from daily menus
+    name: optional query parameter to search for exact match in today's menu
     """
     def get(self, request, format=None):
-        items = DailyMenuItem.objects.all()
-        serializer = DailyMenuItemSerializer(items, many=True)
+        search_name = self.request.query_params.get('name')
+        today = date.today()
+        if search_name:
+            item_id = UniqueMenuItem.objects.get(name=search_name).id
+            menu_item_today = DailyMenuItem.objects.filter(menu_item_id=item_id, date=today)
+            if menu_item_today.exists():
+                serializer = DailyMenuItemSerializer(menu_item_today, many=True)
+            else:
+                serializer = DailyMenuItemSerializer(None, many=True)
+
+        else:
+            items = DailyMenuItem.objects.all()
+            serializer = DailyMenuItemSerializer(items, many=True)
+
         return Response(serializer.data)
+
