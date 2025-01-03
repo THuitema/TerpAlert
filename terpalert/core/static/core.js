@@ -49,15 +49,16 @@ window.onload = function () {
 function getMenu(request, response) {
     return $.ajax({
         type: 'GET',
-        url: '/accounts/load-menu/',
+        url: '/api/items/',  // /accounts/load-menu/
         data: {
             'term': request.term,
         },
         success: function (data) {
-            let results = $.map(data.data, function (value, key) {
+            console.log("value:", "key:");
+            let results = $.map(data, function (value, key) {
                 return {
-                    label: value.label, // label and value is the name of the menu item
-                    value: value.label
+                    label: value.name, // value.label  //label and value is the name of the menu item
+                    value: value.name  // value.label
                 }
             });
             response(results.slice(0, 10)); // limit to 10 results
