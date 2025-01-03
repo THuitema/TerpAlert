@@ -78,14 +78,14 @@ class Profile(AbstractBaseUser):
         return self.email
 
 
-class Menu(models.Model):
+class UniqueMenuItem(models.Model):
     """
     Stores all menu items that be chosen as a keyword
     """
-    item = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.item
+        return self.name
 
 
 class Alert(models.Model):
@@ -93,18 +93,18 @@ class Alert(models.Model):
     Tracks a keyword associated with a user
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    menu_item = models.ForeignKey(Menu, on_delete=models.CASCADE)
+    menu_item = models.ForeignKey(UniqueMenuItem, on_delete=models.CASCADE)
     date_created = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"{self.menu_item.item} - {self.user.email}"
+        return f"{self.menu_item.name} - {self.user.email}"
 
 
-class DailyMenu(models.Model):
+class DailyMenuItem(models.Model):
     """
     Stores dining hall menu for each day
     """
-    menu_item = models.ForeignKey(Menu, on_delete=models.CASCADE)
+    menu_item = models.ForeignKey(UniqueMenuItem, on_delete=models.CASCADE)
     date = models.DateField(default=date.today)
     yahentamitsi_dining_hall = models.BooleanField(default=False)
     south_dining_hall = models.BooleanField(default=False)

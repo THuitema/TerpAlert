@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.http import JsonResponse, Http404
 from .forms import ProfileCreationForm
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Alert, Menu, DailyMenu, Profile
+from .models import Alert, UniqueMenuItem, DailyMenuItem, Profile
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db.models import Case, Value, When, CharField
@@ -104,7 +104,7 @@ def account(request):
     # Find today's alerts (if any) for user
     alerts = Alert.objects.filter(user__email__exact=request.user.email).order_by('menu_item')
     for alert in alerts:  # All the user's alerts
-        daily_menu_item = DailyMenu.objects.filter(menu_item_id=alert.menu_item.id, date=date.today())
+        daily_menu_item = DailyMenuItem.objects.filter(menu_item_id=alert.menu_item.id, date=date.today())
 
         if daily_menu_item.exists():  # Alert is in the daily menu for today's date
             context['notifications'] = True
@@ -170,8 +170,8 @@ def save_alert(request):
         data = {}
 
         try:
-            menu_item = Menu.objects.get(item=alert_item)
-        except Menu.DoesNotExist:
+            menu_item = UniqueMenuItem.objects.get(item=alert_item)
+        except UniqueMenuItem.DoesNotExist:
             data['success'] = False
             data['message'] = 'This menu item does not exist!'
         else:
@@ -208,7 +208,7 @@ def load_menu(request):
     """
     if 'term' in request.GET:
         term = request.GET['term']
-        menu = Menu.objects.annotate(
+        menu = UniqueMenuItem.objects.annotate(
             order_by_position=Case(
                 When(item__istartswith=term, then=Value(1)),
                 When(item__icontains=term, then=Value(2)),

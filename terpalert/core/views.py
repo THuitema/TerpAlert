@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from accounts.models import DailyMenu, Menu
+from accounts.models import DailyMenuItem, UniqueMenuItem
 from django.http import JsonResponse, HttpResponse
 from datetime import date
 
@@ -24,8 +24,8 @@ def check_for_alert(request):
     if 'item' in request.GET:
         item = request.GET['item']
 
-        menu_item = Menu.objects.get(item=item)  # Get Menu object for that item
-        daily_menu_item = DailyMenu.objects.filter(menu_item_id=menu_item.id, date=date.today())
+        menu_item = UniqueMenuItem.objects.get(item=item)  # Get Menu object for that item
+        daily_menu_item = DailyMenuItem.objects.filter(menu_item_id=menu_item.id, date=date.today())
 
         if daily_menu_item.exists():
             # Item is being served today
