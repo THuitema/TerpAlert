@@ -183,4 +183,17 @@ img.image {
     width: 50%;
 }
 
+.nav-item .nav-link {
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.navbar {
+    padding-left: 2%;
+    padding-right: 2%;
+}
+
+
 
