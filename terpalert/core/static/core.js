@@ -49,15 +49,16 @@ window.onload = function () {
 function getMenu(request, response) {
     return $.ajax({
         type: 'GET',
-        url: '/accounts/load-menu/',
+        url: '/api/items/',  // /accounts/load-menu/
         data: {
             'term': request.term,
         },
         success: function (data) {
-            let results = $.map(data.data, function (value, key) {
+            console.log("value:", "key:");
+            let results = $.map(data, function (value, key) {
                 return {
-                    label: value.label, // label and value is the name of the menu item
-                    value: value.label
+                    label: value.name, // value.label  //label and value is the name of the menu item
+                    value: value.name  // value.label
                 }
             });
             response(results.slice(0, 10)); // limit to 10 results
@@ -72,19 +73,29 @@ function getMenu(request, response) {
 function checkAlertExists(input) {
     $.ajax({
         type: 'GET',
-        url: '/check-for-alert',
+        url: '/api/daily-items/',  //'/check-for-alert',
         data: {
-            'item': input,
+            'name': input,
         },
         success: function (data) {
             $('#food-input').val('');
             $('#food-input').attr('placeholder', '')
             const result = document.getElementById('food-input-results') // $('#food-input-results');
-
-            if (data.found == true) { // Item is being served today
-                result.innerHTML = '🚨 ' + data.item + ' is being served at ' + data.dining_halls + ' 🚨';
+            console.log(data);
+            if (data.length == 1) { // data.found == true
+                var dining_halls = [];
+                if (data[0].south_dining_hall) {
+                    dining_halls.push("South")
+                }
+                if (data[0].two_fifty_one_dining_hall) {
+                    dining_halls.push("251")
+                }
+                if (data[0].yahentamitsi_dining_hall) {
+                    dining_halls.push("Yahentamitsi")
+                }
+                result.innerHTML = '🚨 ' + input + ' is being served at ' + dining_halls.join(', ') + ' 🚨';
             } else { // Item is not being served today
-                result.innerHTML = "Sorry, no dining halls have " + data.item + " today";
+                result.innerHTML = "Sorry, no dining halls have " + input + " today"; // data.item
                 result.classList.add('auth-form-error')
             }
         },

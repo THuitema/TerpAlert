@@ -198,35 +198,35 @@ def save_alert(request):
         return Http404()
 
 
-def load_menu(request):
-    """
-    Handle the Ajax request to retrieve search results for autocomplete
-    Results are ordered starting with ones starting with the search term,
-    followed by ones containing the term in alphabetical order
-
-    :return: JsonResponse containing a list with fields "label" and "value"
-    """
-    if 'term' in request.GET:
-        term = request.GET['term']
-        menu = UniqueMenuItem.objects.annotate(
-            order_by_position=Case(
-                When(item__istartswith=term, then=Value(1)),
-                When(item__icontains=term, then=Value(2)),
-                default=Value(3),
-                output_field=CharField(),
-            )
-        ).filter(item__icontains=term).order_by('order_by_position', 'item')
-        data = []
-        for item in menu:
-            item = {
-                'label': item.name,
-                'value': item.id,
-            }
-            data.append(item)
-
-        return JsonResponse({'data': data})
-    else:
-        return Http404()
+# def load_menu(request):
+#     """
+#     Handle the Ajax request to retrieve search results for autocomplete
+#     Results are ordered starting with ones starting with the search term,
+#     followed by ones containing the term in alphabetical order
+#
+#     :return: JsonResponse containing a list with fields "label" and "value"
+#     """
+#     if 'term' in request.GET:
+#         term = request.GET['term']
+#         menu = UniqueMenuItem.objects.annotate(
+#             order_by_position=Case(
+#                 When(item__istartswith=term, then=Value(1)),
+#                 When(item__icontains=term, then=Value(2)),
+#                 default=Value(3),
+#                 output_field=CharField(),
+#             )
+#         ).filter(item__icontains=term).order_by('order_by_position', 'item')
+#         data = []
+#         for item in menu:
+#             item = {
+#                 'label': item.name,
+#                 'value': item.id,
+#             }
+#             data.append(item)
+#
+#         return JsonResponse({'data': data})
+#     else:
+#         return Http404()
 
 
 def verify_email_done(request):
