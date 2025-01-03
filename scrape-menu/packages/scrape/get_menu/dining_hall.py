@@ -129,9 +129,9 @@ class Menu:
         for key in self.total_menu.keys():
             # Insert new items to Menu table
             menu_insert_query = '''
-                INSERT INTO accounts_menu (item)
+                INSERT INTO accounts_uniquemenuitem (item)
                 SELECT %s
-                WHERE NOT EXISTS (SELECT * FROM accounts_menu WHERE item=%s)
+                WHERE NOT EXISTS (SELECT * FROM accounts_uniquemenuitem WHERE item=%s)
             '''
             db_write(conn, menu_insert_query, key, key)
 
@@ -143,7 +143,7 @@ class Menu:
             # Get foreign key for menu item
             get_menu_item_query = '''
                 SELECT * 
-                FROM accounts_menu
+                FROM accounts_uniquemenuitem
                 WHERE item=%s
             '''
 
@@ -151,7 +151,7 @@ class Menu:
             menu_item_id = rows[0][0]
 
             daily_menu_insert_query = '''
-                INSERT INTO accounts_dailymenu 
+                INSERT INTO accounts_dailymenuitem 
                     (menu_item_id, date, yahentamitsi_dining_hall, south_dining_hall, two_fifty_one_dining_hall)
                 VALUES
                     (%s, %s, %s, %s, %s)
@@ -179,7 +179,7 @@ class Menu:
                     FROM accounts_alert
                     WHERE menu_item_id in (
                         SELECT id
-                        FROM accounts_menu
+                        FROM accounts_uniquemenuitem
                         WHERE item=%s
                     )
                 )
