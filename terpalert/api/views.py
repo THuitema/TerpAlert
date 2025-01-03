@@ -11,9 +11,13 @@ class UniqueMenuItemList(APIView):
     Get all unique menu items
     """
     def get(self, request, format=None):
-        items = UniqueMenuItem.objects.all()
-        serializer = UniqueMenuItemSerializer(items, many=True)
-        return Response(serializer.data)
+        try:
+            items = UniqueMenuItem.objects.all()
+            serializer = UniqueMenuItemSerializer(items, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            print(e)
+            return e
 
 
 class DailyMenuItemList(APIView):
