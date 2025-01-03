@@ -36,6 +36,7 @@ SECRET_KEY = env("SECRET_KEY")
 # Application definition
 INSTALLED_APPS = [
     'accounts',
+    'api',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,7 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'bootstrap5',
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
