@@ -15,7 +15,6 @@ class ProfileAdmin(ModelAdmin):
     readonly_fields = ('id',)
 
 
-# Overriding Django's default UserManager with our own, since we are customizing the User model
 class ProfileManager(BaseUserManager):
     """
     Custom user model manager thta uses email as identification rather than usernames
@@ -33,7 +32,7 @@ class ProfileManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password, **extra_fields):  # phone
+    def create_superuser(self, email, password, **extra_fields):
         """
         Create a superuser with the given information
         """
@@ -48,15 +47,12 @@ class ProfileManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-# Overriding Django's auth User model with our own, using email as the identifier
 class Profile(AbstractBaseUser):
     """
     Custom user model in replacement of Django's default auth User model
     We are using email as a user's identifier
     """
-    # Attributes
-    email = LowercaseEmailField(unique=True, max_length=255)  # models.EmailField
-    # phone = models.CharField(max_length=10)
+    email = LowercaseEmailField(unique=True, max_length=255)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -64,9 +60,8 @@ class Profile(AbstractBaseUser):
     receive_email_alerts = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
-    # REQUIRED_FIELDS = ["phone"]  # email already required b/c it is the USERNAME_FIELD
 
-    objects = ProfileManager()  # links custom user to custom manager, so we can call Profile.objects.create_user()
+    objects = ProfileManager()
 
     def has_perm(self, perm, obj=None):
         return self.is_superuser
@@ -78,14 +73,14 @@ class Profile(AbstractBaseUser):
         return self.email
 
 
-class Menu(models.Model):
+class UniqueMenuItem(models.Model):
     """
     Stores all menu items that be chosen as a keyword
     """
-    item = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.item
+        return self.name
 
 
 class Alert(models.Model):
@@ -93,18 +88,18 @@ class Alert(models.Model):
     Tracks a keyword associated with a user
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    menu_item = models.ForeignKey(Menu, on_delete=models.CASCADE)
+    menu_item = models.ForeignKey(UniqueMenuItem, on_delete=models.CASCADE)
     date_created = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"{self.menu_item.item} - {self.user.email}"
+        return f"{self.menu_item.name} - {self.user.email}"
 
 
-class DailyMenu(models.Model):
+class DailyMenuItem(models.Model):
     """
     Stores dining hall menu for each day
     """
-    menu_item = models.ForeignKey(Menu, on_delete=models.CASCADE)
+    menu_item = models.ForeignKey(UniqueMenuItem, on_delete=models.CASCADE)
     date = models.DateField(default=date.today)
     yahentamitsi_dining_hall = models.BooleanField(default=False)
     south_dining_hall = models.BooleanField(default=False)

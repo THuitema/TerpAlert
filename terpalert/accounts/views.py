@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from .forms import ProfileCreationForm
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Alert, Menu, DailyMenu, Profile
+from .models import Alert, UniqueMenuItem, DailyMenuItem, Profile
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db.models import Case, Value, When, CharField
@@ -43,7 +43,6 @@ def create_profile(request):
 
     else:
         # form has not been submitted yet
-        # check if user is authenticated
         if request.user.is_authenticated:
             return redirect('account')
 
@@ -105,7 +104,7 @@ def account(request):
     # Find today's alerts (if any) for user
     alerts = Alert.objects.filter(user__email__exact=request.user.email).order_by('menu_item')
     for alert in alerts:  # All the user's alerts
-        daily_menu_item = DailyMenu.objects.filter(menu_item_id=alert.menu_item.id, date=date.today())
+        daily_menu_item = DailyMenuItem.objects.filter(menu_item_id=alert.menu_item.id, date=date.today())
 
         if daily_menu_item.exists():  # Alert is in the daily menu for today's date
             context['notifications'] = True
@@ -155,7 +154,7 @@ def delete_alert(request):
         data = {'data': alert_to_delete.delete()}
         return JsonResponse(data)
     else:
-        return redirect('home')  # Redirect any attempts to access this page
+        return Http404()
 
 
 @login_required
@@ -171,8 +170,8 @@ def save_alert(request):
         data = {}
 
         try:
-            menu_item = Menu.objects.get(item=alert_item)
-        except Menu.DoesNotExist:
+            menu_item = UniqueMenuItem.objects.get(item=alert_item)
+        except UniqueMenuItem.DoesNotExist:
             data['success'] = False
             data['message'] = 'This menu item does not exist!'
         else:
@@ -196,7 +195,7 @@ def save_alert(request):
         finally:
             return JsonResponse(data)
     else:
-        return redirect('account')  # Redirect any attempts to access this page
+        return Http404()
 
 
 def load_menu(request):
@@ -209,7 +208,7 @@ def load_menu(request):
     """
     if 'term' in request.GET:
         term = request.GET['term']
-        menu = Menu.objects.annotate(
+        menu = UniqueMenuItem.objects.annotate(
             order_by_position=Case(
                 When(item__istartswith=term, then=Value(1)),
                 When(item__icontains=term, then=Value(2)),
@@ -227,7 +226,7 @@ def load_menu(request):
 
         return JsonResponse({'data': data})
     else:
-        return redirect('account')
+        return Http404()
 
 
 def verify_email_done(request):
@@ -274,7 +273,7 @@ def set_receive_alerts(request):
         Profile.objects.filter(pk=request.user.id).update(receive_email_alerts=is_checked)
         return JsonResponse({'success': True})
     else:
-        return redirect('account')
+        return Http404()
 
 
 @login_required
@@ -287,13 +286,12 @@ def delete_account(request):
         try:
             user = Profile.objects.get(pk=request.user.id)
             user.delete()
-
         except Exception as e:
             return redirect('account')
 
         return redirect('home')
     else:
-        return redirect('account')
+        return Http404()
 
 
 def auth(request, token):
@@ -308,7 +306,7 @@ def auth(request, token):
         login(request, profile)
         return redirect('account')
     else:
-        return redirect('home')
+        return Http404()
 
 
 def unsubscribe(request, token):
@@ -324,7 +322,7 @@ def unsubscribe(request, token):
             login(request, profile)
             return render(request, 'unsubscribe.html', {'email': profile.email})
         else:
-            return redirect('home')
+            return Http404()
     else:
         Profile.objects.filter(pk=request.user.id).update(receive_email_alerts=False)
         return render(request, 'unsubscribe_done.html')
