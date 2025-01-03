@@ -15,7 +15,6 @@ class ProfileAdmin(ModelAdmin):
     readonly_fields = ('id',)
 
 
-# Overriding Django's default UserManager with our own, since we are customizing the User model
 class ProfileManager(BaseUserManager):
     """
     Custom user model manager thta uses email as identification rather than usernames
@@ -33,7 +32,7 @@ class ProfileManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password, **extra_fields):  # phone
+    def create_superuser(self, email, password, **extra_fields):
         """
         Create a superuser with the given information
         """
@@ -48,15 +47,12 @@ class ProfileManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-# Overriding Django's auth User model with our own, using email as the identifier
 class Profile(AbstractBaseUser):
     """
     Custom user model in replacement of Django's default auth User model
     We are using email as a user's identifier
     """
-    # Attributes
-    email = LowercaseEmailField(unique=True, max_length=255)  # models.EmailField
-    # phone = models.CharField(max_length=10)
+    email = LowercaseEmailField(unique=True, max_length=255)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -64,9 +60,8 @@ class Profile(AbstractBaseUser):
     receive_email_alerts = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
-    # REQUIRED_FIELDS = ["phone"]  # email already required b/c it is the USERNAME_FIELD
 
-    objects = ProfileManager()  # links custom user to custom manager, so we can call Profile.objects.create_user()
+    objects = ProfileManager()
 
     def has_perm(self, perm, obj=None):
         return self.is_superuser
