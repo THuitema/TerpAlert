@@ -131,7 +131,7 @@ class Menu:
             menu_insert_query = '''
                 INSERT INTO accounts_uniquemenuitem (item)
                 SELECT %s
-                WHERE NOT EXISTS (SELECT * FROM accounts_uniquemenuitem WHERE item=%s)
+                WHERE NOT EXISTS (SELECT * FROM accounts_uniquemenuitem WHERE name=%s)
             '''
             db_write(conn, menu_insert_query, key, key)
 
@@ -144,7 +144,7 @@ class Menu:
             get_menu_item_query = '''
                 SELECT * 
                 FROM accounts_uniquemenuitem
-                WHERE item=%s
+                WHERE name=%s
             '''
 
             rows = db_select(conn, get_menu_item_query, key)
@@ -180,7 +180,7 @@ class Menu:
                     WHERE menu_item_id in (
                         SELECT id
                         FROM accounts_uniquemenuitem
-                        WHERE item=%s
+                        WHERE name=%s
                     )
                 )
             '''

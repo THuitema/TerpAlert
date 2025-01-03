@@ -170,7 +170,7 @@ def save_alert(request):
         data = {}
 
         try:
-            menu_item = UniqueMenuItem.objects.get(item=alert_item)
+            menu_item = UniqueMenuItem.objects.get(name=alert_item)
         except UniqueMenuItem.DoesNotExist:
             data['success'] = False
             data['message'] = 'This menu item does not exist!'
