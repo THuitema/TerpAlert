@@ -3,7 +3,7 @@ import dj_database_url
 
 env = environ.Env()
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [env("ALLOWED_HOSTS")]
 
