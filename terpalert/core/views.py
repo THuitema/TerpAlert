@@ -15,36 +15,36 @@ def about(request):
     return HttpResponse('ABOUT')
 
 
-def check_for_alert(request):
-    """
-    Handle the Ajax request to check if an item is in DailyMenu table for today's date
-
-    :return: JsonResponse with fields "found", "item", and "dining_halls" (if found is true)
-    """
-    if 'item' in request.GET:
-        item = request.GET['item']
-
-        menu_item = UniqueMenuItem.objects.get(name=item)  # Get Menu object for that item
-        daily_menu_item = DailyMenuItem.objects.filter(menu_item_id=menu_item.id, date=date.today())
-
-        if daily_menu_item.exists():
-            # Item is being served today
-            data = {'found': True, 'item': item}
-
-            # Add dining halls the item is applicable to
-            dining_halls = []
-            if daily_menu_item[0].yahentamitsi_dining_hall:
-                dining_halls.append('Yahentamitsi')
-            if daily_menu_item[0].south_dining_hall:
-                dining_halls.append('South')
-            if daily_menu_item[0].two_fifty_one_dining_hall:
-                dining_halls.append('251')
-
-            data['dining_halls'] = ', '.join(dining_halls)
-        else:
-            # Item isn't being served today
-            data = {'found': False, 'item': item}
-
-        return JsonResponse(data)
-    else:
-        return redirect('home')
+# def check_for_alert(request):
+#     """
+#     Handle the Ajax request to check if an item is in DailyMenu table for today's date
+#
+#     :return: JsonResponse with fields "found", "item", and "dining_halls" (if found is true)
+#     """
+#     if 'item' in request.GET:
+#         item = request.GET['item']
+#
+#         menu_item = UniqueMenuItem.objects.get(name=item)  # Get Menu object for that item
+#         daily_menu_item = DailyMenuItem.objects.filter(menu_item_id=menu_item.id, date=date.today())
+#
+#         if daily_menu_item.exists():
+#             # Item is being served today
+#             data = {'found': True, 'item': item}
+#
+#             # Add dining halls the item is applicable to
+#             dining_halls = []
+#             if daily_menu_item[0].yahentamitsi_dining_hall:
+#                 dining_halls.append('Yahentamitsi')
+#             if daily_menu_item[0].south_dining_hall:
+#                 dining_halls.append('South')
+#             if daily_menu_item[0].two_fifty_one_dining_hall:
+#                 dining_halls.append('251')
+#
+#             data['dining_halls'] = ', '.join(dining_halls)
+#         else:
+#             # Item isn't being served today
+#             data = {'found': False, 'item': item}
+#
+#         return JsonResponse(data)
+#     else:
+#         return redirect('home')

@@ -73,19 +73,29 @@ function getMenu(request, response) {
 function checkAlertExists(input) {
     $.ajax({
         type: 'GET',
-        url: '/check-for-alert',
+        url: '/api/daily-items/',  //'/check-for-alert',
         data: {
-            'item': input,
+            'name': input,
         },
         success: function (data) {
             $('#food-input').val('');
             $('#food-input').attr('placeholder', '')
             const result = document.getElementById('food-input-results') // $('#food-input-results');
-
-            if (data.found == true) { // Item is being served today
-                result.innerHTML = '🚨 ' + data.item + ' is being served at ' + data.dining_halls + ' 🚨';
+            console.log(data);
+            if (data.length == 1) { // data.found == true
+                var dining_halls = [];
+                if (data[0].south_dining_hall) {
+                    dining_halls.push("South")
+                }
+                if (data[0].two_fifty_one_dining_hall) {
+                    dining_halls.push("251")
+                }
+                if (data[0].yahentamitsi_dining_hall) {
+                    dining_halls.push("Yahentamitsi")
+                }
+                result.innerHTML = '🚨 ' + input + ' is being served at ' + dining_halls.join(', ') + ' 🚨';
             } else { // Item is not being served today
-                result.innerHTML = "Sorry, no dining halls have " + data.item + " today";
+                result.innerHTML = "Sorry, no dining halls have " + input + " today"; // data.item
                 result.classList.add('auth-form-error')
             }
         },
