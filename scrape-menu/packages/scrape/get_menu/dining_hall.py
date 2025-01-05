@@ -152,7 +152,7 @@ class Menu:
 
             daily_menu_insert_query = '''
                 INSERT INTO accounts_dailymenuitem 
-                    (menu_item_id, date, yahentamitsi_dining_hall, south_dining_hall, two_fifty_one_dining_hall)
+                    (menu_item_id, date, dh_y, dh_south, dh_251)
                 VALUES
                     (%s, %s, %s, %s, %s)
             '''

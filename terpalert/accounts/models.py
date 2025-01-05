@@ -78,7 +78,14 @@ class UniqueMenuItem(models.Model):
     Stores all menu items that be chosen as a keyword
     """
     name = models.CharField(max_length=255)
-
+    '''
+    Nutrition:
+    calories
+    protein
+    carbs
+    fats
+    ingredients
+    '''
     def __str__(self):
         return self.name
 
@@ -101,9 +108,9 @@ class DailyMenuItem(models.Model):
     """
     menu_item = models.ForeignKey(UniqueMenuItem, on_delete=models.CASCADE)
     date = models.DateField(default=date.today)
-    yahentamitsi_dining_hall = models.BooleanField(default=False)
-    south_dining_hall = models.BooleanField(default=False)
-    two_fifty_one_dining_hall = models.BooleanField(default=False)
+    dh_y = models.BooleanField(default=False)  # yahentamitsi_dining_hall
+    dh_south = models.BooleanField(default=False)  # south_dining_hall
+    dh_251 = models.BooleanField(default=False)  # two_fifty_one_dining_hall
 
     def __str__(self):
         return f"{self.date}: {self.menu_item}"

@@ -7,6 +7,25 @@ from rest_framework import status
 from django.db.models import Case, Value, When, CharField
 from datetime import date
 
+''''
+Convert ID's for Foods to UID
+Add date param to daily items make today's date default if no param provided
+Pagination if necessary
+Rename dining hall fields to shorter names (i.e. dh_251, dh_south, dh_y)
+    rename in:
+    - models.py
+    - core/views.py
+    - accounts/serializers
+    - scrape-menu/dining_hall, umd
+    - accounts/views
+    - static/core (run collectstatic!!)
+    - run migrations
+    
+Add frontend page for API info
+Create table to store nutrition OR just make new column in unique table
+Scrape nutrition macros: calories, protein, carbs, fats, allergens
+'''
+
 
 class UniqueMenuItemList(APIView):
     """
@@ -40,6 +59,7 @@ class DailyMenuItemList(APIView):
     """
     def get(self, request, format=None):
         search_name = self.request.query_params.get('name')
+
         today = date.today()
         if search_name:
             item_id = UniqueMenuItem.objects.get(name=search_name).id

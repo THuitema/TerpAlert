@@ -19,7 +19,7 @@ class DailyMenuItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DailyMenuItem
-        fields = ['id', 'menu_item', 'date', 'yahentamitsi_dining_hall', 'south_dining_hall', 'two_fifty_one_dining_hall']
+        fields = ['id', 'menu_item', 'date', 'dh_y', 'dh_south', 'dh_251']
 
 
 class AlertSerializer(serializers.ModelSerializer):
