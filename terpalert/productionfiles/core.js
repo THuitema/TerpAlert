@@ -84,13 +84,13 @@ function checkAlertExists(input) {
             console.log(data);
             if (data.length == 1) { // data.found == true
                 var dining_halls = [];
-                if (data[0].south_dining_hall) {
+                if (data[0].dh_south) {
                     dining_halls.push("South")
                 }
-                if (data[0].two_fifty_one_dining_hall) {
+                if (data[0].dh_251) {
                     dining_halls.push("251")
                 }
-                if (data[0].yahentamitsi_dining_hall) {
+                if (data[0].dh_y) {
                     dining_halls.push("Yahentamitsi")
                 }
                 result.innerHTML = '🚨 ' + input + ' is being served at ' + dining_halls.join(', ') + ' 🚨';
