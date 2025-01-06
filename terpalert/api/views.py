@@ -35,7 +35,7 @@ class UniqueMenuItemList(APIView):
             ).filter(name__icontains=search_term).order_by('order_by_position', 'name')
             serializer = UniqueMenuItemSerializer(matching_items, many=True)
         else:
-            items = UniqueMenuItem.objects.all()
+            items = UniqueMenuItem.objects.all().order_by('name')
             serializer = UniqueMenuItemSerializer(items, many=True)
 
         return Response(serializer.data)
@@ -64,7 +64,7 @@ class DailyMenuItemList(APIView):
             item_id = UniqueMenuItem.objects.get(name=search_name).id
             menu = DailyMenuItem.objects.filter(menu_item_id=item_id, date=search_date)
         else:
-            menu = DailyMenuItem.objects.filter(date=search_date)
+            menu = DailyMenuItem.objects.filter(date=search_date).order_by('menu_item__name')
 
         if menu.exists():
             serializer = DailyMenuItemSerializer(menu, many=True)
@@ -79,6 +79,6 @@ class AllergenList(APIView):
     Get allergens
     """
     def get(self, request):
-        allergens = Allergen.objects.all()
+        allergens = Allergen.objects.all().order_by('name')
         serializer = AllergenSerializer(allergens, many=True)
         return Response(serializer.data)
