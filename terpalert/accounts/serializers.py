@@ -9,9 +9,15 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class UniqueMenuItemSerializer(serializers.ModelSerializer):
+    allergens = serializers.SerializerMethodField()
+
     class Meta:
         model = UniqueMenuItem
-        fields = ['id', 'name', 'calories', 'protein', 'carbs', 'fats']
+        fields = ['id', 'name', 'calories', 'protein', 'carbs', 'fats', 'allergens']
+
+    def get_allergens(self, obj):
+        allergens = Allergen.objects.filter(menuitemallergen__menu_item=obj)
+        return [a.name for a in allergens]
 
 
 class AllergenSerializer(serializers.ModelSerializer):
