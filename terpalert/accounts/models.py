@@ -78,16 +78,34 @@ class UniqueMenuItem(models.Model):
     Stores all menu items that be chosen as a keyword
     """
     name = models.CharField(max_length=255)
-    '''
-    Nutrition:
-    calories
-    protein
-    carbs
-    fats
-    ingredients
-    '''
+    calories = models.IntegerField(null=True, blank=True)
+    protein = models.FloatField(null=True, blank=True)
+    carbs = models.FloatField(null=True, blank=True)
+    fats = models.FloatField(null=True, blank=True)
+
     def __str__(self):
         return self.name
+
+
+class Allergen(models.Model):
+    """
+    Stores all allergens that a menu item could contain
+    """
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
+class MenuItemAllergen(models.Model):
+    """
+    Bridge between UniqueMenuItem and Allergen to store allergens for each item
+    """
+    menu_item = models.ForeignKey(UniqueMenuItem, on_delete=models.CASCADE)
+    allergen = models.ForeignKey(Allergen, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.menu_item) + ' - ' + str(self.allergen)
 
 
 class Alert(models.Model):
