@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Profile, Alert, UniqueMenuItem, DailyMenuItem
+from .models import Profile, Alert, UniqueMenuItem, DailyMenuItem, Allergen, MenuItemAllergen
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -11,7 +11,19 @@ class ProfileSerializer(serializers.ModelSerializer):
 class UniqueMenuItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = UniqueMenuItem
+        fields = ['id', 'name', 'calories', 'protein', 'carbs', 'fats']
+
+
+class AllergenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Allergen
         fields = ['id', 'name']
+
+
+class MenuItemAllergenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MenuItemAllergen
+        fields = ['id', 'menu_item', 'allergen']
 
 
 class DailyMenuItemSerializer(serializers.ModelSerializer):
