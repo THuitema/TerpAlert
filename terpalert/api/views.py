@@ -1,5 +1,5 @@
-from accounts.models import Profile, DailyMenuItem, UniqueMenuItem, Alert
-from accounts.serializers import DailyMenuItemSerializer, UniqueMenuItemSerializer, ProfileSerializer, AlertSerializer
+from accounts.models import Profile, DailyMenuItem, UniqueMenuItem, Alert, Allergen
+from accounts.serializers import DailyMenuItemSerializer, UniqueMenuItemSerializer, ProfileSerializer, AlertSerializer, AllergenSerializer
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -73,3 +73,12 @@ class DailyMenuItemList(APIView):
 
         return Response(serializer.data)
 
+
+class AllergenList(APIView):
+    """
+    Get allergens
+    """
+    def get(self, request):
+        allergens = Allergen.objects.all()
+        serializer = AllergenSerializer(allergens, many=True)
+        return Response(serializer.data)
