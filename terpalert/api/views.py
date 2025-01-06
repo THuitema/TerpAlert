@@ -6,21 +6,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Case, Value, When, CharField
 from datetime import date
+import re
 
 ''''
 Convert ID's for Foods to UID
-Add date param to daily items make today's date default if no param provided
-Pagination if necessary
-Rename dining hall fields to shorter names (i.e. dh_251, dh_south, dh_y)
-    rename in:
-    - models.py
-    - core/views.py
-    - accounts/serializers
-    - scrape-menu/dining_hall, umd
-    - accounts/views
-    - static/core (run collectstatic!!)
-    - run migrations
-    
 Add frontend page for API info
 Create table to store nutrition OR just make new column in unique table
 Scrape nutrition macros: calories, protein, carbs, fats, allergens
@@ -55,23 +44,32 @@ class UniqueMenuItemList(APIView):
 class DailyMenuItemList(APIView):
     """
     Get all items from daily menus
-    name: optional query parameter to search for exact match in today's menu
+    name: optional query parameter to search for exact match in menu
+    date: optional query parameter to filter menu by date (default is today)
     """
     def get(self, request, format=None):
         search_name = self.request.query_params.get('name')
+        search_date = self.request.query_params.get('date')
 
-        today = date.today()
+        # Check if date is correct format, return error if not
+
+        if not search_date:
+            search_date = date.today()  # '2024-06-03'
+
+        # Validate format of date parameter string
+        if not re.search(r"^\d{4}-\d{2}-\d{2}", search_date):
+            return Response("Incorrect format for date parameter. Format needs to be YYYY-MM-DD.", status=status.HTTP_400_BAD_REQUEST)
+
         if search_name:
             item_id = UniqueMenuItem.objects.get(name=search_name).id
-            menu_item_today = DailyMenuItem.objects.filter(menu_item_id=item_id, date=today)
-            if menu_item_today.exists():
-                serializer = DailyMenuItemSerializer(menu_item_today, many=True)
-            else:
-                serializer = DailyMenuItemSerializer(None, many=True)
-
+            menu = DailyMenuItem.objects.filter(menu_item_id=item_id, date=search_date)
         else:
-            items = DailyMenuItem.objects.all()
-            serializer = DailyMenuItemSerializer(items, many=True)
+            menu = DailyMenuItem.objects.filter(date=search_date)
+
+        if menu.exists():
+            serializer = DailyMenuItemSerializer(menu, many=True)
+        else:
+            serializer = DailyMenuItemSerializer(None, many=True)
 
         return Response(serializer.data)
 
