@@ -21,9 +21,9 @@ Add fields for breakfast, lunch, dinner in daily menu. Update scraper
 
 class UniqueMenuItemList(APIView):  # APIView
     """
-    /api/items
-    Get all unique menu items
-    term: optional query parameter
+    /api/v1/items
+    Get all menu items, sorted in alphabetical order
+    term: Search menu by name. All items returned if parameter not provided
     """
 
     @extend_schema(
@@ -38,7 +38,6 @@ class UniqueMenuItemList(APIView):  # APIView
             )
         ],
         responses={200: UniqueMenuItemSerializer},
-        auth=None,
         examples=[
             OpenApiExample(
                 name='response_valid',
@@ -76,10 +75,10 @@ class UniqueMenuItemList(APIView):  # APIView
 
 class DailyMenuItemList(APIView):
     """
-    /api/daily-items
-    Get all items from daily menus
-    name: optional query parameter to search for exact match in menu
-    date (YYYY-MM-DD): optional query parameter to filter menu by date (default is today)
+    /api/v1/daily-items
+    Get menu items for the specified date, sorted in alphabetical order
+    match_name: Search menu for exact match. Will return one or no matches.
+    date: Filter menu by date. Format is YYYY-MM-DD. Default is today
     """
 
     @extend_schema(
@@ -87,7 +86,7 @@ class DailyMenuItemList(APIView):
         description='Get menu items for the specified date, sorted in alphabetical order',
         parameters=[
             OpenApiParameter(
-                name='name',
+                name='match_name',
                 type=str,
                 description='Search menu for exact match. Will return one or no matches.',
                 required=False
@@ -100,7 +99,6 @@ class DailyMenuItemList(APIView):
                 required=False
             )
         ],
-        auth=None,
         responses={200: DailyMenuItemSerializer, 400: BadRequestSerializer},
         examples=[
             OpenApiExample(
@@ -131,7 +129,7 @@ class DailyMenuItemList(APIView):
         ]
     )
     def get(self, request):
-        search_name = self.request.query_params.get('name')
+        search_name = self.request.query_params.get('match_name')
         search_date = self.request.query_params.get('date')
 
         if not search_date:
@@ -157,15 +155,14 @@ class DailyMenuItemList(APIView):
 
 class AllergenList(APIView):
     """
-    /api/allergens
-    Get allergens
+    /api/v1/allergens
+    Get all allergens, sorted in alphabetical order
     """
 
     @extend_schema(
         summary='Get Allergens',
         description='Get all allergens, sorted in alphabetical order',
         responses={200: AllergenSerializer},
-        auth=None,
         examples=[
             OpenApiExample(
                 name='response_valid',
