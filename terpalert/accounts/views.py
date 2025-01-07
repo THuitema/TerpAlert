@@ -111,11 +111,11 @@ def account(request):
 
             # Add dining halls the alert is applicable to
             dining_halls = []
-            if daily_menu_item[0].yahentamitsi_dining_hall:
+            if daily_menu_item[0].dh_y:
                 dining_halls.append('Yahentamitsi')
-            if daily_menu_item[0].south_dining_hall:
+            if daily_menu_item[0].dh_south:
                 dining_halls.append('South')
-            if daily_menu_item[0].two_fifty_one_dining_hall:
+            if daily_menu_item[0].dh_251:
                 dining_halls.append('251')
 
             context['data'].append([alert.menu_item.name, ', '.join(dining_halls)])

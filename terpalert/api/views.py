@@ -1,19 +1,59 @@
-from accounts.models import Profile, DailyMenuItem, UniqueMenuItem, Alert
-from accounts.serializers import DailyMenuItemSerializer, UniqueMenuItemSerializer, ProfileSerializer, AlertSerializer
-from django.http import Http404
+from accounts.models import Profile, DailyMenuItem, UniqueMenuItem, Alert, Allergen
+from accounts.serializers import DailyMenuItemSerializer, UniqueMenuItemSerializer, ProfileSerializer, AlertSerializer, AllergenSerializer, BadRequestSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Case, Value, When, CharField
 from datetime import date
+import re
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
+
+''''
+Add frontend page for API info
+
+*** MERGE WITH MAIN BRANCH AFTER FINISHING THE ABOVE ***
+
+Scrape nutrition macros: calories, protein, carbs, fats, allergens
+Convert ID's for Foods to UID
+Add fields for breakfast, lunch, dinner in daily menu. Update scraper
+'''
 
 
-class UniqueMenuItemList(APIView):
+class UniqueMenuItemList(APIView):  # APIView
     """
-    /api/items
-    Get all unique menu items
-    term: optional query parameter
+    /api/v1/items
+    Get all menu items, sorted in alphabetical order
+    term: Search menu by name. All items returned if parameter not provided
     """
+
+    @extend_schema(
+        summary='Get Menu Items',
+        description='Get all menu items, sorted in alphabetical order',
+        parameters=[
+            OpenApiParameter(
+                name='term',
+                type=str,
+                description='Search menu for names containing term. All items returned if parameter not provided',
+                required=False,
+            )
+        ],
+        responses={200: UniqueMenuItemSerializer},
+        examples=[
+            OpenApiExample(
+                name='response_valid',
+                status_codes=[200],
+                value={
+                    "id": 467,
+                    "name": "Banana",
+                    "calories": 100,
+                    "protein": 4,
+                    "carbs": 10,
+                    "fats": 1,
+                    "allergens": []
+                }
+            )
+        ]
+    )
     def get(self, request):
         search_term = self.request.query_params.get('term')
         if search_term:
@@ -27,7 +67,7 @@ class UniqueMenuItemList(APIView):
             ).filter(name__icontains=search_term).order_by('order_by_position', 'name')
             serializer = UniqueMenuItemSerializer(matching_items, many=True)
         else:
-            items = UniqueMenuItem.objects.all()
+            items = UniqueMenuItem.objects.all().order_by('name')
             serializer = UniqueMenuItemSerializer(items, many=True)
 
         return Response(serializer.data)
@@ -35,23 +75,126 @@ class UniqueMenuItemList(APIView):
 
 class DailyMenuItemList(APIView):
     """
-    Get all items from daily menus
-    name: optional query parameter to search for exact match in today's menu
+    /api/v1/daily-items
+    Get menu items for the specified date, sorted in alphabetical order
+    term: Search menu for names containing term. If supplied, "match_name" is ignored.
+    match_name: Search menu for exact match. Will return one or no matches.
+    date: Filter menu by date. Format is YYYY-MM-DD. Default is today
     """
-    def get(self, request, format=None):
-        search_name = self.request.query_params.get('name')
-        today = date.today()
+
+    @extend_schema(
+        summary='Get Daily Menu Items',
+        description='Get menu items for the specified date, sorted in alphabetical order',
+        parameters=[
+            OpenApiParameter(
+                name='term',
+                type=str,
+                description='Search menu for names containing term. If supplied, "match_name" is ignored',
+                required=False,
+            ),
+            OpenApiParameter(
+                name='match_name',
+                type=str,
+                description='Search menu for exact match on a name. Returns one result if match, none otherwise.',
+                required=False
+            ),
+            OpenApiParameter(
+                name='date',
+                type=str,
+                description='Filter menu by date. Format is YYYY-MM-DD. Default is today',
+                style='YYYY-MM-DD',
+                required=False
+            )
+        ],
+        responses={200: DailyMenuItemSerializer, 400: BadRequestSerializer},
+        examples=[
+            OpenApiExample(
+                name='response_bad_request',
+                status_codes=[400],
+                value={'message': 'Incorrect format for date parameter. Format needs to be YYYY-MM-DD.'}
+            ),
+            OpenApiExample(
+                name='response_valid',
+                status_codes=[200],
+                value={
+                    "id": 129,
+                    "menu_item": {
+                        "id": 54,
+                        "name": "Vanilla Ice Cream",
+                        "calories": 275,
+                        "protein": 6.5,
+                        "carbs": 2,
+                        "fats": 6.2,
+                        "allergens": ["Dairy"]
+                    },
+                    "date": "2019-08-24",
+                    "dh_y": True,
+                    "dh_south": False,
+                    "dh_251": True
+                }
+            )
+        ]
+    )
+    def get(self, request):
+        search_name = self.request.query_params.get('match_name')
+        search_date = self.request.query_params.get('date')
+        search_term = self.request.query_params.get('term')
+
+        if not search_date:
+            search_date = date.today()  # '2024-06-03'
+
+        # Validate format of date parameter string
+        if not re.search(r"^\d{4}-\d{2}-\d{2}", str(search_date)):
+            return Response({'detail': "Incorrect format for date parameter. Format needs to be YYYY-MM-DD."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if search_term:
+            matching_items = DailyMenuItem.objects.annotate(
+                order_by_position=Case(
+                    When(menu_item__name__istartswith=search_term, then=Value(1)),
+                    When(menu_item__name__icontains=search_term, then=Value(2)),
+                    default=Value(3),
+                    output_field=CharField(),
+                )
+            ).filter(menu_item__name__icontains=search_term).order_by('order_by_position', 'menu_item__name')
+            serializer = DailyMenuItemSerializer(matching_items, many=True)
+            return Response(serializer.data)
+
         if search_name:
             item_id = UniqueMenuItem.objects.get(name=search_name).id
-            menu_item_today = DailyMenuItem.objects.filter(menu_item_id=item_id, date=today)
-            if menu_item_today.exists():
-                serializer = DailyMenuItemSerializer(menu_item_today, many=True)
-            else:
-                serializer = DailyMenuItemSerializer(None, many=True)
-
+            menu = DailyMenuItem.objects.filter(menu_item_id=item_id, date=search_date)
         else:
-            items = DailyMenuItem.objects.all()
-            serializer = DailyMenuItemSerializer(items, many=True)
+            menu = DailyMenuItem.objects.filter(date=search_date).order_by('menu_item__name')
+
+        if menu.exists():
+            serializer = DailyMenuItemSerializer(menu, many=True)
+        else:
+            serializer = DailyMenuItemSerializer(None, many=True)
 
         return Response(serializer.data)
 
+
+class AllergenList(APIView):
+    """
+    /api/v1/allergens
+    Get all allergens, sorted in alphabetical order
+    """
+
+    @extend_schema(
+        summary='Get Allergens',
+        description='Get all allergens, sorted in alphabetical order',
+        responses={200: AllergenSerializer},
+        examples=[
+            OpenApiExample(
+                name='response_valid',
+                status_codes=[200],
+                value={
+                    "id": 3,
+                    "name": "Peanuts"
+                }
+            )
+        ]
+    )
+    def get(self, request):
+        allergens = Allergen.objects.all().order_by('name')
+        serializer = AllergenSerializer(allergens, many=True)
+        return Response(serializer.data)
