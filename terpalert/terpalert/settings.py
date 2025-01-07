@@ -46,8 +46,21 @@ INSTALLED_APPS = [
     'core',
     'bootstrap5',
     'rest_framework.authtoken',
-    'rest_framework'
+    'rest_framework',
+    # 'drf_yasg',
+    'drf_spectacular'
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'TerpAlert API',
+    'DESCRIPTION': 'Access data on meals, nutrition information, and allergens from University of Maryland dining halls',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

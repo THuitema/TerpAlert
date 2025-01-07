@@ -9,6 +9,12 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'receive_email_alerts', 'is_staff', 'is_superuser', 'is_active', 'date_joined']
 
 
+class AllergenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Allergen
+        fields = ['id', 'name']
+
+
 class UniqueMenuItemSerializer(serializers.ModelSerializer):
     allergens = serializers.SerializerMethodField()
 
@@ -16,15 +22,10 @@ class UniqueMenuItemSerializer(serializers.ModelSerializer):
         model = UniqueMenuItem
         fields = ['id', 'name', 'calories', 'protein', 'carbs', 'fats', 'allergens']
 
+    # @swagger_serializer_method(serializer_or_field=AllergenSerializer)  # not really sure here
     def get_allergens(self, obj):
         allergens = Allergen.objects.filter(menuitemallergen__menu_item=obj)
         return [a.name for a in allergens]
-
-
-class AllergenSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Allergen
-        fields = ['id', 'name']
 
 
 class MenuItemAllergenSerializer(serializers.ModelSerializer):
