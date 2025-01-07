@@ -77,6 +77,7 @@ class DailyMenuItemList(APIView):
     """
     /api/v1/daily-items
     Get menu items for the specified date, sorted in alphabetical order
+    term: Search menu for names containing term. If supplied, "match_name" is ignored.
     match_name: Search menu for exact match. Will return one or no matches.
     date: Filter menu by date. Format is YYYY-MM-DD. Default is today
     """
@@ -85,6 +86,12 @@ class DailyMenuItemList(APIView):
         summary='Get Daily Menu Items',
         description='Get menu items for the specified date, sorted in alphabetical order',
         parameters=[
+            OpenApiParameter(
+                name='term',
+                type=str,
+                description='Search menu for names containing term. If supplied, "match_name" is ignored',
+                required=False,
+            ),
             OpenApiParameter(
                 name='match_name',
                 type=str,
@@ -131,6 +138,7 @@ class DailyMenuItemList(APIView):
     def get(self, request):
         search_name = self.request.query_params.get('match_name')
         search_date = self.request.query_params.get('date')
+        search_term = self.request.query_params.get('term')
 
         if not search_date:
             search_date = date.today()  # '2024-06-03'
@@ -138,6 +146,18 @@ class DailyMenuItemList(APIView):
         # Validate format of date parameter string
         if not re.search(r"^\d{4}-\d{2}-\d{2}", str(search_date)):
             return Response({'detail': "Incorrect format for date parameter. Format needs to be YYYY-MM-DD."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if search_term:
+            matching_items = DailyMenuItem.objects.annotate(
+                order_by_position=Case(
+                    When(menu_item__name__istartswith=search_term, then=Value(1)),
+                    When(menu_item__name__icontains=search_term, then=Value(2)),
+                    default=Value(3),
+                    output_field=CharField(),
+                )
+            ).filter(menu_item__name__icontains=search_term).order_by('order_by_position', 'menu_item__name')
+            serializer = DailyMenuItemSerializer(matching_items, many=True)
+            return Response(serializer.data)
 
         if search_name:
             item_id = UniqueMenuItem.objects.get(name=search_name).id
