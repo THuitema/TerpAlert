@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Profile, Alert, UniqueMenuItem, DailyMenuItem, Allergen, MenuItemAllergen
+# from drf_yasg.utils import swagger_serializer_method
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -47,3 +48,7 @@ class AlertSerializer(serializers.ModelSerializer):
     class Meta:
         model = Alert
         fields = ['id', 'user', 'menu_item', 'date_created']
+
+
+class BadRequestSerializer(serializers.Serializer):
+    message = serializers.CharField()
