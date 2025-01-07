@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import Profile, Alert, UniqueMenuItem, DailyMenuItem, Allergen, MenuItemAllergen
-# from drf_yasg.utils import swagger_serializer_method
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -22,7 +21,6 @@ class UniqueMenuItemSerializer(serializers.ModelSerializer):
         model = UniqueMenuItem
         fields = ['id', 'name', 'calories', 'protein', 'carbs', 'fats', 'allergens']
 
-    # @swagger_serializer_method(serializer_or_field=AllergenSerializer)  # not really sure here
     def get_allergens(self, obj):
         allergens = Allergen.objects.filter(menuitemallergen__menu_item=obj)
         return [a.name for a in allergens]

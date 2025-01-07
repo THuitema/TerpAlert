@@ -1,16 +1,12 @@
 from accounts.models import Profile, DailyMenuItem, UniqueMenuItem, Alert, Allergen
 from accounts.serializers import DailyMenuItemSerializer, UniqueMenuItemSerializer, ProfileSerializer, AlertSerializer, AllergenSerializer, BadRequestSerializer
-from django.http import Http404
 from rest_framework.views import APIView
-from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
-from rest_framework import status, viewsets
+from rest_framework import status
 from django.db.models import Case, Value, When, CharField
 from datetime import date
 import re
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
-from rest_framework.exceptions import APIException
-# from drf_yasg.utils import swagger_auto_schema
 
 ''''
 Add frontend page for API info
@@ -24,14 +20,11 @@ Add fields for breakfast, lunch, dinner in daily menu. Update scraper
 
 
 class UniqueMenuItemList(APIView):  # APIView
-    # serializer_class = UniqueMenuItemSerializer
-
     """
     /api/items
     Get all unique menu items
     term: optional query parameter
     """
-    # @swagger_auto_schema(responses={200: UniqueMenuItemSerializer(many=True)})
 
     @extend_schema(
         summary='Get Menu Items',
@@ -73,7 +66,6 @@ class UniqueMenuItemList(APIView):  # APIView
                     output_field=CharField(),
                 )
             ).filter(name__icontains=search_term).order_by('order_by_position', 'name')
-            # queryset = matching_items
             serializer = UniqueMenuItemSerializer(matching_items, many=True)
         else:
             items = UniqueMenuItem.objects.all().order_by('name')
@@ -83,15 +75,12 @@ class UniqueMenuItemList(APIView):  # APIView
 
 
 class DailyMenuItemList(APIView):
-    # serializer_class = DailyMenuItemSerializer
-
     """
     /api/daily-items
     Get all items from daily menus
     name: optional query parameter to search for exact match in menu
     date (YYYY-MM-DD): optional query parameter to filter menu by date (default is today)
     """
-    # @swagger_auto_schema(responses={200: DailyMenuItemSerializer(many=True), 400: {"error": "Incorrect format for date parameter. Format needs to be YYYY-MM-DD."}})
 
     @extend_schema(
         summary='Get Daily Menu Items',
@@ -145,8 +134,6 @@ class DailyMenuItemList(APIView):
         search_name = self.request.query_params.get('name')
         search_date = self.request.query_params.get('date')
 
-        # Check if date is correct format, return error if not
-
         if not search_date:
             search_date = date.today()  # '2024-06-03'
 
@@ -169,14 +156,11 @@ class DailyMenuItemList(APIView):
 
 
 class AllergenList(APIView):
-    # serializer_class = AllergenSerializer
-
     """
     /api/allergens
     Get allergens
     """
 
-    # @swagger_auto_schema(responses={200: AllergenSerializer(many=True)})
     @extend_schema(
         summary='Get Allergens',
         description='Get all allergens, sorted in alphabetical order',

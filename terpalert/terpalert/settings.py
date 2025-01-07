@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'bootstrap5',
     'rest_framework.authtoken',
     'rest_framework',
-    # 'drf_yasg',
     'drf_spectacular'
 ]
 
