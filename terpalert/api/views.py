@@ -33,7 +33,7 @@ class UniqueMenuItemList(APIView):  # APIView
             OpenApiParameter(
                 name='term',
                 type=str,
-                description='Search menu by name. All items returned if parameter not provided',
+                description='Search menu for names containing term. All items returned if parameter not provided',
                 required=False,
             )
         ],
@@ -88,7 +88,7 @@ class DailyMenuItemList(APIView):
             OpenApiParameter(
                 name='match_name',
                 type=str,
-                description='Search menu for exact match. Will return one or no matches.',
+                description='Search menu for exact match on a name. Returns one result if match, none otherwise.',
                 required=False
             ),
             OpenApiParameter(
