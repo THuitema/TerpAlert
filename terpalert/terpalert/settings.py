@@ -58,7 +58,10 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'TerpAlert API',
-    'DESCRIPTION': 'Access data on meals, nutrition information, and allergens from University of Maryland dining halls',
+    'DESCRIPTION': 'Access data on meals, nutrition information, and allergens from University of Maryland dining '
+                   'halls. \nAll data on this website was collected from the menus published on the UMD dining hall '
+                   'website (dining.umd.edu).\nThis API requires no authentication for its use, but please be mindful '
+                   'with how many requests you send',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
