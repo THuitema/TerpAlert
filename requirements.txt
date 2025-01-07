@@ -27,5 +27,6 @@ urllib3==2.2.1
 wsproto==1.2.0
 dj-database-url==2.2.0
 djangorestframework==3.15.2
+drf-spectacular==0.28.0
 
 gunicorn
