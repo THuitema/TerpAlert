@@ -10,6 +10,22 @@ MENU_TAG = "a"
 MENU_CLASS = "menu-item-name"
 
 
+class NutritionFacts:
+    def __init__(self, protein=0.0, carbs=0.0, fat=0.0, calories=0.0, allergens=list[str], serving_size='', available=True):
+        self.protein = protein
+        self.carbs = carbs
+        self.fat = fat
+        self.calories = calories
+        self.allergens = allergens
+        self.serving_size = serving_size
+        self.available = available
+
+    def __str__(self):
+        if self.available:
+            return f"Cals: {self.calories}, P: {self.protein}, C: {self.carbs}, F: {self.fat}, Serving Size: {self.serving_size}, Allergens: {self.allergens}"
+        return "Nutrition facts not available"
+
+
 class DiningHall:
     """
     Stores information pertaining to a dining hall and functionality to web scrape menu data
@@ -69,6 +85,33 @@ class DiningHall:
             items.add(line.text)
 
         return items
+
+    def scrape_nutrition(self, nutrition_url) -> NutritionFacts:
+        page = requests.get(nutrition_url)
+        soup = BeautifulSoup(page.content, "html.parser")
+
+        # Check if nutrition for the item is not available
+        if soup.find('div', class_='labelnotavailable'):
+            return NutritionFacts(available=False)
+
+        rows = soup.findAll('table', class_='facts_table')[0].findAll('tr')
+
+        serving_size = rows[0].findAll('div', class_='nutfactsservsize')[1].text
+        calories = int(rows[0].findAll('p')[1].text)
+
+        fat = rows[1].findAll('span', class_='nutfactstopnutrient')[0].text
+        fat = float(fat.replace('Total Fat', '').replace('g', ''))
+
+        carbs = rows[1].findAll('span', class_='nutfactstopnutrient')[2].text
+        carbs = float(carbs.replace('Total Carbohydrate.', '').replace('g', ''))
+
+        protein = rows[5].findAll('span', class_='nutfactstopnutrient')[2].text
+        protein = float(protein.replace('Protein', '').replace('g', ''))
+
+        allergens_table = soup.findAll('table')[2]
+        allergens_list = allergens_table.findAll('span', class_='labelallergensvalue')[0].text.split(', ')
+
+        return NutritionFacts(protein, carbs, fat, calories, allergens_list, serving_size)
 
 
 class Menu:
