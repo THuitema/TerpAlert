@@ -1,7 +1,8 @@
 import os
 import psycopg2
 
-DATABASE_URL = os.environ['DATABASE_URL']
+DATABASE_URL = '' # os.environ['DATABASE_URL']
+# todo: uncomment
 
 
 def connect() -> psycopg2.extensions.connection:

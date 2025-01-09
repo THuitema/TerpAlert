@@ -62,9 +62,9 @@ class DiningHall:
         """
         :return: url to the current dining hall's menu for today
         """
-        month = date.today().month
-        day = date.today().day
-        year = date.today().year
+        month = '1'  # date.today().month
+        day = '27'  # date.today().day
+        year = '2025'  # date.today().year
 
         return BASE_URL + "/?locationNum=" + str(self.location_num) + "&dtdate=" + str(month) + "/" + str(
             day) + "/" + str(year)
@@ -77,11 +77,16 @@ class DiningHall:
         # Set up web scraper
         page = requests.get(self.url, verify=False)
         soup = BeautifulSoup(page.content, "html.parser")
-
         items = set()
 
         # Iterate through each menu item found in webpage, add to items set
-        for line in soup.find_all(MENU_TAG, class_=MENU_CLASS):
+        for line in soup.find_all(MENU_TAG, class_=MENU_CLASS, href=True):
+            nutrition_url = BASE_URL + '/' + line['href']
+            print(nutrition_url)
+            nutrition = self.scrape_nutrition(nutrition_url)
+            # for now, scrape nutrition info here for everything.
+            # in the future, only scrape nutrition for new items in the DB
+            #   for this, store nutrition url and then call scrape_nutrition and add to Db in update_db_menu
             items.add(line.text)
 
         return items
