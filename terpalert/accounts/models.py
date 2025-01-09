@@ -82,6 +82,7 @@ class UniqueMenuItem(models.Model):
     protein = models.FloatField(null=True, blank=True)
     carbs = models.FloatField(null=True, blank=True)
     fats = models.FloatField(null=True, blank=True)
+    serving_size = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.name
