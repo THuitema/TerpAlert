@@ -49,7 +49,8 @@ class UniqueMenuItemList(APIView):  # APIView
                     "protein": 4,
                     "carbs": 10,
                     "fats": 1,
-                    "allergens": []
+                    "allergens": [],
+                    "serving_size": "1 each"
                 }
             )
         ]
@@ -125,7 +126,8 @@ class DailyMenuItemList(APIView):
                         "protein": 6.5,
                         "carbs": 2,
                         "fats": 6.2,
-                        "allergens": ["Dairy"]
+                        "allergens": ["Dairy"],
+                        "serving_size": "1 pint"
                     },
                     "date": "2019-08-24",
                     "dh_y": True,
