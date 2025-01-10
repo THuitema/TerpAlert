@@ -49,7 +49,7 @@ window.onload = function () {
 function getMenu(request, response) {
     return $.ajax({
         type: 'GET',
-        url: '/api/items/',  // /accounts/load-menu/
+        url: '/api/v1/items/',  // /accounts/load-menu/
         data: {
             'term': request.term,
         },
@@ -73,7 +73,7 @@ function getMenu(request, response) {
 function checkAlertExists(input) {
     $.ajax({
         type: 'GET',
-        url: '/api/daily-items/',  //'/check-for-alert',
+        url: '/api/v1/daily-items/',  //'/check-for-alert',
         data: {
             'name': input,
         },
