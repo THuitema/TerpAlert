@@ -62,9 +62,9 @@ class DiningHall:
         """
         :return: url to the current dining hall's menu for today
         """
-        month = '1'  # date.today().month
-        day = '27'  # date.today().day
-        year = '2025'  # date.today().year
+        month = date.today().month
+        day = date.today().day
+        year = date.today().year
 
         return BASE_URL + "/?locationNum=" + str(self.location_num) + "&dtdate=" + str(month) + "/" + str(
             day) + "/" + str(year)
@@ -82,11 +82,6 @@ class DiningHall:
         # Iterate through each menu item found in webpage, add to items set
         for line in soup.find_all(MENU_TAG, class_=MENU_CLASS, href=True):
             nutrition_url = BASE_URL + '/' + line['href']
-            # print(nutrition_url)
-            # nutrition = self.scrape_nutrition(nutrition_url)
-            # for now, scrape nutrition info here for everything.
-            # in the future, only scrape nutrition for new items in the DB
-            #   for this, store nutrition url and then call scrape_nutrition and add to Db in update_db_menu
             items.add((line.text, nutrition_url))
 
         return items
@@ -140,9 +135,6 @@ class Menu:
                     # otherwise, create new Item object and initialize its list with current dining hall
                     self.total_menu[item[0]] = Item(item[0], item[1])
                     self.total_menu[item[0]].dining_halls = [dining_hall.name]
-
-        # for item_name in self.total_menu:
-        #     print(item_name + ": " + self.total_menu[item_name].nutrition_url)
 
     def update_db_menu(self, conn):
         """
