@@ -3,7 +3,6 @@ import psycopg2
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
-
 def connect() -> psycopg2.extensions.connection:
     """
     :return: conection to PostgreSQL database

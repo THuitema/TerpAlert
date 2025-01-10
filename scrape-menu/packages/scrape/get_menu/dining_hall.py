@@ -10,6 +10,22 @@ MENU_TAG = "a"
 MENU_CLASS = "menu-item-name"
 
 
+class NutritionFacts:
+    def __init__(self, protein=0.0, carbs=0.0, fat=0.0, calories=0.0, allergens=list[str], serving_size='', available=True):
+        self.protein = protein
+        self.carbs = carbs
+        self.fat = fat
+        self.calories = calories
+        self.allergens = allergens
+        self.serving_size = serving_size
+        self.available = available
+
+    def __str__(self):
+        if self.available:
+            return f"Cals: {self.calories}, P: {self.protein}, C: {self.carbs}, F: {self.fat}, Serving Size: {self.serving_size}, Allergens: {self.allergens}"
+        return "Nutrition facts not available"
+
+
 class DiningHall:
     """
     Stores information pertaining to a dining hall and functionality to web scrape menu data
@@ -53,7 +69,7 @@ class DiningHall:
         return BASE_URL + "/?locationNum=" + str(self.location_num) + "&dtdate=" + str(month) + "/" + str(
             day) + "/" + str(year)
 
-    def scrape_menu(self) -> set[str]:
+    def scrape_menu(self) -> set[(str, str)]:
         """
         Web-scrapes the menu of the dining hall for the current day
         :return: set of items on the menu
@@ -61,12 +77,12 @@ class DiningHall:
         # Set up web scraper
         page = requests.get(self.url, verify=False)
         soup = BeautifulSoup(page.content, "html.parser")
-
         items = set()
 
         # Iterate through each menu item found in webpage, add to items set
-        for line in soup.find_all(MENU_TAG, class_=MENU_CLASS):
-            items.add(line.text)
+        for line in soup.find_all(MENU_TAG, class_=MENU_CLASS, href=True):
+            nutrition_url = BASE_URL + '/' + line['href']
+            items.add((line.text, nutrition_url))
 
         return items
 
@@ -102,8 +118,8 @@ class Menu:
 
         :param dining_halls: list of DiningHall objects
         """
-        self.dining_halls = dining_halls
-        self.total_menu = {}
+        self.dining_halls: list[DiningHall] = dining_halls
+        self.total_menu: dict[str, Item] = {}
         self.users_to_alert = {}
 
     def create_menu(self):
@@ -112,28 +128,66 @@ class Menu:
         """
         for dining_hall in self.dining_halls:
             for item in dining_hall.menu:
-                if item in self.total_menu:
+                if item[0] in self.total_menu:
                     # if item has already been seen, add current dining hall to its list
-                    self.total_menu[item].dining_halls.append(dining_hall.name)
+                    self.total_menu[item[0]].dining_halls.append(dining_hall.name)
                 else:
                     # otherwise, create new Item object and initialize its list with current dining hall
-                    self.total_menu[item] = Item(item)
-                    self.total_menu[item].dining_halls = [dining_hall.name]
+                    self.total_menu[item[0]] = Item(item[0], item[1])
+                    self.total_menu[item[0]].dining_halls = [dining_hall.name]
 
     def update_db_menu(self, conn):
         """
         Insert new menu items to Menu table and all items to Daily Menu table
         :param conn: PostgreSQL database connection
         """
-
         for key in self.total_menu.keys():
-            # Insert new items to Menu table
-            menu_insert_query = '''
-                INSERT INTO accounts_uniquemenuitem (item)
+            insert_query = '''
+                INSERT INTO accounts_uniquemenuitem (name)
                 SELECT %s
-                WHERE NOT EXISTS (SELECT * FROM accounts_uniquemenuitem WHERE name=%s)
+                WHERE NOT EXISTS (
+                    SELECT *
+                    FROM accounts_uniquemenuitem
+                    WHERE name = %s
+                )
             '''
-            db_write(conn, menu_insert_query, key, key)
+            db_write(conn, insert_query, key, key)
+
+            get_item_query = '''
+                SELECT * 
+                FROM accounts_uniquemenuitem
+                WHERE name = %s;
+            '''
+            response = db_select(conn, get_item_query, key)
+            item_id = response[0][0]
+
+            # Check if current item has nutrition info added. Scrape nutrition info if not
+            if not response[0][2]:
+                nutrition = self.scrape_nutrition(self.total_menu[key].nutrition_url)
+                if nutrition.available:
+                    update_nutrition_query = '''
+                        UPDATE accounts_uniquemenuitem
+                        SET
+                            calories = %s,
+                            carbs = %s,
+                            fats = %s,
+                            protein = %s,
+                            serving_size = %s
+                        WHERE name = %s
+                    '''
+                    db_write(
+                        conn,
+                        update_nutrition_query,
+                        nutrition.calories,
+                        nutrition.carbs,
+                        nutrition.fat,
+                        nutrition.protein,
+                        nutrition.serving_size,
+                        key
+                    )
+
+                    # Insert allergens to DB
+                    self.update_allergens(conn, item_id, nutrition.allergens)
 
             # Insert all items to Daily Menu table
             at_y = 'Yahentamitsi' in self.total_menu[key].dining_halls
@@ -141,25 +195,96 @@ class Menu:
             at_251 = '251' in self.total_menu[key].dining_halls
 
             # Get foreign key for menu item
-            get_menu_item_query = '''
-                SELECT * 
-                FROM accounts_uniquemenuitem
-                WHERE name=%s
-            '''
-
-            rows = db_select(conn, get_menu_item_query, key)
-            menu_item_id = rows[0][0]
+            # get_menu_item_query = '''
+            #     SELECT *
+            #     FROM accounts_uniquemenuitem
+            #     WHERE name=%s
+            # '''
+            #
+            # rows = db_select(conn, get_menu_item_query, key)
+            # menu_item_id = rows[0][0]
 
             daily_menu_insert_query = '''
-                INSERT INTO accounts_dailymenuitem 
+                INSERT INTO accounts_dailymenuitem
                     (menu_item_id, date, dh_y, dh_south, dh_251)
                 VALUES
                     (%s, %s, %s, %s, %s)
             '''
 
-            db_write(conn, daily_menu_insert_query, menu_item_id, date.today(), at_y, at_south, at_251)
+            db_write(conn, daily_menu_insert_query, item_id, date.today(), at_y, at_south, at_251) # menu_item_id
 
         return {'Completed': True}
+
+    def update_allergens(self, conn, item_id, allergens):
+        """
+        Update allergen table with new entries and link current item with its allergens
+        :param conn: PostgreSQL database connection
+        :param item_id: ID of current item
+        :param allergens: list of allergen strings
+        """
+        for allergen in allergens:
+            # Insert allergen into allergen table if it doesn't exist
+            insert_query = '''
+                INSERT INTO accounts_allergen (name)
+                SELECT %s
+                WHERE NOT EXISTS (
+                    SELECT *
+                    FROM accounts_allergen
+                    WHERE name = %s
+                )
+            '''
+            db_write(conn, insert_query, allergen, allergen)
+
+            # Get ID of current allergen
+            get_allergen_query = '''
+                SELECT *
+                FROM accounts_allergen
+                WHERE name = %s
+            '''
+            response = db_select(conn, get_allergen_query, allergen)
+            allergen_id = response[0][0]
+
+            # Insert link between allergen and item
+            insert_link_query = '''
+                INSERT INTO accounts_menuitemallergen (allergen_id, menu_item_id)
+                VALUES (%s, %s)
+            '''
+            db_write(conn, insert_link_query, allergen_id, item_id)
+
+    def scrape_nutrition(self, nutrition_url) -> NutritionFacts:
+        """
+        Scrape nutrition facts given the URL
+        :param nutrition_url: URL string
+        """
+        page = requests.get(nutrition_url)
+        soup = BeautifulSoup(page.content, "html.parser")
+
+        # Check if nutrition for the item is not available
+        if soup.find('div', class_='labelnotavailable'):
+            return NutritionFacts(available=False)
+
+        rows = soup.findAll('table', class_='facts_table')[0].findAll('tr')
+
+        serving_size = rows[0].findAll('div', class_='nutfactsservsize')[1].text
+        calories = int(rows[0].findAll('p')[1].text)
+
+        fat = rows[1].findAll('span', class_='nutfactstopnutrient')[0].text
+        fat = float(fat.replace('Total Fat', '').replace('g', ''))
+
+        carbs = rows[1].findAll('span', class_='nutfactstopnutrient')[2].text
+        carbs = float(carbs.replace('Total Carbohydrate.', '').replace('g', ''))
+
+        protein = rows[5].findAll('span', class_='nutfactstopnutrient')[2].text
+        protein = float(protein.replace('Protein', '').replace('g', ''))
+
+        allergens_table = soup.findAll('table')[2]
+        allergens_list = allergens_table.findAll('span', class_='labelallergensvalue')[0].text.split(', ')
+
+        # No allergens scraped
+        if allergens_list[0] == '':
+            allergens_list = []
+
+        return NutritionFacts(protein, carbs, fat, calories, allergens_list, serving_size)
 
     def get_alerts(self, conn):
         """
@@ -241,7 +366,7 @@ class Item:
         names of the dining halls at which the item is being served
     """
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, nutrition_url: str, nutrition_facts: NutritionFacts = None):
         """
         Initializes Item object
 
@@ -249,6 +374,8 @@ class Item:
         """
         self.name = name
         self.dining_halls = []
+        self.nutrition_url = nutrition_url
+        self.nutrition = nutrition_facts
 
     def __str__(self):
         """

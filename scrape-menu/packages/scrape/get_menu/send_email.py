@@ -4,7 +4,6 @@ import json
 
 MAILGUN_API = os.environ['MAILGUN_API']
 
-
 def send_alert(to_email: str, alerts: list[str], token: str):
     """
     Sends alert email to user using the Mailgun API

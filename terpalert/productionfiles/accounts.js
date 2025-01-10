@@ -189,7 +189,7 @@ function getMenu(request, response) {
     // })
     return $.ajax({
         type: 'GET',
-        url: '/api/items/',  // /accounts/load-menu/
+        url: '/api/v1/items/',  // /accounts/load-menu/
         data: {
             'term': request.term,
         },
