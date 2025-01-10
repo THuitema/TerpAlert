@@ -9,6 +9,8 @@ import re
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 from rest_framework.generics import GenericAPIView
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.exceptions import NotAcceptable
+
 
 ''''
 *** MERGE WITH MAIN BRANCH AFTER FINISHING THE ABOVE ***
@@ -17,6 +19,11 @@ Scrape nutrition macros: calories, protein, carbs, fats, allergens
 Convert ID's for Foods to UID
 Add fields for breakfast, lunch, dinner in daily menu. Update scraper
 '''
+
+
+class BadRequest(NotAcceptable):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = "Incorrect format for date parameter. Format needs to be YYYY-MM-DD."
 
 
 class UniqueMenuItemList(GenericAPIView):  #APIView
@@ -106,7 +113,7 @@ class UniqueMenuItemList(GenericAPIView):  #APIView
         # return Response(serializer.data)
 
 
-class DailyMenuItemList(APIView):
+class DailyMenuItemList(GenericAPIView):
     """
     /api/v1/daily-items
     Get menu items for the specified date, sorted in alphabetical order
@@ -114,6 +121,53 @@ class DailyMenuItemList(APIView):
     match_name: Search menu for exact match. Will return one or no matches.
     date: Filter menu by date. Format is YYYY-MM-DD. Default is today
     """
+
+    '''
+    Convert this to GenericAPIView and implement pagination like UniqueItemList, update JS files and collectstatic
+    '''
+    serializer_class = DailyMenuItemSerializer
+    pagination_class = PageNumberPagination
+
+    def get_queryset(self):
+        search_name = self.request.query_params.get('match_name')
+        search_date = self.request.query_params.get('date')
+        search_term = self.request.query_params.get('term')
+
+        if not search_date:
+            search_date = date.today()  # '2024-06-03'
+
+        # Validate format of date parameter string
+        if not re.search(r"^\d{4}-\d{2}-\d{2}", str(search_date)):
+            return BadRequest()
+            # do you need to keep BadRequestSerializer?
+            # return Response({'detail': "Incorrect format for date parameter. Format needs to be YYYY-MM-DD."},
+            #                 status=status.HTTP_400_BAD_REQUEST)
+
+        if search_term:
+            queryset = DailyMenuItem.objects.annotate(
+                order_by_position=Case(
+                    When(menu_item__name__istartswith=search_term, then=Value(1)),
+                    When(menu_item__name__icontains=search_term, then=Value(2)),
+                    default=Value(3),
+                    output_field=CharField(),
+                )
+            ).filter(menu_item__name__icontains=search_term).order_by('order_by_position', 'menu_item__name')
+            # serializer = DailyMenuItemSerializer(matching_items, many=True)
+            # return Response(serializer.data)
+            return queryset
+
+        if search_name:
+            item_id = UniqueMenuItem.objects.get(name=search_name).id
+            queryset = DailyMenuItem.objects.filter(menu_item_id=item_id, date=search_date)
+        else:
+            queryset = DailyMenuItem.objects.filter(date=search_date).order_by('menu_item__name')
+        return queryset
+        # if menu.exists():
+        #     serializer = DailyMenuItemSerializer(menu, many=True)
+        # else:
+        #     serializer = DailyMenuItemSerializer(None, many=True)
+        #
+        # return Response(serializer.data)
 
     @extend_schema(
         summary='Get Daily Menu Items',
@@ -170,41 +224,54 @@ class DailyMenuItemList(APIView):
         ]
     )
     def get(self, request):
-        search_name = self.request.query_params.get('match_name')
-        search_date = self.request.query_params.get('date')
-        search_term = self.request.query_params.get('term')
+        queryset = self.get_queryset()
+        # Paginate the queryset
+        paginated_queryset = self.paginate_queryset(queryset)
+        if paginated_queryset is not None:
+            # Serialize the paginated queryset and return the response
+            serializer = self.get_serializer(paginated_queryset, many=True)
+            return self.get_paginated_response(serializer.data)
 
-        if not search_date:
-            search_date = date.today()  # '2024-06-03'
-
-        # Validate format of date parameter string
-        if not re.search(r"^\d{4}-\d{2}-\d{2}", str(search_date)):
-            return Response({'detail': "Incorrect format for date parameter. Format needs to be YYYY-MM-DD."}, status=status.HTTP_400_BAD_REQUEST)
-
-        if search_term:
-            matching_items = DailyMenuItem.objects.annotate(
-                order_by_position=Case(
-                    When(menu_item__name__istartswith=search_term, then=Value(1)),
-                    When(menu_item__name__icontains=search_term, then=Value(2)),
-                    default=Value(3),
-                    output_field=CharField(),
-                )
-            ).filter(menu_item__name__icontains=search_term).order_by('order_by_position', 'menu_item__name')
-            serializer = DailyMenuItemSerializer(matching_items, many=True)
-            return Response(serializer.data)
-
-        if search_name:
-            item_id = UniqueMenuItem.objects.get(name=search_name).id
-            menu = DailyMenuItem.objects.filter(menu_item_id=item_id, date=search_date)
-        else:
-            menu = DailyMenuItem.objects.filter(date=search_date).order_by('menu_item__name')
-
-        if menu.exists():
-            serializer = DailyMenuItemSerializer(menu, many=True)
-        else:
-            serializer = DailyMenuItemSerializer(None, many=True)
-
+        # If pagination isn't applied, return all results
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+
+        # search_name = self.request.query_params.get('match_name')
+        # search_date = self.request.query_params.get('date')
+        # search_term = self.request.query_params.get('term')
+        #
+        # if not search_date:
+        #     search_date = date.today()  # '2024-06-03'
+        #
+        # # Validate format of date parameter string
+        # if not re.search(r"^\d{4}-\d{2}-\d{2}", str(search_date)):
+        #     return Response({'detail': "Incorrect format for date parameter. Format needs to be YYYY-MM-DD."}, status=status.HTTP_400_BAD_REQUEST)
+        #
+        # if search_term:
+        #     matching_items = DailyMenuItem.objects.annotate(
+        #         order_by_position=Case(
+        #             When(menu_item__name__istartswith=search_term, then=Value(1)),
+        #             When(menu_item__name__icontains=search_term, then=Value(2)),
+        #             default=Value(3),
+        #             output_field=CharField(),
+        #         )
+        #     ).filter(menu_item__name__icontains=search_term).order_by('order_by_position', 'menu_item__name')
+        #     serializer = DailyMenuItemSerializer(matching_items, many=True)
+        #     return Response(serializer.data)
+        #
+        # if search_name:
+        #     item_id = UniqueMenuItem.objects.get(name=search_name).id
+        #     menu = DailyMenuItem.objects.filter(menu_item_id=item_id, date=search_date)
+        # else:
+        #     menu = DailyMenuItem.objects.filter(date=search_date).order_by('menu_item__name')
+        #
+        # if menu.exists():
+        #     serializer = DailyMenuItemSerializer(menu, many=True)
+        # else:
+        #     serializer = DailyMenuItemSerializer(None, many=True)
+        #
+        # return Response(serializer.data)
 
 
 class AllergenList(APIView):
