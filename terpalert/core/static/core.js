@@ -55,7 +55,7 @@ function getMenu(request, response) {
         },
         success: function (data) {
             console.log("value:", "key:");
-            let results = $.map(data, function (value, key) {
+            let results = $.map(data.results, function (value, key) {
                 return {
                     label: value.name, // value.label  //label and value is the name of the menu item
                     value: value.name  // value.label

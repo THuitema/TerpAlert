@@ -7,10 +7,10 @@ from django.db.models import Case, Value, When, CharField
 from datetime import date
 import re
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
+from rest_framework.generics import GenericAPIView
+from rest_framework.pagination import PageNumberPagination
 
 ''''
-Add frontend page for API info
-
 *** MERGE WITH MAIN BRANCH AFTER FINISHING THE ABOVE ***
 
 Scrape nutrition macros: calories, protein, carbs, fats, allergens
@@ -19,12 +19,31 @@ Add fields for breakfast, lunch, dinner in daily menu. Update scraper
 '''
 
 
-class UniqueMenuItemList(APIView):  # APIView
+class UniqueMenuItemList(GenericAPIView):  #APIView
     """
     /api/v1/items
     Get all menu items, sorted in alphabetical order
     term: Search menu by name. All items returned if parameter not provided
     """
+
+    serializer_class = UniqueMenuItemSerializer
+    pagination_class = PageNumberPagination
+
+    def get_queryset(self):
+        search_term = self.request.query_params.get('term')
+        if search_term:
+            queryset = UniqueMenuItem.objects.annotate(
+                order_by_position=Case(
+                    When(name__istartswith=search_term, then=Value(1)),
+                    When(name__icontains=search_term, then=Value(2)),
+                    default=Value(3),
+                    output_field=CharField(),
+                )
+            ).filter(name__icontains=search_term).order_by('order_by_position', 'name')
+        else:
+            queryset = UniqueMenuItem.objects.all().order_by('name')
+
+        return queryset
 
     @extend_schema(
         summary='Get Menu Items',
@@ -56,22 +75,35 @@ class UniqueMenuItemList(APIView):  # APIView
         ]
     )
     def get(self, request):
-        search_term = self.request.query_params.get('term')
-        if search_term:
-            matching_items = UniqueMenuItem.objects.annotate(
-                order_by_position=Case(
-                    When(name__istartswith=search_term, then=Value(1)),
-                    When(name__icontains=search_term, then=Value(2)),
-                    default=Value(3),
-                    output_field=CharField(),
-                )
-            ).filter(name__icontains=search_term).order_by('order_by_position', 'name')
-            serializer = UniqueMenuItemSerializer(matching_items, many=True)
-        else:
-            items = UniqueMenuItem.objects.all().order_by('name')
-            serializer = UniqueMenuItemSerializer(items, many=True)
+        queryset = self.get_queryset()
+        # Paginate the queryset
+        paginated_queryset = self.paginate_queryset(queryset)
+        if paginated_queryset is not None:
+            # Serialize the paginated queryset and return the response
+            serializer = self.get_serializer(paginated_queryset, many=True)
+            return self.get_paginated_response(serializer.data)
 
+        # If pagination isn't applied, return all results
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+
+        # search_term = self.request.query_params.get('term')
+        # if search_term:
+        #     matching_items = UniqueMenuItem.objects.annotate(
+        #         order_by_position=Case(
+        #             When(name__istartswith=search_term, then=Value(1)),
+        #             When(name__icontains=search_term, then=Value(2)),
+        #             default=Value(3),
+        #             output_field=CharField(),
+        #         )
+        #     ).filter(name__icontains=search_term).order_by('order_by_position', 'name')
+        #     serializer = UniqueMenuItemSerializer(matching_items, many=True)
+        # else:
+        #     items = UniqueMenuItem.objects.all().order_by('name')
+        #     serializer = UniqueMenuItemSerializer(items, many=True)
+        #
+        # return Response(serializer.data)
 
 
 class DailyMenuItemList(APIView):
