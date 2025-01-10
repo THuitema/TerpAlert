@@ -149,105 +149,60 @@ class Menu:
         Insert new menu items to Menu table and all items to Daily Menu table
         :param conn: PostgreSQL database connection
         """
-
         for key in self.total_menu.keys():
-            # Insert new items to Menu table
-            # If current item not in accounts_uniquemenuitem
-            #    Call scrape method to collect nutrition data for item
-            #    Insert all data for item into table at once
+            insert_query = '''
+                INSERT INTO accounts_uniquemenuitem (name)
+                SELECT %s
+                WHERE NOT EXISTS (
+                    SELECT *
+                    FROM accounts_uniquemenuitem
+                    WHERE name = %s
+                )
+            '''
+            db_write(conn, insert_query, key, key)
 
-            # Get rid of current query, add one to check if item exists in accounts_uniquemenutem
-            # Will have to edit menu_insert_query to add all the new info (nutrition)
-            check_exists_query = '''
+            get_item_query = '''
                 SELECT * 
                 FROM accounts_uniquemenuitem
-                WHERE name=%s;
+                WHERE name = %s;
             '''
-            response = db_select(conn, check_exists_query, key)
+            response = db_select(conn, get_item_query, key)
+            item_id = response[0][0]
 
-            if not response:
-                # First time seeing this item, so scrape nutrition info and add to uniquemenuitems table
-                print(key + " IS NEW")
+            # Check if current item has nutrition info added. Scrape nutrition info if not
+            if not response[0][2]:
                 nutrition = self.scrape_nutrition(self.total_menu[key].nutrition_url)
-
                 if nutrition.available:
-                    insert_query = '''
-                        INSERT INTO accounts_uniquemenuitem (name, calories, carbs, fats, protein, serving_size)
-                        VALUES (%s, %s, %s, %s, %s, %s);
+                    update_nutrition_query = '''
+                        UPDATE accounts_uniquemenuitem
+                        SET
+                            calories = %s,
+                            carbs = %s,
+                            fats = %s,
+                            protein = %s,
+                            serving_size = %s
+                        WHERE name = %s
                     '''
                     db_write(
                         conn,
-                        insert_query,
-                        key,
+                        update_nutrition_query,
                         nutrition.calories,
                         nutrition.carbs,
                         nutrition.fat,
                         nutrition.protein,
-                        nutrition.serving_size
+                        nutrition.serving_size,
+                        key
                     )
 
-                    # todo: update allergens table if necessary, add each to MenuItemAllergen
+                    # Insert allergens to DB
+                    self.update_allergens(conn, item_id, nutrition.allergens)
 
+            # Insert all items to Daily Menu table
+            at_y = 'Yahentamitsi' in self.total_menu[key].dining_halls
+            at_south = 'South' in self.total_menu[key].dining_halls
+            at_251 = '251' in self.total_menu[key].dining_halls
 
-            else:
-                # Exists but doesn't have nutrition info, so attempt to scrape it, and update entry
-                if not response[0][2]:
-                    print(key + " EXISTS BUT DOES NOT HAVE NUTRITION INFO")
-                    nutrition = self.scrape_nutrition(self.total_menu[key].nutrition_url)
-                    print(nutrition)
-
-                    if nutrition.available:
-                        update_nutrition_query = '''
-                            UPDATE accounts_uniquemenuitem
-                            SET
-                                calories = %s,
-                                carbs = %s,
-                                fats = %s,
-                                protein = %s,
-                                serving_size = %s
-                            WHERE name = %s
-                        '''
-                        db_write(
-                            conn,
-                            update_nutrition_query,
-                            nutrition.calories,
-                            nutrition.carbs,
-                            nutrition.fat,
-                            nutrition.protein,
-                            nutrition.serving_size,
-                            key
-                        )
-
-                        # todo: update allergens table if necessary, add each to MenuItemAllergen
-
-                else:
-                    print(key + " EXISTS and HAS NUTRITION")
-
-
-
-            # menu_insert_query = '''
-            #     INSERT INTO accounts_uniquemenuitem (item)
-            #     SELECT %s
-            #     WHERE NOT EXISTS (SELECT * FROM accounts_uniquemenuitem WHERE name=%s)
-            # '''
-            # db_write(conn, menu_insert_query, key, key)
-            #
-
-
-            ''' *** Everything below this line shouuuuld be good *** '''
-            '''KEEP COMMENTED UNTIL DONE UPDATING NUTRITION IN PROD DATABASE'''
-            '''UNCOMMENT BELOW WHEN READY TO RESUME AUTOMATED SCRAPER'''
-
-            '''REMEMBER TO UPDATE SERVERLESS FUNCTION IN DIGITAL OCEAN'''
-            '''have to run some commands in terminal to deploy it'''
-            #
-            #
-            # # Insert all items to Daily Menu table
-            # at_y = 'Yahentamitsi' in self.total_menu[key].dining_halls
-            # at_south = 'South' in self.total_menu[key].dining_halls
-            # at_251 = '251' in self.total_menu[key].dining_halls
-            #
-            # # Get foreign key for menu item
+            # Get foreign key for menu item
             # get_menu_item_query = '''
             #     SELECT *
             #     FROM accounts_uniquemenuitem
@@ -256,19 +211,59 @@ class Menu:
             #
             # rows = db_select(conn, get_menu_item_query, key)
             # menu_item_id = rows[0][0]
-            #
-            # daily_menu_insert_query = '''
-            #     INSERT INTO accounts_dailymenuitem
-            #         (menu_item_id, date, dh_y, dh_south, dh_251)
-            #     VALUES
-            #         (%s, %s, %s, %s, %s)
-            # '''
-            #
-            # db_write(conn, daily_menu_insert_query, menu_item_id, date.today(), at_y, at_south, at_251)
+
+            daily_menu_insert_query = '''
+                INSERT INTO accounts_dailymenuitem
+                    (menu_item_id, date, dh_y, dh_south, dh_251)
+                VALUES
+                    (%s, %s, %s, %s, %s)
+            '''
+
+            db_write(conn, daily_menu_insert_query, item_id, date.today(), at_y, at_south, at_251) # menu_item_id
 
         return {'Completed': True}
 
+    def update_allergens(self, conn, item_id, allergens):
+        """
+        Update allergen table with new entries and link current item with its allergens
+        :param conn: PostgreSQL database connection
+        :param item_id: ID of current item
+        :param allergens: list of allergen strings
+        """
+        for allergen in allergens:
+            # Insert allergen into allergen table if it doesn't exist
+            insert_query = '''
+                INSERT INTO accounts_allergen (name)
+                SELECT %s
+                WHERE NOT EXISTS (
+                    SELECT *
+                    FROM accounts_allergen
+                    WHERE name = %s
+                )
+            '''
+            db_write(conn, insert_query, allergen, allergen)
+
+            # Get ID of current allergen
+            get_allergen_query = '''
+                SELECT *
+                FROM accounts_allergen
+                WHERE name = %s
+            '''
+            response = db_select(conn, get_allergen_query, allergen)
+            allergen_id = response[0][0]
+
+            # Insert link between allergen and item
+            insert_link_query = '''
+                INSERT INTO accounts_menuitemallergen (allergen_id, menu_item_id)
+                VALUES (%s, %s)
+            '''
+            db_write(conn, insert_link_query, allergen_id, item_id)
+
     def scrape_nutrition(self, nutrition_url) -> NutritionFacts:
+        """
+        Scrape nutrition facts given the URL
+        :param nutrition_url: URL string
+        """
         page = requests.get(nutrition_url)
         soup = BeautifulSoup(page.content, "html.parser")
 
@@ -292,6 +287,10 @@ class Menu:
 
         allergens_table = soup.findAll('table')[2]
         allergens_list = allergens_table.findAll('span', class_='labelallergensvalue')[0].text.split(', ')
+
+        # No allergens scraped
+        if allergens_list[0] == '':
+            allergens_list = []
 
         return NutritionFacts(protein, carbs, fat, calories, allergens_list, serving_size)
 
