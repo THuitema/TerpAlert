@@ -1,8 +1,8 @@
 import os
 import psycopg2
 
-DATABASE_URL = '' # os.environ['DATABASE_URL']
-# todo: uncomment
+DATABASE_URL = 'postgresql://postgres:NerfTAH321@localhost:5432/terpalert'  # os.environ['DATABASE_URL']
+# todo: uncomment, UNCOMMENT SSL_MODE BELOW
 
 
 def connect() -> psycopg2.extensions.connection:
@@ -10,7 +10,7 @@ def connect() -> psycopg2.extensions.connection:
     :return: conection to PostgreSQL database
     """
     try:
-        with psycopg2.connect(DATABASE_URL, sslmode='require') as conn:
+        with psycopg2.connect(DATABASE_URL) as conn:  # , sslmode='require'
             return conn
 
     except (psycopg2.DatabaseError, Exception) as e:

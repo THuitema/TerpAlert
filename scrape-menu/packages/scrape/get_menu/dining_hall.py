@@ -69,7 +69,7 @@ class DiningHall:
         return BASE_URL + "/?locationNum=" + str(self.location_num) + "&dtdate=" + str(month) + "/" + str(
             day) + "/" + str(year)
 
-    def scrape_menu(self) -> set[str]:
+    def scrape_menu(self) -> set[(str, str)]:
         """
         Web-scrapes the menu of the dining hall for the current day
         :return: set of items on the menu
@@ -82,41 +82,14 @@ class DiningHall:
         # Iterate through each menu item found in webpage, add to items set
         for line in soup.find_all(MENU_TAG, class_=MENU_CLASS, href=True):
             nutrition_url = BASE_URL + '/' + line['href']
-            print(nutrition_url)
-            nutrition = self.scrape_nutrition(nutrition_url)
+            # print(nutrition_url)
+            # nutrition = self.scrape_nutrition(nutrition_url)
             # for now, scrape nutrition info here for everything.
             # in the future, only scrape nutrition for new items in the DB
             #   for this, store nutrition url and then call scrape_nutrition and add to Db in update_db_menu
-            items.add(line.text)
+            items.add((line.text, nutrition_url))
 
         return items
-
-    def scrape_nutrition(self, nutrition_url) -> NutritionFacts:
-        page = requests.get(nutrition_url)
-        soup = BeautifulSoup(page.content, "html.parser")
-
-        # Check if nutrition for the item is not available
-        if soup.find('div', class_='labelnotavailable'):
-            return NutritionFacts(available=False)
-
-        rows = soup.findAll('table', class_='facts_table')[0].findAll('tr')
-
-        serving_size = rows[0].findAll('div', class_='nutfactsservsize')[1].text
-        calories = int(rows[0].findAll('p')[1].text)
-
-        fat = rows[1].findAll('span', class_='nutfactstopnutrient')[0].text
-        fat = float(fat.replace('Total Fat', '').replace('g', ''))
-
-        carbs = rows[1].findAll('span', class_='nutfactstopnutrient')[2].text
-        carbs = float(carbs.replace('Total Carbohydrate.', '').replace('g', ''))
-
-        protein = rows[5].findAll('span', class_='nutfactstopnutrient')[2].text
-        protein = float(protein.replace('Protein', '').replace('g', ''))
-
-        allergens_table = soup.findAll('table')[2]
-        allergens_list = allergens_table.findAll('span', class_='labelallergensvalue')[0].text.split(', ')
-
-        return NutritionFacts(protein, carbs, fat, calories, allergens_list, serving_size)
 
 
 class Menu:
@@ -150,8 +123,8 @@ class Menu:
 
         :param dining_halls: list of DiningHall objects
         """
-        self.dining_halls = dining_halls
-        self.total_menu = {}
+        self.dining_halls: list[DiningHall] = dining_halls
+        self.total_menu: dict[str, Item] = {}
         self.users_to_alert = {}
 
     def create_menu(self):
@@ -160,13 +133,16 @@ class Menu:
         """
         for dining_hall in self.dining_halls:
             for item in dining_hall.menu:
-                if item in self.total_menu:
+                if item[0] in self.total_menu:
                     # if item has already been seen, add current dining hall to its list
-                    self.total_menu[item].dining_halls.append(dining_hall.name)
+                    self.total_menu[item[0]].dining_halls.append(dining_hall.name)
                 else:
                     # otherwise, create new Item object and initialize its list with current dining hall
-                    self.total_menu[item] = Item(item)
-                    self.total_menu[item].dining_halls = [dining_hall.name]
+                    self.total_menu[item[0]] = Item(item[0], item[1])
+                    self.total_menu[item[0]].dining_halls = [dining_hall.name]
+
+        # for item_name in self.total_menu:
+        #     print(item_name + ": " + self.total_menu[item_name].nutrition_url)
 
     def update_db_menu(self, conn):
         """
@@ -176,38 +152,148 @@ class Menu:
 
         for key in self.total_menu.keys():
             # Insert new items to Menu table
-            menu_insert_query = '''
-                INSERT INTO accounts_uniquemenuitem (item)
-                SELECT %s
-                WHERE NOT EXISTS (SELECT * FROM accounts_uniquemenuitem WHERE name=%s)
-            '''
-            db_write(conn, menu_insert_query, key, key)
+            # If current item not in accounts_uniquemenuitem
+            #    Call scrape method to collect nutrition data for item
+            #    Insert all data for item into table at once
 
-            # Insert all items to Daily Menu table
-            at_y = 'Yahentamitsi' in self.total_menu[key].dining_halls
-            at_south = 'South' in self.total_menu[key].dining_halls
-            at_251 = '251' in self.total_menu[key].dining_halls
-
-            # Get foreign key for menu item
-            get_menu_item_query = '''
+            # Get rid of current query, add one to check if item exists in accounts_uniquemenutem
+            # Will have to edit menu_insert_query to add all the new info (nutrition)
+            check_exists_query = '''
                 SELECT * 
                 FROM accounts_uniquemenuitem
-                WHERE name=%s
+                WHERE name=%s;
             '''
+            response = db_select(conn, check_exists_query, key)
 
-            rows = db_select(conn, get_menu_item_query, key)
-            menu_item_id = rows[0][0]
+            if not response:
+                # First time seeing this item, so scrape nutrition info and add to uniquemenuitems table
+                print(key + " IS NEW")
+                nutrition = self.scrape_nutrition(self.total_menu[key].nutrition_url)
 
-            daily_menu_insert_query = '''
-                INSERT INTO accounts_dailymenuitem 
-                    (menu_item_id, date, dh_y, dh_south, dh_251)
-                VALUES
-                    (%s, %s, %s, %s, %s)
-            '''
+                if nutrition.available:
+                    insert_query = '''
+                        INSERT INTO accounts_uniquemenuitem (name, calories, carbs, fats, protein, serving_size)
+                        VALUES (%s, %s, %s, %s, %s, %s);
+                    '''
+                    db_write(
+                        conn,
+                        insert_query,
+                        key,
+                        nutrition.calories,
+                        nutrition.carbs,
+                        nutrition.fat,
+                        nutrition.protein,
+                        nutrition.serving_size
+                    )
 
-            db_write(conn, daily_menu_insert_query, menu_item_id, date.today(), at_y, at_south, at_251)
+                    # todo: update allergens table if necessary, add each to MenuItemAllergen
+
+
+            else:
+                # Exists but doesn't have nutrition info, so attempt to scrape it, and update entry
+                if not response[0][2]:
+                    print(key + " EXISTS BUT DOES NOT HAVE NUTRITION INFO")
+                    nutrition = self.scrape_nutrition(self.total_menu[key].nutrition_url)
+                    print(nutrition)
+
+                    if nutrition.available:
+                        update_nutrition_query = '''
+                            UPDATE accounts_uniquemenuitem
+                            SET
+                                calories = %s,
+                                carbs = %s,
+                                fats = %s,
+                                protein = %s,
+                                serving_size = %s
+                            WHERE name = %s
+                        '''
+                        db_write(
+                            conn,
+                            update_nutrition_query,
+                            nutrition.calories,
+                            nutrition.carbs,
+                            nutrition.fat,
+                            nutrition.protein,
+                            nutrition.serving_size,
+                            key
+                        )
+
+                        # todo: update allergens table if necessary, add each to MenuItemAllergen
+
+                else:
+                    print(key + " EXISTS and HAS NUTRITION")
+
+
+
+            # menu_insert_query = '''
+            #     INSERT INTO accounts_uniquemenuitem (item)
+            #     SELECT %s
+            #     WHERE NOT EXISTS (SELECT * FROM accounts_uniquemenuitem WHERE name=%s)
+            # '''
+            # db_write(conn, menu_insert_query, key, key)
+            #
+
+
+            ''' *** Everything below this line shouuuuld be good *** '''
+            '''KEEP COMMENTED UNTIL DONE UPDATING NUTRITION IN PROD DATABASE'''
+            '''UNCOMMENT BELOW WHEN READY TO RESUME AUTOMATED SCRAPER'''
+
+            '''REMEMBER TO UPDATE SERVERLESS FUNCTION IN DIGITAL OCEAN'''
+            '''have to run some commands in terminal to deploy it'''
+            #
+            #
+            # # Insert all items to Daily Menu table
+            # at_y = 'Yahentamitsi' in self.total_menu[key].dining_halls
+            # at_south = 'South' in self.total_menu[key].dining_halls
+            # at_251 = '251' in self.total_menu[key].dining_halls
+            #
+            # # Get foreign key for menu item
+            # get_menu_item_query = '''
+            #     SELECT *
+            #     FROM accounts_uniquemenuitem
+            #     WHERE name=%s
+            # '''
+            #
+            # rows = db_select(conn, get_menu_item_query, key)
+            # menu_item_id = rows[0][0]
+            #
+            # daily_menu_insert_query = '''
+            #     INSERT INTO accounts_dailymenuitem
+            #         (menu_item_id, date, dh_y, dh_south, dh_251)
+            #     VALUES
+            #         (%s, %s, %s, %s, %s)
+            # '''
+            #
+            # db_write(conn, daily_menu_insert_query, menu_item_id, date.today(), at_y, at_south, at_251)
 
         return {'Completed': True}
+
+    def scrape_nutrition(self, nutrition_url) -> NutritionFacts:
+        page = requests.get(nutrition_url)
+        soup = BeautifulSoup(page.content, "html.parser")
+
+        # Check if nutrition for the item is not available
+        if soup.find('div', class_='labelnotavailable'):
+            return NutritionFacts(available=False)
+
+        rows = soup.findAll('table', class_='facts_table')[0].findAll('tr')
+
+        serving_size = rows[0].findAll('div', class_='nutfactsservsize')[1].text
+        calories = int(rows[0].findAll('p')[1].text)
+
+        fat = rows[1].findAll('span', class_='nutfactstopnutrient')[0].text
+        fat = float(fat.replace('Total Fat', '').replace('g', ''))
+
+        carbs = rows[1].findAll('span', class_='nutfactstopnutrient')[2].text
+        carbs = float(carbs.replace('Total Carbohydrate.', '').replace('g', ''))
+
+        protein = rows[5].findAll('span', class_='nutfactstopnutrient')[2].text
+        protein = float(protein.replace('Protein', '').replace('g', ''))
+
+        allergens_table = soup.findAll('table')[2]
+        allergens_list = allergens_table.findAll('span', class_='labelallergensvalue')[0].text.split(', ')
+
+        return NutritionFacts(protein, carbs, fat, calories, allergens_list, serving_size)
 
     def get_alerts(self, conn):
         """
@@ -289,7 +375,7 @@ class Item:
         names of the dining halls at which the item is being served
     """
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, nutrition_url: str, nutrition_facts: NutritionFacts = None):
         """
         Initializes Item object
 
@@ -297,6 +383,8 @@ class Item:
         """
         self.name = name
         self.dining_halls = []
+        self.nutrition_url = nutrition_url
+        self.nutrition = nutrition_facts
 
     def __str__(self):
         """

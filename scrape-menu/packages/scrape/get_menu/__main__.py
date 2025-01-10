@@ -8,26 +8,27 @@ TWO_FIFTY_ONE = "251"
 HALLS = {SOUTH: 16, YAHENTAMITSI: 19, TWO_FIFTY_ONE: 51}
 
 
-def main(args):
+def main():
     # the_y = DiningHall(name=YAHENTAMITSI, location_num=HALLS[YAHENTAMITSI])
     south = DiningHall(name=SOUTH, location_num=HALLS[SOUTH])
     # two_fifty_one = DiningHall(name=TWO_FIFTY_ONE, location_num=HALLS[TWO_FIFTY_ONE])
 
     # *** UNCOMMENT ENV VARS IN DB.PY AND SEND_EMAIL.PY ****
     # menu = Menu([the_y, south, two_fifty_one])
-    # menu.create_menu()
+    menu = Menu([south])
+    menu.create_menu()
 
-    # conn = connect()
-    # menu.update_db_menu(conn)
+    conn = connect()
+    menu.update_db_menu(conn)
     # menu.get_alerts(conn)
     # alerted_emails = menu.alert_users(conn)
-    # conn.close()
+    conn.close()
 
     # return {'Alert responses': str(alerted_emails)}
     return {'done'}
 
 
-main(None) # todo: delete line
+main()  # todo: delete line
 
 
 
