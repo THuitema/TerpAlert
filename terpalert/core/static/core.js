@@ -78,19 +78,21 @@ function checkAlertExists(input) {
             'name': input,
         },
         success: function (data) {
+            results = data.results
+
             $('#food-input').val('');
             $('#food-input').attr('placeholder', '')
             const result = document.getElementById('food-input-results') // $('#food-input-results');
-            console.log(data);
-            if (data.length == 1) { // data.found == true
+            console.log(results);
+            if (results.length == 1) { // data.found == true
                 var dining_halls = [];
-                if (data[0].dh_south) {
+                if (results[0].dh_south) {
                     dining_halls.push("South")
                 }
-                if (data[0].dh_251) {
+                if (results[0].dh_251) {
                     dining_halls.push("251")
                 }
-                if (data[0].dh_y) {
+                if (results[0].dh_y) {
                     dining_halls.push("Yahentamitsi")
                 }
                 result.innerHTML = '🚨 ' + input + ' is being served at ' + dining_halls.join(', ') + ' 🚨';
