@@ -1,5 +1,6 @@
 from accounts.models import Profile, DailyMenuItem, UniqueMenuItem, Alert, Allergen
-from accounts.serializers import DailyMenuItemSerializer, UniqueMenuItemSerializer, ProfileSerializer, AlertSerializer, AllergenSerializer, BadRequestSerializer
+from accounts.serializers import DailyMenuItemSerializer, UniqueMenuItemSerializer, ProfileSerializer, AlertSerializer, \
+    AllergenSerializer, BadRequestSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -11,13 +12,16 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.exceptions import NotAcceptable
 
-
 ''''
-*** MERGE WITH MAIN BRANCH AFTER FINISHING THE ABOVE ***
+Get more examples of API calls
+Screenshot array responses
+Example API call link for valid data
 
-Scrape nutrition macros: calories, protein, carbs, fats, allergens
-Convert ID's for Foods to UID
+*** MERGE WITH MAIN BRANCH AFTER FINISHING THE ABOVE ***
+REDEPLOY SERVERLESS FUNCTION
+
 Add fields for breakfast, lunch, dinner in daily menu. Update scraper
+^ don't need to manually run this (maybe to test i guess), but only needs to be run once a day & don't need past info
 '''
 
 
@@ -26,7 +30,12 @@ class BadRequest(NotAcceptable):
     default_detail = "Incorrect format for date parameter. Format needs to be YYYY-MM-DD."
 
 
-class UniqueMenuItemList(GenericAPIView):  #APIView
+class CustomPagination(PageNumberPagination):
+    page_size = 100
+    page_size_query_param = 'page_size'
+
+
+class UniqueMenuItemList(GenericAPIView):
     """
     /api/v1/items
     Get all menu items, sorted in alphabetical order
@@ -34,7 +43,7 @@ class UniqueMenuItemList(GenericAPIView):  #APIView
     """
 
     serializer_class = UniqueMenuItemSerializer
-    pagination_class = PageNumberPagination
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         search_term = self.request.query_params.get('term')
@@ -61,6 +70,20 @@ class UniqueMenuItemList(GenericAPIView):  #APIView
                 type=str,
                 description='Search menu for names containing term. All items returned if parameter not provided',
                 required=False,
+            ),
+            OpenApiParameter(
+                name='page_size',
+                type=int,
+                description='Set number of results per page',
+                default=100,
+                required=False,
+            ),
+            OpenApiParameter(
+                name='all',
+                type=bool,
+                description='If True, pagination is disabled and all results are returned',
+                default=False,
+                required=False,
             )
         ],
         responses={200: UniqueMenuItemSerializer},
@@ -69,48 +92,55 @@ class UniqueMenuItemList(GenericAPIView):  #APIView
                 name='response_valid',
                 status_codes=[200],
                 value={
-                    "id": 467,
-                    "name": "Banana",
-                    "calories": 100,
-                    "protein": 4,
-                    "carbs": 10,
-                    "fats": 1,
-                    "allergens": [],
-                    "serving_size": "1 each"
+                    "count": 630,
+                    "next": "https://terpalert.xyz/api/v1/items/?page=2",
+                    "previous": None,
+                    "results": [
+                        {
+                            "id": 119,
+                            "name": "Battered Wild Blue Catfish",
+                            "calories": 133,
+                            "protein": 17.4,
+                            "carbs": 9.1,
+                            "fats": 3.5,
+                            "allergens": [
+                                "Milk",
+                                "Wheat",
+                                "Fish"
+                            ],
+                            "serving_size": "4 oz"
+                        },
+                        {
+                            "id": 112,
+                            "name": "Amarillo Rice",
+                            "calories": 186,
+                            "protein": 4.9,
+                            "carbs": 39.0,
+                            "fats": 0.6,
+                            "allergens": [],
+                            "serving_size": "3 oz"
+                        }
+                    ]
+
                 }
             )
         ]
     )
     def get(self, request):
         queryset = self.get_queryset()
-        # Paginate the queryset
+
+        # Check if pagination disabled
+        if self.request.query_params.get('all') == 'True':
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+
         paginated_queryset = self.paginate_queryset(queryset)
         if paginated_queryset is not None:
-            # Serialize the paginated queryset and return the response
             serializer = self.get_serializer(paginated_queryset, many=True)
             return self.get_paginated_response(serializer.data)
 
-        # If pagination isn't applied, return all results
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-
-
-        # search_term = self.request.query_params.get('term')
-        # if search_term:
-        #     matching_items = UniqueMenuItem.objects.annotate(
-        #         order_by_position=Case(
-        #             When(name__istartswith=search_term, then=Value(1)),
-        #             When(name__icontains=search_term, then=Value(2)),
-        #             default=Value(3),
-        #             output_field=CharField(),
-        #         )
-        #     ).filter(name__icontains=search_term).order_by('order_by_position', 'name')
-        #     serializer = UniqueMenuItemSerializer(matching_items, many=True)
-        # else:
-        #     items = UniqueMenuItem.objects.all().order_by('name')
-        #     serializer = UniqueMenuItemSerializer(items, many=True)
-        #
-        # return Response(serializer.data)
 
 
 class DailyMenuItemList(GenericAPIView):
@@ -122,11 +152,8 @@ class DailyMenuItemList(GenericAPIView):
     date: Filter menu by date. Format is YYYY-MM-DD. Default is today
     """
 
-    '''
-    Convert this to GenericAPIView and implement pagination like UniqueItemList, update JS files and collectstatic
-    '''
     serializer_class = DailyMenuItemSerializer
-    pagination_class = PageNumberPagination
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         search_name = self.request.query_params.get('match_name')
@@ -134,14 +161,11 @@ class DailyMenuItemList(GenericAPIView):
         search_term = self.request.query_params.get('term')
 
         if not search_date:
-            search_date = date.today()  # '2024-06-03'
+            search_date = date.today()
 
         # Validate format of date parameter string
         if not re.search(r"^\d{4}-\d{2}-\d{2}", str(search_date)):
             return BadRequest()
-            # do you need to keep BadRequestSerializer?
-            # return Response({'detail': "Incorrect format for date parameter. Format needs to be YYYY-MM-DD."},
-            #                 status=status.HTTP_400_BAD_REQUEST)
 
         if search_term:
             queryset = DailyMenuItem.objects.annotate(
@@ -152,8 +176,6 @@ class DailyMenuItemList(GenericAPIView):
                     output_field=CharField(),
                 )
             ).filter(menu_item__name__icontains=search_term).order_by('order_by_position', 'menu_item__name')
-            # serializer = DailyMenuItemSerializer(matching_items, many=True)
-            # return Response(serializer.data)
             return queryset
 
         if search_name:
@@ -162,12 +184,6 @@ class DailyMenuItemList(GenericAPIView):
         else:
             queryset = DailyMenuItem.objects.filter(date=search_date).order_by('menu_item__name')
         return queryset
-        # if menu.exists():
-        #     serializer = DailyMenuItemSerializer(menu, many=True)
-        # else:
-        #     serializer = DailyMenuItemSerializer(None, many=True)
-        #
-        # return Response(serializer.data)
 
     @extend_schema(
         summary='Get Daily Menu Items',
@@ -191,6 +207,20 @@ class DailyMenuItemList(GenericAPIView):
                 description='Filter menu by date. Format is YYYY-MM-DD. Default is today',
                 style='YYYY-MM-DD',
                 required=False
+            ),
+            OpenApiParameter(
+                name='page_size',
+                type=int,
+                description='Set number of results per page',
+                default=100,
+                required=False,
+            ),
+            OpenApiParameter(
+                name='all',
+                type=bool,
+                description='If True, pagination is disabled and all results are returned',
+                default=False,
+                required=False,
             )
         ],
         responses={200: DailyMenuItemSerializer, 400: BadRequestSerializer},
@@ -204,74 +234,68 @@ class DailyMenuItemList(GenericAPIView):
                 name='response_valid',
                 status_codes=[200],
                 value={
-                    "id": 129,
-                    "menu_item": {
-                        "id": 54,
-                        "name": "Vanilla Ice Cream",
-                        "calories": 275,
-                        "protein": 6.5,
-                        "carbs": 2,
-                        "fats": 6.2,
-                        "allergens": ["Dairy"],
-                        "serving_size": "1 pint"
-                    },
-                    "date": "2019-08-24",
-                    "dh_y": True,
-                    "dh_south": False,
-                    "dh_251": True
+                    "count": 201,
+                    "next": "https://terpalert.xyz/api/v1/daily-items/?page=2",
+                    "previous": None,
+                    "results": [
+                        {
+                            "id": 465,
+                            "menu_item": {
+                                "id": 119,
+                                "name": "Battered Wild Blue Catfish",
+                                "calories": 133,
+                                "protein": 17.4,
+                                "carbs": 9.1,
+                                "fats": 3.5,
+                                "allergens": [
+                                    "Milk",
+                                    "Wheat",
+                                    "Fish"
+                                ],
+                                "serving_size": "4 oz"
+                            },
+                            "date": "2024-06-03",
+                            "dh_y": True,
+                            "dh_south": False,
+                            "dh_251": True
+                        },
+                        {
+                            "id": 572,
+                            "menu_item": {
+                                "id": 112,
+                                "name": "Amarillo Rice",
+                                "calories": 186,
+                                "protein": 4.9,
+                                "carbs": 39.0,
+                                "fats": 0.6,
+                                "allergens": [],
+                                "serving_size": "3 oz"
+                            },
+                            "date": "2024-06-03",
+                            "dh_y": True,
+                            "dh_south": True,
+                            "dh_251": True
+                        }
+                    ]
                 }
             )
         ]
     )
     def get(self, request):
         queryset = self.get_queryset()
-        # Paginate the queryset
+
+        # Check if pagination disabled
+        if self.request.query_params.get('all') == 'True':
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+
         paginated_queryset = self.paginate_queryset(queryset)
         if paginated_queryset is not None:
-            # Serialize the paginated queryset and return the response
             serializer = self.get_serializer(paginated_queryset, many=True)
             return self.get_paginated_response(serializer.data)
 
-        # If pagination isn't applied, return all results
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-
-
-        # search_name = self.request.query_params.get('match_name')
-        # search_date = self.request.query_params.get('date')
-        # search_term = self.request.query_params.get('term')
-        #
-        # if not search_date:
-        #     search_date = date.today()  # '2024-06-03'
-        #
-        # # Validate format of date parameter string
-        # if not re.search(r"^\d{4}-\d{2}-\d{2}", str(search_date)):
-        #     return Response({'detail': "Incorrect format for date parameter. Format needs to be YYYY-MM-DD."}, status=status.HTTP_400_BAD_REQUEST)
-        #
-        # if search_term:
-        #     matching_items = DailyMenuItem.objects.annotate(
-        #         order_by_position=Case(
-        #             When(menu_item__name__istartswith=search_term, then=Value(1)),
-        #             When(menu_item__name__icontains=search_term, then=Value(2)),
-        #             default=Value(3),
-        #             output_field=CharField(),
-        #         )
-        #     ).filter(menu_item__name__icontains=search_term).order_by('order_by_position', 'menu_item__name')
-        #     serializer = DailyMenuItemSerializer(matching_items, many=True)
-        #     return Response(serializer.data)
-        #
-        # if search_name:
-        #     item_id = UniqueMenuItem.objects.get(name=search_name).id
-        #     menu = DailyMenuItem.objects.filter(menu_item_id=item_id, date=search_date)
-        # else:
-        #     menu = DailyMenuItem.objects.filter(date=search_date).order_by('menu_item__name')
-        #
-        # if menu.exists():
-        #     serializer = DailyMenuItemSerializer(menu, many=True)
-        # else:
-        #     serializer = DailyMenuItemSerializer(None, many=True)
-        #
-        # return Response(serializer.data)
 
 
 class AllergenList(APIView):
