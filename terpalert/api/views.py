@@ -72,6 +72,20 @@ class UniqueMenuItemList(GenericAPIView):
                 type=str,
                 description='Search menu for names containing term. All items returned if parameter not provided',
                 required=False,
+            ),
+            OpenApiParameter(
+                name='page_size',
+                type=int,
+                description='Set number of results per page',
+                default=100,
+                required=False,
+            ),
+            OpenApiParameter(
+                name='all',
+                type=bool,
+                description='If True, pagination is disabled and all results are returned',
+                default=False,
+                required=False,
             )
         ],
         responses={200: UniqueMenuItemSerializer},
@@ -96,7 +110,7 @@ class UniqueMenuItemList(GenericAPIView):
         queryset = self.get_queryset()
 
         # Check if pagination disabled
-        if self.request.query_params.get('no_pagination') == 'True':
+        if self.request.query_params.get('all') == 'True':
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data)
 
@@ -173,6 +187,20 @@ class DailyMenuItemList(GenericAPIView):
                 description='Filter menu by date. Format is YYYY-MM-DD. Default is today',
                 style='YYYY-MM-DD',
                 required=False
+            ),
+            OpenApiParameter(
+                name='page_size',
+                type=int,
+                description='Set number of results per page',
+                default=100,
+                required=False,
+            ),
+            OpenApiParameter(
+                name='all',
+                type=bool,
+                description='If True, pagination is disabled and all results are returned',
+                default=False,
+                required=False,
             )
         ],
         responses={200: DailyMenuItemSerializer, 400: BadRequestSerializer},
@@ -209,7 +237,7 @@ class DailyMenuItemList(GenericAPIView):
         queryset = self.get_queryset()
 
         # Check if pagination disabled
-        if self.request.query_params.get('no_pagination') == 'True':
+        if self.request.query_params.get('all') == 'True':
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data)
 
