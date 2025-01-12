@@ -31,6 +31,11 @@ class BadRequest(NotAcceptable):
     default_detail = "Incorrect format for date parameter. Format needs to be YYYY-MM-DD."
 
 
+class CustomPagination(PageNumberPagination):
+    page_size = 100
+    page_size_query_param = 'page_size'
+
+
 class UniqueMenuItemList(GenericAPIView):
     """
     /api/v1/items
@@ -39,7 +44,7 @@ class UniqueMenuItemList(GenericAPIView):
     """
 
     serializer_class = UniqueMenuItemSerializer
-    pagination_class = PageNumberPagination
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         search_term = self.request.query_params.get('term')
@@ -88,6 +93,12 @@ class UniqueMenuItemList(GenericAPIView):
     )
     def get(self, request):
         queryset = self.get_queryset()
+
+        # Check if pagination disabled
+        if self.request.query_params.get('no_pagination') == 'True':
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+
         paginated_queryset = self.paginate_queryset(queryset)
         if paginated_queryset is not None:
             serializer = self.get_serializer(paginated_queryset, many=True)
@@ -107,7 +118,7 @@ class DailyMenuItemList(GenericAPIView):
     """
 
     serializer_class = DailyMenuItemSerializer
-    pagination_class = PageNumberPagination
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         search_name = self.request.query_params.get('match_name')
