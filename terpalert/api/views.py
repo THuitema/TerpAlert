@@ -1,5 +1,6 @@
 from accounts.models import Profile, DailyMenuItem, UniqueMenuItem, Alert, Allergen
-from accounts.serializers import DailyMenuItemSerializer, UniqueMenuItemSerializer, ProfileSerializer, AlertSerializer, AllergenSerializer, BadRequestSerializer
+from accounts.serializers import DailyMenuItemSerializer, UniqueMenuItemSerializer, ProfileSerializer, AlertSerializer, \
+    AllergenSerializer, BadRequestSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -11,13 +12,10 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.exceptions import NotAcceptable
 
-
 ''''
 Get more examples of API calls
 Screenshot array responses
 Example API call link for valid data
-Pagination query param to make optional & change page size
-
 
 *** MERGE WITH MAIN BRANCH AFTER FINISHING THE ABOVE ***
 REDEPLOY SERVERLESS FUNCTION
@@ -94,14 +92,36 @@ class UniqueMenuItemList(GenericAPIView):
                 name='response_valid',
                 status_codes=[200],
                 value={
-                    "id": 467,
-                    "name": "Banana",
-                    "calories": 100,
-                    "protein": 4,
-                    "carbs": 10,
-                    "fats": 1,
-                    "allergens": [],
-                    "serving_size": "1 each"
+                    "count": 630,
+                    "next": "https://terpalert.xyz/api/v1/items/?page=2",
+                    "previous": None,
+                    "results": [
+                        {
+                            "id": 119,
+                            "name": "Battered Wild Blue Catfish",
+                            "calories": 133,
+                            "protein": 17.4,
+                            "carbs": 9.1,
+                            "fats": 3.5,
+                            "allergens": [
+                                "Milk",
+                                "Wheat",
+                                "Fish"
+                            ],
+                            "serving_size": "4 oz"
+                        },
+                        {
+                            "id": 112,
+                            "name": "Amarillo Rice",
+                            "calories": 186,
+                            "protein": 4.9,
+                            "carbs": 39.0,
+                            "fats": 0.6,
+                            "allergens": [],
+                            "serving_size": "3 oz"
+                        }
+                    ]
+
                 }
             )
         ]
@@ -214,21 +234,49 @@ class DailyMenuItemList(GenericAPIView):
                 name='response_valid',
                 status_codes=[200],
                 value={
-                    "id": 129,
-                    "menu_item": {
-                        "id": 54,
-                        "name": "Vanilla Ice Cream",
-                        "calories": 275,
-                        "protein": 6.5,
-                        "carbs": 2,
-                        "fats": 6.2,
-                        "allergens": ["Dairy"],
-                        "serving_size": "1 pint"
-                    },
-                    "date": "2019-08-24",
-                    "dh_y": True,
-                    "dh_south": False,
-                    "dh_251": True
+                    "count": 201,
+                    "next": "https://terpalert.xyz/api/v1/daily-items/?page=2",
+                    "previous": None,
+                    "results": [
+                        {
+                            "id": 465,
+                            "menu_item": {
+                                "id": 119,
+                                "name": "Battered Wild Blue Catfish",
+                                "calories": 133,
+                                "protein": 17.4,
+                                "carbs": 9.1,
+                                "fats": 3.5,
+                                "allergens": [
+                                    "Milk",
+                                    "Wheat",
+                                    "Fish"
+                                ],
+                                "serving_size": "4 oz"
+                            },
+                            "date": "2024-06-03",
+                            "dh_y": True,
+                            "dh_south": False,
+                            "dh_251": True
+                        },
+                        {
+                            "id": 572,
+                            "menu_item": {
+                                "id": 112,
+                                "name": "Amarillo Rice",
+                                "calories": 186,
+                                "protein": 4.9,
+                                "carbs": 39.0,
+                                "fats": 0.6,
+                                "allergens": [],
+                                "serving_size": "3 oz"
+                            },
+                            "date": "2024-06-03",
+                            "dh_y": True,
+                            "dh_south": True,
+                            "dh_251": True
+                        }
+                    ]
                 }
             )
         ]
