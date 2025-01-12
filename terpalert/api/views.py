@@ -20,6 +20,7 @@ Pagination query param to make optional & change page size
 
 
 *** MERGE WITH MAIN BRANCH AFTER FINISHING THE ABOVE ***
+REDEPLOY SERVERLESS FUNCTION
 
 Add fields for breakfast, lunch, dinner in daily menu. Update scraper
 ^ don't need to manually run this (maybe to test i guess), but only needs to be run once a day & don't need past info
@@ -206,6 +207,12 @@ class DailyMenuItemList(GenericAPIView):
     )
     def get(self, request):
         queryset = self.get_queryset()
+
+        # Check if pagination disabled
+        if self.request.query_params.get('no_pagination') == 'True':
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+
         paginated_queryset = self.paginate_queryset(queryset)
         if paginated_queryset is not None:
             serializer = self.get_serializer(paginated_queryset, many=True)
