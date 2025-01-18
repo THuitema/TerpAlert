@@ -17,9 +17,9 @@ def main():
     menu.create_menu()
 
     conn = connect()
-    menu.update_db_menu(conn)
+    update_response = menu.update_db_menu(conn)
     menu.get_alerts(conn)
     alerted_emails = menu.alert_users(conn)
     conn.close()
 
-    return {'Alert responses': str(alerted_emails)}
+    return {'Menu updates': update_response, 'Alert responses': str(alerted_emails)}

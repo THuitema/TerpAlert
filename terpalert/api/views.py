@@ -12,18 +12,6 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.exceptions import NotAcceptable
 
-''''
-Get more examples of API calls
-Screenshot array responses
-Example API call link for valid data
-
-*** MERGE WITH MAIN BRANCH AFTER FINISHING THE ABOVE ***
-REDEPLOY SERVERLESS FUNCTION
-
-Add fields for breakfast, lunch, dinner in daily menu. Update scraper
-^ don't need to manually run this (maybe to test i guess), but only needs to be run once a day & don't need past info
-'''
-
 
 class BadRequest(NotAcceptable):
     status_code = status.HTTP_400_BAD_REQUEST

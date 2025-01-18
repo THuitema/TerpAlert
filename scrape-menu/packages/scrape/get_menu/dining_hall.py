@@ -141,6 +141,7 @@ class Menu:
         Insert new menu items to Menu table and all items to Daily Menu table
         :param conn: PostgreSQL database connection
         """
+        count = 0
         for key in self.total_menu.keys():
             insert_query = '''
                 INSERT INTO accounts_uniquemenuitem (name)
@@ -161,10 +162,12 @@ class Menu:
             response = db_select(conn, get_item_query, key)
             item_id = response[0][0]
 
-            # Check if current item has nutrition info added. Scrape nutrition info if not
+            # Check if current item has nutrition info added. Scrape nutrition info if missing
             if not response[0][2]:
                 nutrition = self.scrape_nutrition(self.total_menu[key].nutrition_url)
                 if nutrition.available:
+                    count += 1
+                    print('Nutrition for ' + key + ': ' + str(nutrition))
                     update_nutrition_query = '''
                         UPDATE accounts_uniquemenuitem
                         SET
@@ -189,20 +192,10 @@ class Menu:
                     # Insert allergens to DB
                     self.update_allergens(conn, item_id, nutrition.allergens)
 
-            # Insert all items to Daily Menu table
+            # Insert into Daily Menu table
             at_y = 'Yahentamitsi' in self.total_menu[key].dining_halls
             at_south = 'South' in self.total_menu[key].dining_halls
             at_251 = '251' in self.total_menu[key].dining_halls
-
-            # Get foreign key for menu item
-            # get_menu_item_query = '''
-            #     SELECT *
-            #     FROM accounts_uniquemenuitem
-            #     WHERE name=%s
-            # '''
-            #
-            # rows = db_select(conn, get_menu_item_query, key)
-            # menu_item_id = rows[0][0]
 
             daily_menu_insert_query = '''
                 INSERT INTO accounts_dailymenuitem
@@ -211,9 +204,9 @@ class Menu:
                     (%s, %s, %s, %s, %s)
             '''
 
-            db_write(conn, daily_menu_insert_query, item_id, date.today(), at_y, at_south, at_251) # menu_item_id
+            db_write(conn, daily_menu_insert_query, item_id, date.today(), at_y, at_south, at_251)
 
-        return {'Completed': True}
+        return {'Completed': True, 'Total items scraped': len(self.total_menu.keys()), 'Items with new nutrition': count}
 
     def update_allergens(self, conn, item_id, allergens):
         """
