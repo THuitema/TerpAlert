@@ -19,7 +19,7 @@ class UniqueMenuItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UniqueMenuItem
-        fields = ['id', 'name', 'calories', 'protein', 'carbs', 'fats', 'allergens', 'serving_size']
+        fields = ['id', 'name', 'calories', 'protein', 'carbs', 'fats', 'allergens', 'serving_size', 'ingredients']
 
     def get_allergens(self, obj) -> list[str]:
         allergens = Allergen.objects.filter(menuitemallergen__menu_item=obj)
