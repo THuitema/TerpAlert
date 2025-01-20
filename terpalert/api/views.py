@@ -28,6 +28,7 @@ class UniqueMenuItemList(GenericAPIView):
     /api/v1/items
     Get all menu items, sorted in alphabetical order
     term: Search menu by name. All items returned if parameter not provided
+    id: Search menu by id
     """
 
     serializer_class = UniqueMenuItemSerializer
@@ -35,6 +36,8 @@ class UniqueMenuItemList(GenericAPIView):
 
     def get_queryset(self):
         search_term = self.request.query_params.get('term')
+        search_id = self.request.query_params.get('id')
+
         if search_term:
             queryset = UniqueMenuItem.objects.annotate(
                 order_by_position=Case(
@@ -44,6 +47,8 @@ class UniqueMenuItemList(GenericAPIView):
                     output_field=CharField(),
                 )
             ).filter(name__icontains=search_term).order_by('order_by_position', 'name')
+        elif search_id:
+            queryset = UniqueMenuItem.objects.filter(id=search_id)
         else:
             queryset = UniqueMenuItem.objects.all().order_by('name')
 
@@ -57,6 +62,12 @@ class UniqueMenuItemList(GenericAPIView):
                 name='term',
                 type=str,
                 description='Search menu for names containing term. All items returned if parameter not provided',
+                required=False,
+            ),
+            OpenApiParameter(
+                name='id',
+                type=int,
+                description='Search menu for item id. Ignored if "term" is supplied',
                 required=False,
             ),
             OpenApiParameter(
@@ -136,6 +147,7 @@ class DailyMenuItemList(GenericAPIView):
     /api/v1/daily-items
     Get menu items for the specified date, sorted in alphabetical order
     term: Search menu for names containing term. If supplied, "match_name" is ignored.
+    id: Search menu by item id
     match_name: Search menu for exact match. Will return one or no matches.
     date: Filter menu by date. Format is YYYY-MM-DD. Default is today
     """
@@ -147,6 +159,7 @@ class DailyMenuItemList(GenericAPIView):
         search_name = self.request.query_params.get('match_name')
         search_date = self.request.query_params.get('date')
         search_term = self.request.query_params.get('term')
+        search_id = self.request.query_params.get('id')
 
         if not search_date:
             search_date = date.today()
@@ -168,7 +181,9 @@ class DailyMenuItemList(GenericAPIView):
 
         if search_name:
             item_id = UniqueMenuItem.objects.get(name=search_name).id
-            queryset = DailyMenuItem.objects.filter(menu_item_id=item_id, date=search_date)
+            queryset = DailyMenuItem.objects.filter(menu_item_id=item_id, date=search_date).order_by('menu_item__name')
+        elif search_id:
+            queryset = DailyMenuItem.objects.filter(menu_item_id=search_id, date=search_date).order_by('menu_item__name')
         else:
             queryset = DailyMenuItem.objects.filter(date=search_date).order_by('menu_item__name')
         return queryset
@@ -187,6 +202,12 @@ class DailyMenuItemList(GenericAPIView):
                 name='match_name',
                 type=str,
                 description='Search menu for exact match on a name. Returns one result if match, none otherwise.',
+                required=False
+            ),
+            OpenApiParameter(
+                name='id',
+                type=int,
+                description='Search menu for item id. Ignored if "term" is supplied',
                 required=False
             ),
             OpenApiParameter(
