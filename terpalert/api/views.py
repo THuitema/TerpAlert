@@ -107,7 +107,8 @@ class UniqueMenuItemList(GenericAPIView):
                                 "Wheat",
                                 "Fish"
                             ],
-                            "serving_size": "4 oz"
+                            "serving_size": "4 oz",
+                            "ingredients": "...",
                         },
                         {
                             "id": 112,
@@ -117,7 +118,8 @@ class UniqueMenuItemList(GenericAPIView):
                             "carbs": 39.0,
                             "fats": 0.6,
                             "allergens": [],
-                            "serving_size": "3 oz"
+                            "serving_size": "3 oz",
+                            "ingredients": "...",
                         }
                     ]
 
@@ -261,7 +263,8 @@ class DailyMenuItemList(GenericAPIView):
                                     "Wheat",
                                     "Fish"
                                 ],
-                                "serving_size": "4 oz"
+                                "serving_size": "4 oz",
+                                "ingredients": "...",
                             },
                             "date": "2024-06-03",
                             "dh_y": True,
@@ -278,7 +281,8 @@ class DailyMenuItemList(GenericAPIView):
                                 "carbs": 39.0,
                                 "fats": 0.6,
                                 "allergens": [],
-                                "serving_size": "3 oz"
+                                "serving_size": "3 oz",
+                                "ingredients": "...",
                             },
                             "date": "2024-06-03",
                             "dh_y": True,
