@@ -11,18 +11,19 @@ MENU_CLASS = "menu-item-name"
 
 
 class NutritionFacts:
-    def __init__(self, protein=0.0, carbs=0.0, fat=0.0, calories=0.0, allergens=list[str], serving_size='', available=True):
+    def __init__(self, protein=0.0, carbs=0.0, fat=0.0, calories=0.0, allergens=list[str], serving_size='', ingredients='', available=True):
         self.protein = protein
         self.carbs = carbs
         self.fat = fat
         self.calories = calories
         self.allergens = allergens
         self.serving_size = serving_size
+        self.ingredients = ingredients
         self.available = available
 
     def __str__(self):
         if self.available:
-            return f"Cals: {self.calories}, P: {self.protein}, C: {self.carbs}, F: {self.fat}, Serving Size: {self.serving_size}, Allergens: {self.allergens}"
+            return f"Cals: {self.calories}, P: {self.protein}, C: {self.carbs}, F: {self.fat}, Serving Size: {self.serving_size}, Allergens: {self.allergens}, Ingredients: {self.ingredients}"
         return "Nutrition facts not available"
 
 
@@ -175,7 +176,8 @@ class Menu:
                             carbs = %s,
                             fats = %s,
                             protein = %s,
-                            serving_size = %s
+                            serving_size = %s,
+                            ingredients = %s
                         WHERE name = %s
                     '''
                     db_write(
@@ -186,6 +188,7 @@ class Menu:
                         nutrition.fat,
                         nutrition.protein,
                         nutrition.serving_size,
+                        nutrition.ingredients,
                         key
                     )
 
@@ -273,11 +276,17 @@ class Menu:
         allergens_table = soup.findAll('table')[2]
         allergens_list = allergens_table.findAll('span', class_='labelallergensvalue')[0].text.split(', ')
 
+        ingredients = soup.find('span', class_='labelingredientsvalue').text
+
+        # Cap length of ingredients to 1024 characters
+        if len(ingredients) > 1024:
+            ingredients = ingredients[:1024]
+
         # No allergens scraped
         if allergens_list[0] == '':
             allergens_list = []
 
-        return NutritionFacts(protein, carbs, fat, calories, allergens_list, serving_size)
+        return NutritionFacts(protein, carbs, fat, calories, allergens_list, serving_size, ingredients)
 
     def get_alerts(self, conn):
         """
