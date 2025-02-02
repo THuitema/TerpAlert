@@ -19,9 +19,10 @@ async function loadMenu() {
 /**
  * When the window is loaded, display the user's alerts in a table
  */
-window.onload = async function () {
+window.onload = () => {
     // Cache menu for autocomplete to use
-    menu = await loadMenu();
+    menu = loadMenu();
+    console.log("menu:", menu);
 
     alertTableBody = document.getElementById('alert-table-body');
     if (alertTableBody != null) {
