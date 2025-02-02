@@ -1,9 +1,28 @@
 let alertTableBody;
+let menu;
+
+// Return list of menu item names for the autocomplete in search
+async function loadMenu() {
+    try {
+        const response = await fetch('/api/v1/items/?' + new URLSearchParams({all: 'True'}).toString());
+        const data = await response.json();
+
+        // Return list of menu item names
+        const names = data.map(item => item.name);
+        return names;
+    } catch (error) {
+        console.error('Error fetching menu:', error);
+        return []; // Return an empty array on error
+    }
+}
 
 /**
  * When the window is loaded, display the user's alerts in a table
  */
-window.onload = function () {
+window.onload = async function () {
+    // Cache menu for autocomplete to use
+    menu = await loadMenu();
+
     alertTableBody = document.getElementById('alert-table-body');
     if (alertTableBody != null) {
         getAlerts();
@@ -142,7 +161,7 @@ function addAlert(button) {
     // Autocomplete dropdown for input
     $('#alert-input').autocomplete({
         // Sends an Ajax request to gather menu items matching user's input
-        source: getMenu,
+        source: menu, // getMenu
         // Bold characters in results that match search term (case-insensitive)
         open: function (event, ui) {
             const data = $(this).data('ui-autocomplete');
@@ -165,46 +184,46 @@ function addAlert(button) {
     });
 }
 
-/**
- * Sends an Ajax request to get relevant menu items based on the search term
- * @param request Contains the search term from the user
- * @param response Callback function to send labels and values to the autocomplete menu
- */
-function getMenu(request, response) {
-    // return $.ajax({
-    //     type: 'GET',
-    //     url: '/accounts/load-menu/',
-    //     data: {
-    //         'term': request.term,
-    //     },
-    //     success: function (data) {
-    //         let results = $.map(data.data, function (value, key) {
-    //             return {
-    //                 label: value.label, // label and value is the name of the menu item
-    //                 value: value.label
-    //             }
-    //         });
-    //         response(results.slice(0, 10)); // limit to 10 results
-    //     }
-    // })
-    return $.ajax({
-        type: 'GET',
-        url: '/api/v1/items/',  // /accounts/load-menu/
-        data: {
-            'term': request.term,
-        },
-        success: function (data) {
-            console.log("value:", "key:");
-            let results = $.map(data.results, function (value, key) {
-                return {
-                    label: value.name, // value.label  //label and value is the name of the menu item
-                    value: value.name  // value.label
-                }
-            });
-            response(results.slice(0, 10)); // limit to 10 results
-        }
-    })
-}
+// /**
+//  * Sends an Ajax request to get relevant menu items based on the search term
+//  * @param request Contains the search term from the user
+//  * @param response Callback function to send labels and values to the autocomplete menu
+//  */
+// function getMenu(request, response) {
+//     // return $.ajax({
+//     //     type: 'GET',
+//     //     url: '/accounts/load-menu/',
+//     //     data: {
+//     //         'term': request.term,
+//     //     },
+//     //     success: function (data) {
+//     //         let results = $.map(data.data, function (value, key) {
+//     //             return {
+//     //                 label: value.label, // label and value is the name of the menu item
+//     //                 value: value.label
+//     //             }
+//     //         });
+//     //         response(results.slice(0, 10)); // limit to 10 results
+//     //     }
+//     // })
+//     return $.ajax({
+//         type: 'GET',
+//         url: '/api/v1/items/',  // /accounts/load-menu/
+//         data: {
+//             'term': request.term,
+//         },
+//         success: function (data) {
+//             console.log("value:", "key:");
+//             let results = $.map(data.results, function (value, key) {
+//                 return {
+//                     label: value.name, // value.label  //label and value is the name of the menu item
+//                     value: value.name  // value.label
+//                 }
+//             });
+//             response(results.slice(0, 10)); // limit to 10 results
+//         }
+//     })
+// }
 
 /**
  * Sends an Ajax request to save the alert entered by the user
