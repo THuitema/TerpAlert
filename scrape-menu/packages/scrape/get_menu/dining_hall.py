@@ -163,8 +163,8 @@ class Menu:
             response = db_select(conn, get_item_query, key)
             item_id = response[0][0]
 
-            # Check if current item has nutrition info added. Scrape nutrition info if missing
-            if not response[0][2]:
+            # Scrape nutrition info if missing
+            if not response[0][2] or not response[0][7]:
                 nutrition = self.scrape_nutrition(self.total_menu[key].nutrition_url)
                 if nutrition.available:
                     count += 1
