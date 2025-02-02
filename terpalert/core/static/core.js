@@ -25,10 +25,15 @@ async function loadMenu() {
 /**
  * Apply autocomplete functionality to search bar
  */
-window.onload = () => {
+window.onload = async function () {
     // Cache menu for autocomplete to use
-    const menu = loadMenu();
-    console.log("menu:", menu);
+    try {
+        menu = await loadMenu(); // Call your async function
+        console.log(menu); // Do something with the result
+    } catch (error) {
+        menu = []
+        console.error(error); // Handle any errors
+    }
 
     // Autocomplete
     $('#food-input').autocomplete({
