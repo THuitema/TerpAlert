@@ -6,6 +6,7 @@ let placeholder = "";
 const txt = "Old Fashioned Texas Fried Chicken";
 let speed = 45;
 let cursorOn = false;
+let menu = [];
 
 // Return list of menu item names for the autocomplete in search
 async function loadMenu() {
@@ -25,44 +26,47 @@ async function loadMenu() {
 /**
  * Apply autocomplete functionality to search bar
  */
-window.onload = async function () {
-    // Cache menu for autocomplete to use
-    try {
-        menu = await loadMenu(); // Call your async function
-        console.log(menu); // Do something with the result
-    } catch (error) {
-        menu = []
-        console.error(error); // Handle any errors
-    }
+window.onload = () => {
+    // Cache menu for autocomplete to use and create autocomplete
+    (async function () {
+        try {
+            menu = await loadMenu(); // Call your async function
+            console.log(menu); // Do something with the result
+        } catch (error) {
+            menu = []
+            console.error(error); // Handle any errors
+        }
 
-    // Autocomplete
-    $('#food-input').autocomplete({
-        // Sends an Ajax request to gather menu items matching user's input
-        source: menu, // getMenu,
-        // Bold characters in results that match search term (case-insensitive)
-        open: function (event, ui) {
-            const data = $(this).data('ui-autocomplete');
-            data.menu.element.find('li').each(function () {
-                const me = $(this);
-                const keywords = data.term.split(' ').join('|');
-                let textWrapper = me.find('.ui-menu-item-wrapper');
-                let text = textWrapper.text();
-                let newTextHtml = text.replace(new RegExp("(" + keywords + ")", "gi"), '<b>$1</b>');
-                textWrapper.html(newTextHtml);
-            });
-        },
-        // Check if item is being served today, when selected
-        select: function (event, ui) {
-            const input = $('#food-input');
-            input.val(ui.item.label);
-            checkAlertExists(input.val());
-        },
-        delay: 200,
-        minLength: 1,
-    })
+        // Autocomplete
+        console.log(menu);
+        $('#food-input').autocomplete({
+            // Sends an Ajax request to gather menu items matching user's input
+            source: menu, // getMenu,
+            // Bold characters in results that match search term (case-insensitive)
+            open: function (event, ui) {
+                const data = $(this).data('ui-autocomplete');
+                data.menu.element.find('li').each(function () {
+                    const me = $(this);
+                    const keywords = data.term.split(' ').join('|');
+                    let textWrapper = me.find('.ui-menu-item-wrapper');
+                    let text = textWrapper.text();
+                    let newTextHtml = text.replace(new RegExp("(" + keywords + ")", "gi"), '<b>$1</b>');
+                    textWrapper.html(newTextHtml);
+                });
+            },
+            // Check if item is being served today, when selected
+            select: function (event, ui) {
+                const input = $('#food-input');
+                input.val(ui.item.label);
+                checkAlertExists(input.val());
+            },
+            delay: 200,
+            minLength: 1,
+        })
 
-    // Animate search bar placeholder
-    animatePlaceholder();
+        // Animate search bar placeholder
+        animatePlaceholder();
+    })();
 }
 
 

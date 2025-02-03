@@ -1,5 +1,5 @@
 let alertTableBody;
-let menu;
+let menu = [];
 
 // Return list of menu item names for the autocomplete in search
 async function loadMenu() {
@@ -19,15 +19,17 @@ async function loadMenu() {
 /**
  * When the window is loaded, display the user's alerts in a table
  */
-window.onload = async function () {
+window.onload = () => {
     // Cache menu for autocomplete to use
-    try {
-        menu = await loadMenu(); // Call your async function
-        console.log(menu); // Do something with the result
-    } catch (error) {
-        menu = []
-        console.error(error); // Handle any errors
-    }
+    (async function () {
+        try {
+            menu = await loadMenu(); // Call your async function
+            console.log(menu); // Do something with the result
+        } catch (error) {
+            menu = []
+            console.error(error); // Handle any errors
+        }
+    })();
 
     alertTableBody = document.getElementById('alert-table-body');
     if (alertTableBody != null) {
