@@ -165,7 +165,11 @@ class Menu:
 
             # Scrape nutrition info if missing
             if not response[0][2] or not response[0][7]:
-                nutrition = self.scrape_nutrition(self.total_menu[key].nutrition_url)
+                if not response[0][7]:
+                    nutrition = self.scrape_nutrition(self.total_menu[key].nutrition_url, scrape_allergens=True)
+                else:
+                    nutrition = self.scrape_nutrition(self.total_menu[key].nutrition_url)
+
                 if nutrition.available:
                     count += 1
                     print('Nutrition for ' + key + ': ' + str(nutrition))
@@ -193,7 +197,8 @@ class Menu:
                     )
 
                     # Insert allergens to DB
-                    self.update_allergens(conn, item_id, nutrition.allergens)
+                    if not response[0][7]:
+                        self.update_allergens(conn, item_id, nutrition.allergens)
 
             # Insert into Daily Menu table
             at_y = 'Yahentamitsi' in self.total_menu[key].dining_halls
@@ -247,10 +252,11 @@ class Menu:
             '''
             db_write(conn, insert_link_query, allergen_id, item_id)
 
-    def scrape_nutrition(self, nutrition_url) -> NutritionFacts:
+    def scrape_nutrition(self, nutrition_url, scrape_allergens=False) -> NutritionFacts:
         """
         Scrape nutrition facts given the URL
         :param nutrition_url: URL string
+        :param scrape_allergens: Boolean, if True, scrape allergens field
         """
         page = requests.get(nutrition_url)
         soup = BeautifulSoup(page.content, "html.parser")
@@ -273,18 +279,20 @@ class Menu:
         protein = rows[5].findAll('span', class_='nutfactstopnutrient')[2].text
         protein = float(protein.replace('Protein', '').replace('g', ''))
 
-        allergens_table = soup.findAll('table')[2]
-        allergens_list = allergens_table.findAll('span', class_='labelallergensvalue')[0].text.split(', ')
+        if scrape_allergens:
+            allergens_table = soup.findAll('table')[2]
+            allergens_list = allergens_table.findAll('span', class_='labelallergensvalue')[0].text.split(', ')
+
+            if allergens_list[0] == '':
+                allergens_list = []
+        else:
+            allergens_list = []
 
         ingredients = soup.find('span', class_='labelingredientsvalue').text
 
         # Cap length of ingredients to 1024 characters
         if len(ingredients) > 1024:
             ingredients = ingredients[:1024]
-
-        # No allergens scraped
-        if allergens_list[0] == '':
-            allergens_list = []
 
         return NutritionFacts(protein, carbs, fat, calories, allergens_list, serving_size, ingredients)
 
