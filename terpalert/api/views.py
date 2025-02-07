@@ -37,6 +37,7 @@ class UniqueMenuItemList(GenericAPIView):
     def get_queryset(self):
         search_term = self.request.query_params.get('term')
         search_id = self.request.query_params.get('id')
+        count = self.request.query_params.get('count')
 
         if search_term:
             queryset = UniqueMenuItem.objects.annotate(
@@ -51,6 +52,9 @@ class UniqueMenuItemList(GenericAPIView):
             queryset = UniqueMenuItem.objects.filter(id=search_id)
         else:
             queryset = UniqueMenuItem.objects.all().order_by('name')
+
+        if count:
+            return queryset[:int(count)]
 
         return queryset
 
@@ -82,6 +86,12 @@ class UniqueMenuItemList(GenericAPIView):
                 type=bool,
                 description='If True, pagination is disabled and all results are returned',
                 default=False,
+                required=False,
+            ),
+            OpenApiParameter(
+                name='count',
+                type=int,
+                description='Set the number of results to return. Pagination is disabled if set.',
                 required=False,
             )
         ],
@@ -131,7 +141,7 @@ class UniqueMenuItemList(GenericAPIView):
         queryset = self.get_queryset()
 
         # Check if pagination disabled
-        if self.request.query_params.get('all') == 'True':
+        if self.request.query_params.get('all') == 'True' or self.request.query_params.get('count'):
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data)
 
