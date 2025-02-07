@@ -9,66 +9,112 @@ let cursorOn = false;
 let menu = [];
 
 // Return list of menu item names for the autocomplete in search
-async function loadMenu() {
-    try {
-        const response = await fetch('/api/v1/items/?' + new URLSearchParams({all: 'True'}).toString());
-        const data = await response.json();
-
-        // Return list of menu item names
-        const names = data.map(item => item.name);
-        return names;
-    } catch (error) {
-        console.error('Error fetching menu:', error);
-        return []; // Return an empty array on error
-    }
-}
+// async function loadMenu() {
+//     try {
+//         const response = await fetch('/api/v1/items/?' + new URLSearchParams({all: 'True'}).toString());
+//         const data = await response.json();
+//
+//         // Return list of menu item names
+//         const names = data.map(item => item.name);
+//         return names;
+//     } catch (error) {
+//         console.error('Error fetching menu:', error);
+//         return []; // Return an empty array on error
+//     }
+// }
 
 /**
  * Apply autocomplete functionality to search bar
  */
-window.onload = () => {
+window.onload = function () {
     // Cache menu for autocomplete to use and create autocomplete
-    (async function () {
-        try {
-            menu = await loadMenu(); // Call your async function
-            console.log(menu); // Do something with the result
-        } catch (error) {
-            menu = []
-            console.error(error); // Handle any errors
-        }
-
-        // Autocomplete
-        console.log(menu);
-        $('#food-input').autocomplete({
-            // Sends an Ajax request to gather menu items matching user's input
-            source: menu, // getMenu,
-            // Bold characters in results that match search term (case-insensitive)
-            open: function (event, ui) {
-                const data = $(this).data('ui-autocomplete');
-                data.menu.element.find('li').each(function () {
-                    const me = $(this);
-                    const keywords = data.term.split(' ').join('|');
-                    let textWrapper = me.find('.ui-menu-item-wrapper');
-                    let text = textWrapper.text();
-                    let newTextHtml = text.replace(new RegExp("(" + keywords + ")", "gi"), '<b>$1</b>');
-                    textWrapper.html(newTextHtml);
-                });
-            },
-            // Check if item is being served today, when selected
-            select: function (event, ui) {
-                const input = $('#food-input');
-                input.val(ui.item.label);
-                checkAlertExists(input.val());
-            },
-            delay: 200,
-            minLength: 1,
+    // (async function () {
+    //     try {
+    //         menu = await loadMenu(); // Call your async function
+    //         console.log(menu); // Do something with the result
+    //     } catch (error) {
+    //         menu = []
+    //         console.error(error); // Handle any errors
+    //     }
+    //
+    //
+    // })();
+    // Autocomplete
+    console.log('Initializing autocomplete...');
+    loadMenu()
+        .then(() => {
+            console.log('Menu:', menu);
+            initializeAutocomplete();
         })
+        .catch(error => {
+            console.log('Failed to initialize autocomplete:', error)
+        });
 
-        // Animate search bar placeholder
-        animatePlaceholder();
-    })();
+
+    // Animate search bar placeholder
+    console.log('Initializing autocomplete uhhh...');
+
+    animatePlaceholder();
 }
 
+function initializeAutocomplete() {
+    $('#food-input').autocomplete({
+        // Sends an Ajax request to gather menu items matching user's input
+        source: menu,
+        // Bold characters in results that match search term (case-insensitive)
+        open: function (event, ui) {
+            const data = $(this).data('ui-autocomplete');
+            data.menu.element.find('li').each(function () {
+                const me = $(this);
+                const keywords = data.term.split(' ').join('|');
+                let textWrapper = me.find('.ui-menu-item-wrapper');
+                let text = textWrapper.text();
+                let newTextHtml = text.replace(new RegExp("(" + keywords + ")", "gi"), '<b>$1</b>');
+                textWrapper.html(newTextHtml);
+            });
+        },
+        // Check if item is being served today, when selected
+        select: function (event, ui) {
+            const input = $('#food-input');
+            input.val(ui.item.label);
+            checkAlertExists(input.val());
+        },
+        delay: 200,
+        minLength: 1,
+    })
+}
+
+function loadMenu() {
+    // try {
+    //     const response = await fetch('/api/v1/items/?' + new URLSearchParams({all: 'True'}).toString());
+    //     const data = await response.json();
+    //
+    //     // Return list of menu item names
+    //     const names = data.map(item => item.name);
+    //     return names;
+    // } catch (error) {
+    //     console.error('Error fetching menu:', error);
+    //     return []; // Return an empty array on error
+    // }
+    return new Promise((resolve, reject) => {
+        fetch('/api/v1/items/?' + new URLSearchParams({all: 'True'}).toString())
+            .then(response => response.json())
+            .then(data => {
+                menu = data.map(item => item.name);
+                console.log('Menu data loaded successfully', menu)
+                resolve();
+            })
+            .catch(error => {
+                console.error('Error loading menu data:', error);
+                reject(error);
+            });
+    });
+}
+
+// Preload data when the page loads
+// window.addEventListener('load', () => {
+//     loadMenu();
+// });
 
 // /**
 //  * Sends an Ajax request to get relevant menu items based on the search term
