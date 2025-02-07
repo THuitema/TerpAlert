@@ -6,7 +6,7 @@ let placeholder = "";
 const txt = "Old Fashioned Texas Fried Chicken";
 let speed = 45;
 let cursorOn = false;
-let menu = [];
+// let menu = [];
 
 // Return list of menu item names for the autocomplete in search
 // async function loadMenu() {
@@ -41,26 +41,36 @@ window.onload = function () {
     // })();
     // Autocomplete
     console.log('Initializing autocomplete...');
-    loadMenu()
-        .then(() => {
-            console.log('Menu:', menu);
-            initializeAutocomplete();
-        })
-        .catch(error => {
-            console.log('Failed to initialize autocomplete:', error)
-        });
+    initializeAutocomplete();
+    // loadMenu()
+    //     .then(() => {
+    //         console.log('Menu:', menu);
+    //         initializeAutocomplete();
+    //     })
+    //     .catch(error => {
+    //         console.log('Failed to initialize autocomplete:', error)
+    //     });
 
+    console.log('Done initializing autocomplete uhhh...');
 
     // Animate search bar placeholder
-    console.log('Initializing autocomplete uhhh...');
-
     animatePlaceholder();
 }
 
 function initializeAutocomplete() {
     $('#food-input').autocomplete({
-        // Sends an Ajax request to gather menu items matching user's input
-        source: menu,
+        source: function (request, response) {
+            // You can fetch data from your server using AJAX or use a static array
+            $.ajax({
+                url: '/api/v1/items/?' + new URLSearchParams({count: '10', term: request.term}).toString(),
+                dataType: 'json', // Expected response type
+                success: function (data) {
+                    let menu = data.map(item => item.name);
+                    console.log('Menu data loaded successfully', menu)
+                    response(menu);
+                }
+            });
+        },
         // Bold characters in results that match search term (case-insensitive)
         open: function (event, ui) {
             const data = $(this).data('ui-autocomplete');
@@ -84,32 +94,32 @@ function initializeAutocomplete() {
     })
 }
 
-function loadMenu() {
-    // try {
-    //     const response = await fetch('/api/v1/items/?' + new URLSearchParams({all: 'True'}).toString());
-    //     const data = await response.json();
-    //
-    //     // Return list of menu item names
-    //     const names = data.map(item => item.name);
-    //     return names;
-    // } catch (error) {
-    //     console.error('Error fetching menu:', error);
-    //     return []; // Return an empty array on error
-    // }
-    return new Promise((resolve, reject) => {
-        fetch('/api/v1/items/?' + new URLSearchParams({all: 'True'}).toString())
-            .then(response => response.json())
-            .then(data => {
-                menu = data.map(item => item.name);
-                console.log('Menu data loaded successfully', menu)
-                resolve();
-            })
-            .catch(error => {
-                console.error('Error loading menu data:', error);
-                reject(error);
-            });
-    });
-}
+// function loadMenu(request, response) {
+//     // try {
+//     //     const response = await fetch('/api/v1/items/?' + new URLSearchParams({all: 'True'}).toString());
+//     //     const data = await response.json();
+//     //
+//     //     // Return list of menu item names
+//     //     const names = data.map(item => item.name);
+//     //     return names;
+//     // } catch (error) {
+//     //     console.error('Error fetching menu:', error);
+//     //     return []; // Return an empty array on error
+//     // }
+//
+//     fetch('/api/v1/items/?' + new URLSearchParams({count: '10', term: request.term}).toString())
+//         .then(response => response.json())
+//         .then(data => {
+//             let menu = data.map(item => item.name);
+//             console.log('Menu data loaded successfully', menu)
+//             response(menu);
+//         })
+//         .catch(error => {
+//             console.error('Error loading menu data:', error);
+//             response(error);
+//         });
+//
+// }
 
 // Preload data when the page loads
 // window.addEventListener('load', () => {
