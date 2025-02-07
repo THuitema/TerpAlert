@@ -6,67 +6,23 @@ let placeholder = "";
 const txt = "Old Fashioned Texas Fried Chicken";
 let speed = 45;
 let cursorOn = false;
-// let menu = [];
-
-// Return list of menu item names for the autocomplete in search
-// async function loadMenu() {
-//     try {
-//         const response = await fetch('/api/v1/items/?' + new URLSearchParams({all: 'True'}).toString());
-//         const data = await response.json();
-//
-//         // Return list of menu item names
-//         const names = data.map(item => item.name);
-//         return names;
-//     } catch (error) {
-//         console.error('Error fetching menu:', error);
-//         return []; // Return an empty array on error
-//     }
-// }
 
 /**
  * Apply autocomplete functionality to search bar
  */
 window.onload = function () {
-    // Cache menu for autocomplete to use and create autocomplete
-    // (async function () {
-    //     try {
-    //         menu = await loadMenu(); // Call your async function
-    //         console.log(menu); // Do something with the result
-    //     } catch (error) {
-    //         menu = []
-    //         console.error(error); // Handle any errors
-    //     }
-    //
-    //
-    // })();
-    // Autocomplete
-    console.log('Initializing autocomplete...');
     initializeAutocomplete();
-    // loadMenu()
-    //     .then(() => {
-    //         console.log('Menu:', menu);
-    //         initializeAutocomplete();
-    //     })
-    //     .catch(error => {
-    //         console.log('Failed to initialize autocomplete:', error)
-    //     });
-
-    console.log('Done initializing autocomplete uhhh...');
-
-    // Animate search bar placeholder
     animatePlaceholder();
 }
 
 function initializeAutocomplete() {
     $('#food-input').autocomplete({
         source: function (request, response) {
-            // You can fetch data from your server using AJAX or use a static array
             $.ajax({
                 url: '/api/v1/items/?' + new URLSearchParams({count: '10', term: request.term}).toString(),
-                dataType: 'json', // Expected response type
+                dataType: 'json',
                 success: function (data) {
                     let menu = data.map(item => item.name);
-                    console.log('Menu data loaded successfully', menu)
                     response(menu);
                 }
             });
@@ -94,63 +50,6 @@ function initializeAutocomplete() {
     })
 }
 
-// function loadMenu(request, response) {
-//     // try {
-//     //     const response = await fetch('/api/v1/items/?' + new URLSearchParams({all: 'True'}).toString());
-//     //     const data = await response.json();
-//     //
-//     //     // Return list of menu item names
-//     //     const names = data.map(item => item.name);
-//     //     return names;
-//     // } catch (error) {
-//     //     console.error('Error fetching menu:', error);
-//     //     return []; // Return an empty array on error
-//     // }
-//
-//     fetch('/api/v1/items/?' + new URLSearchParams({count: '10', term: request.term}).toString())
-//         .then(response => response.json())
-//         .then(data => {
-//             let menu = data.map(item => item.name);
-//             console.log('Menu data loaded successfully', menu)
-//             response(menu);
-//         })
-//         .catch(error => {
-//             console.error('Error loading menu data:', error);
-//             response(error);
-//         });
-//
-// }
-
-// Preload data when the page loads
-// window.addEventListener('load', () => {
-//     loadMenu();
-// });
-
-// /**
-//  * Sends an Ajax request to get relevant menu items based on the search term
-//  * @param request Contains the search term from the user
-//  * @param response Callback function to send labels and values to the autocomplete menu
-//  */
-// function getMenu(request, response) {
-//     return $.ajax({
-//         type: 'GET',
-//         url: '/api/v1/items/',
-//         data: {
-//             'term': request.term,
-//         },
-//         success: function (data) {
-//             console.log("value:", "key:");
-//             let results = $.map(data.results, function (value, key) {
-//                 return {
-//                     label: value.name,
-//                     value: value.name
-//                 }
-//             });
-//             response(results.slice(0, 10)); // limit to 10 results
-//         }
-//     })
-// }
-
 /**
  * Sends an Ajax request to check if item is being served today, and renders the appropriate response
  * @param input Search term
@@ -158,7 +57,7 @@ function initializeAutocomplete() {
 function checkAlertExists(input) {
     $.ajax({
         type: 'GET',
-        url: '/api/v1/daily-items/',  //'/check-for-alert',
+        url: '/api/v1/daily-items/',
         data: {
             'name': input,
         },
@@ -167,7 +66,7 @@ function checkAlertExists(input) {
 
             $('#food-input').val('');
             $('#food-input').attr('placeholder', '')
-            const result = document.getElementById('food-input-results') // $('#food-input-results');
+            const result = document.getElementById('food-input-results')
             console.log(results);
             if (results.length == 1) { // data.found == true
                 var dining_halls = [];
