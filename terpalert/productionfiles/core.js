@@ -57,33 +57,57 @@ function initializeAutocomplete() {
 function checkAlertExists(input) {
     $.ajax({
         type: 'GET',
-        url: '/api/v1/daily-items/',
+        url: '/api/v1/daily-items',
         data: {
-            'name': input,
+            'match_name': input,
         },
         success: function (data) {
-            results = data.results
+            let results = data.results
 
             $('#food-input').val('');
             $('#food-input').attr('placeholder', '')
             const result = document.getElementById('food-input-results')
-            console.log(results);
-            if (results.length == 1) { // data.found == true
-                var dining_halls = [];
+
+            let dh_south = false;
+            let dh_251 = false;
+            let dh_y = false;
+
+            if (results.length == 1) {
                 if (results[0].dh_south) {
-                    dining_halls.push("South")
+                    dh_south = true;
                 }
                 if (results[0].dh_251) {
-                    dining_halls.push("251")
+                    dh_251 = true;
                 }
                 if (results[0].dh_y) {
-                    dining_halls.push("Yahentamitsi")
+                    dh_y = true;
                 }
-                result.innerHTML = '🚨 ' + input + ' is being served at ' + dining_halls.join(', ') + ' 🚨';
-            } else { // Item is not being served today
-                result.innerHTML = "Sorry, no dining halls have " + input + " today"; // data.item
-                result.classList.add('auth-form-error')
             }
+
+            // Build output showing status at each dining hall
+            let result_html = `<h4>${input}</h4>`;
+            let dh_status = ''
+            dh_status = 'Yahentamitsi' + ((dh_y) ? ' ✅ ' : ' ❌ ');
+            dh_status += '  South' + ((dh_south) ? ' ✅ ' : ' ❌ ');
+            dh_status += '  251' + ((dh_251) ? ' ✅ ' : ' ❌ ');
+            result.innerHTML = result_html + `<p>${dh_status}</p>`;
+
+            // if (results.length == 1) { // data.found == true
+            //     var dining_halls = [];
+            //     if (results[0].dh_south) {
+            //         dining_halls.push("South")
+            //     }
+            //     if (results[0].dh_251) {
+            //         dining_halls.push("251")
+            //     }
+            //     if (results[0].dh_y) {
+            //         dining_halls.push("Yahentamitsi")
+            //     }
+            //     result.innerHTML = '🚨 ' + input + ' is being served at ' + dining_halls.join(', ') + ' 🚨';
+            // } else { // Item is not being served today
+            //     result.innerHTML = "Sorry, no dining halls have " + input + " today"; // data.item
+            //     result.classList.add('auth-form-error')
+            // }
         },
         error: function (error) {
             alert('Something went wrong, please try again later');
