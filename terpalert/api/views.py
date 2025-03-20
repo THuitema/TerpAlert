@@ -172,6 +172,8 @@ class DailyMenuItemList(GenericAPIView):
         search_date = self.request.query_params.get('date')
         search_term = self.request.query_params.get('term')
         search_id = self.request.query_params.get('id')
+        search_dh_id = self.request.query_params.get('dining_hall')
+        dining_halls = {16: 'South', 19: 'Yahentamitsi', 51: '251'}
 
         if not search_date:
             search_date = date.today()
@@ -198,6 +200,16 @@ class DailyMenuItemList(GenericAPIView):
             queryset = DailyMenuItem.objects.filter(menu_item_id=search_id, date=search_date).order_by('menu_item__name')
         else:
             queryset = DailyMenuItem.objects.filter(date=search_date).order_by('menu_item__name')
+
+        # Filter by dining hall
+        if search_dh_id:
+            if dining_halls[int(search_dh_id)] == 'South':
+                queryset = queryset.filter(dh_south=True)
+            elif dining_halls[int(search_dh_id)] == 'Yahentamitsi':
+                queryset = queryset.filter(dh_y=True)
+            elif dining_halls[int(search_dh_id)] == '251':
+                queryset = queryset.filter(dh_251=True)
+
         return queryset
 
     @extend_schema(
@@ -227,6 +239,12 @@ class DailyMenuItemList(GenericAPIView):
                 type=str,
                 description='Filter menu by date. Format is YYYY-MM-DD. Default is today',
                 style='YYYY-MM-DD',
+                required=False
+            ),
+            OpenApiParameter(
+                name='dining_hall',
+                type=int,
+                description='Filter by a specific dining hall ID. ID\'s are South: 16, Yahentamitsi: 19, 251: 51',
                 required=False
             ),
             OpenApiParameter(
