@@ -1,4 +1,4 @@
-from accounts.models import Profile, DailyMenuItem, UniqueMenuItem, Alert, Allergen
+from accounts.models import Profile, DailyMenuItem, UniqueMenuItem, Alert, Allergen, MenuItemAllergen
 from accounts.serializers import DailyMenuItemSerializer, UniqueMenuItemSerializer, ProfileSerializer, AlertSerializer, \
     AllergenSerializer, BadRequestSerializer
 from rest_framework.views import APIView
@@ -172,12 +172,21 @@ class DailyMenuItemList(GenericAPIView):
         search_date = self.request.query_params.get('date')
         search_term = self.request.query_params.get('term')
         search_id = self.request.query_params.get('id')
+        search_dh_id = self.request.query_params.get('dining_hall')
+        dining_halls = {16: 'South', 19: 'Yahentamitsi', 51: '251'}
+
+        search_allergens = self.request.query_params.getlist('allergen')
 
         if not search_date:
             search_date = date.today()
 
         # Validate format of date parameter string
         if not re.search(r"^\d{4}-\d{2}-\d{2}", str(search_date)):
+            return BadRequest()
+
+        try:
+            search_allergens = [int(allergen) for allergen in search_allergens]
+        except ValueError:
             return BadRequest()
 
         if search_term:
@@ -198,6 +207,22 @@ class DailyMenuItemList(GenericAPIView):
             queryset = DailyMenuItem.objects.filter(menu_item_id=search_id, date=search_date).order_by('menu_item__name')
         else:
             queryset = DailyMenuItem.objects.filter(date=search_date).order_by('menu_item__name')
+
+        # Filter by dining hall
+        if search_dh_id:
+            if dining_halls[int(search_dh_id)] == 'South':
+                queryset = queryset.filter(dh_south=True)
+            elif dining_halls[int(search_dh_id)] == 'Yahentamitsi':
+                queryset = queryset.filter(dh_y=True)
+            elif dining_halls[int(search_dh_id)] == '251':
+                queryset = queryset.filter(dh_251=True)
+
+        # Filter by removing allergens
+        if search_allergens:
+            excluded_unique_menu_items = MenuItemAllergen.objects.filter(allergen__id__in=search_allergens).values_list(
+                'menu_item', flat=True)
+            queryset = queryset.exclude(menu_item__id__in=excluded_unique_menu_items)
+
         return queryset
 
     @extend_schema(
@@ -227,6 +252,18 @@ class DailyMenuItemList(GenericAPIView):
                 type=str,
                 description='Filter menu by date. Format is YYYY-MM-DD. Default is today',
                 style='YYYY-MM-DD',
+                required=False
+            ),
+            OpenApiParameter(
+                name='dining_hall',
+                type=int,
+                description='Filter by a specific dining hall ID. ID\'s are South: 16, Yahentamitsi: 19, 251: 51',
+                required=False
+            ),
+            OpenApiParameter(
+                name='allergen',
+                type=int,
+                description='Exclude allergen(s) from results by their IDs. Refer to /allergens endpoint to get IDs. Multiple parameters allowed',
                 required=False
             ),
             OpenApiParameter(
