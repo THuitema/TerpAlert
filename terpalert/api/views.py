@@ -174,7 +174,7 @@ class DailyMenuItemList(GenericAPIView):
         search_id = self.request.query_params.get('id')
         search_dh_ids = self.request.query_params.get('dining_halls')
         dining_halls = {16: 'South', 19: 'Yahentamitsi', 51: '251'}
-        search_allergens = self.request.query_params.getlist('allergens')
+        search_allergens = self.request.query_params.get('allergens')
 
         if not search_date:
             search_date = date.today()
@@ -182,11 +182,6 @@ class DailyMenuItemList(GenericAPIView):
         # Validate format of date parameter string
         if not re.search(r"^\d{4}-\d{2}-\d{2}", str(search_date)):
             raise BadRequest(detail="Invalid format for date parameter. Format needs to be YYYY-MM-DD.")
-
-        try:
-            search_allergens = [int(allergen) for allergen in search_allergens]
-        except ValueError:
-            raise BadRequest(detail="Invalid format for allergens parameter")
 
         if search_term:
             queryset = DailyMenuItem.objects.annotate(
@@ -210,7 +205,6 @@ class DailyMenuItemList(GenericAPIView):
         # Filter by dining hall
         if search_dh_ids:
             search_dh_ids = search_dh_ids.split(',') # convert comma-separated string to list of IDs
-            print(search_dh_ids)
             dh_south = False
             dh_y = False
             dh_251 = False
@@ -232,6 +226,12 @@ class DailyMenuItemList(GenericAPIView):
 
         # Filter by removing allergens
         if search_allergens:
+            # Convert comma-separated string of IDs to list of integer IDs
+            try:
+                search_allergens = [int(value.strip()) for value in search_allergens.split(',')]
+            except ValueError:
+                raise BadRequest(detail="Invalid format for allergens parameter")
+
             excluded_unique_menu_items = MenuItemAllergen.objects.filter(allergen__id__in=search_allergens).values_list(
                 'menu_item', flat=True)
             queryset = queryset.exclude(menu_item__id__in=excluded_unique_menu_items)
@@ -270,14 +270,14 @@ class DailyMenuItemList(GenericAPIView):
             OpenApiParameter(
                 name='dining_halls',
                 type=str,
-                description='Filter by a specific dining halls. Multiple values should be comma-separated. ID\'s are South: 16, Yahentamitsi: 19, 251: 51',
+                description='Filter by items present in at least one of the given dining halls. Values are IDs of dining halls and multiple values should be comma-separated. ID\'s are South: 16, Yahentamitsi: 19, 251: 51',
                 style='<ID1>,<ID2>,...',
                 required=False
             ),
             OpenApiParameter(
                 name='allergens',
                 type=str,
-                description='Exclude allergen(s) from results by their IDs. Multiple values should be comma-separated. Refer to /allergens endpoint to get IDs',
+                description='Exclude foods containing any of the given allergens. Values are IDs of allergens and multiple values should be comma-separated. Refer to /allergens endpoint to get IDs',
                 style='<ID1>,<ID2>,...',
                 required=False
             ),
