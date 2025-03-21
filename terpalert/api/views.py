@@ -14,8 +14,9 @@ from rest_framework.exceptions import NotAcceptable
 
 
 class BadRequest(NotAcceptable):
-    status_code = status.HTTP_400_BAD_REQUEST
-    default_detail = "Incorrect format for date parameter. Format needs to be YYYY-MM-DD."
+    def __init__(self, detail): # ="Incorrect format for date parameter. Format needs to be YYYY-MM-DD."
+        super().__init__(detail=detail, code=status.HTTP_400_BAD_REQUEST)
+
 
 
 class CustomPagination(PageNumberPagination):
@@ -172,22 +173,21 @@ class DailyMenuItemList(GenericAPIView):
         search_date = self.request.query_params.get('date')
         search_term = self.request.query_params.get('term')
         search_id = self.request.query_params.get('id')
-        search_dh_id = self.request.query_params.get('dining_hall')
+        search_dh_ids = self.request.query_params.get('dining_halls')
         dining_halls = {16: 'South', 19: 'Yahentamitsi', 51: '251'}
-
-        search_allergens = self.request.query_params.getlist('allergen')
+        search_allergens = self.request.query_params.getlist('allergens')
 
         if not search_date:
             search_date = date.today()
 
         # Validate format of date parameter string
         if not re.search(r"^\d{4}-\d{2}-\d{2}", str(search_date)):
-            return BadRequest()
+            raise BadRequest(detail="Invalid format for date parameter. Format needs to be YYYY-MM-DD.")
 
         try:
             search_allergens = [int(allergen) for allergen in search_allergens]
         except ValueError:
-            return BadRequest()
+            raise BadRequest(detail="Invalid format for allergens parameter")
 
         if search_term:
             queryset = DailyMenuItem.objects.annotate(
@@ -209,13 +209,19 @@ class DailyMenuItemList(GenericAPIView):
             queryset = DailyMenuItem.objects.filter(date=search_date).order_by('menu_item__name')
 
         # Filter by dining hall
-        if search_dh_id:
-            if dining_halls[int(search_dh_id)] == 'South':
-                queryset = queryset.filter(dh_south=True)
-            elif dining_halls[int(search_dh_id)] == 'Yahentamitsi':
-                queryset = queryset.filter(dh_y=True)
-            elif dining_halls[int(search_dh_id)] == '251':
-                queryset = queryset.filter(dh_251=True)
+        if search_dh_ids:
+            search_dh_ids = search_dh_ids.split(',') # convert comma-separated string to list of IDs
+            print(search_dh_ids)
+            for dh_id in search_dh_ids:
+                if int(dh_id) not in dining_halls:
+                    raise BadRequest(detail="Invalid dining_hall parameter")
+
+                if dining_halls[int(dh_id)] == 'South':
+                    queryset = queryset.filter(dh_south=True)
+                elif dining_halls[int(dh_id)] == 'Yahentamitsi':
+                    queryset = queryset.filter(dh_y=True)
+                elif dining_halls[int(dh_id)] == '251':
+                    queryset = queryset.filter(dh_251=True)
 
         # Filter by removing allergens
         if search_allergens:
@@ -255,15 +261,17 @@ class DailyMenuItemList(GenericAPIView):
                 required=False
             ),
             OpenApiParameter(
-                name='dining_hall',
-                type=int,
-                description='Filter by a specific dining hall ID. ID\'s are South: 16, Yahentamitsi: 19, 251: 51',
+                name='dining_halls',
+                type=str,
+                description='Filter by a specific dining halls. Multiple values should be comma-separated. ID\'s are South: 16, Yahentamitsi: 19, 251: 51',
+                style='<ID1>,<ID2>,...',
                 required=False
             ),
             OpenApiParameter(
-                name='allergen',
-                type=int,
-                description='Exclude allergen(s) from results by their IDs. Refer to /allergens endpoint to get IDs. Multiple parameters allowed',
+                name='allergens',
+                type=str,
+                description='Exclude allergen(s) from results by their IDs. Multiple values should be comma-separated. Refer to /allergens endpoint to get IDs',
+                style='<ID1>,<ID2>,...',
                 required=False
             ),
             OpenApiParameter(
