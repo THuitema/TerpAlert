@@ -4,7 +4,7 @@ from accounts.serializers import DailyMenuItemSerializer, UniqueMenuItemSerializ
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.db.models import Case, Value, When, CharField
+from django.db.models import Case, Value, When, CharField, Q
 from datetime import date
 import re
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
@@ -16,7 +16,6 @@ from rest_framework.exceptions import NotAcceptable
 class BadRequest(NotAcceptable):
     def __init__(self, detail): # ="Incorrect format for date parameter. Format needs to be YYYY-MM-DD."
         super().__init__(detail=detail, code=status.HTTP_400_BAD_REQUEST)
-
 
 
 class CustomPagination(PageNumberPagination):
@@ -212,16 +211,24 @@ class DailyMenuItemList(GenericAPIView):
         if search_dh_ids:
             search_dh_ids = search_dh_ids.split(',') # convert comma-separated string to list of IDs
             print(search_dh_ids)
+            dh_south = False
+            dh_y = False
+            dh_251 = False
             for dh_id in search_dh_ids:
-                if int(dh_id) not in dining_halls:
+                try:
+                    if int(dh_id) not in dining_halls:
+                        raise BadRequest(detail="Invalid dining_hall parameter")
+                except ValueError:
                     raise BadRequest(detail="Invalid dining_hall parameter")
 
                 if dining_halls[int(dh_id)] == 'South':
-                    queryset = queryset.filter(dh_south=True)
+                    dh_south = True
                 elif dining_halls[int(dh_id)] == 'Yahentamitsi':
-                    queryset = queryset.filter(dh_y=True)
+                    dh_y = True
                 elif dining_halls[int(dh_id)] == '251':
-                    queryset = queryset.filter(dh_251=True)
+                    dh_251 = True
+
+            queryset = queryset.filter(Q(dh_251=dh_251) | Q(dh_south=dh_south) | Q(dh_y=dh_y))
 
         # Filter by removing allergens
         if search_allergens:
